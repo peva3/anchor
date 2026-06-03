@@ -86,6 +86,12 @@ export VAR=value && your_command
 - Keep functions under 50 lines; extract sub-functions for complex logic
 - Add tests for all new functionality
 
+### Language — English Only
+- **ALL code, comments, documentation, variable names, commit messages, and user-facing text MUST be in English**
+- No foreign language in any file, variable name, comment, or documentation
+- This ensures all agents and developers across any language background can collaborate effectively
+- Exception: Test data with realistic content (names, addresses) may use any language for authenticity
+
 ---
 
 ## 5. Project Structure Conventions
@@ -1763,7 +1769,7 @@ web-app/
 │   ├── app/                # App Router pages
 │   ├── components/         # UI components (shadcn/ui)
 │   ├── lib/                # Utilities
-│   └──公共/
+│   └── public/             # Static assets
 ├── backend/                 # FastAPI
 │   ├── src/
 │   │   ├── api/
