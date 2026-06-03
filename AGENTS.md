@@ -95,7 +95,7 @@ project/
 ├── src/                    # Source code
 │   ├── api/               # API routes/endpoints
 │   ├── models/            # Data models/schemas
-│   ├── services/           # Business logic
+│   ├── services/          # Business logic
 │   └── core/              # Config, logging, exceptions
 ├── tests/                  # All tests, one-off scripts, random tooling
 │   ├── unit/              # Unit tests
@@ -105,6 +105,7 @@ project/
 ├── research/              # Research files, whitepapers, references
 ├── scripts/               # CLI/tools (version controlled)
 ├── docker/                # Dockerfiles, compose
+├── DEEPDIVE.md            # System narrative — detailed explanation
 ├── .env.example           # Environment template
 ├── .gitignore             # Git ignore (ALWAYS includes tests/)
 ├── README.md              # Setup and usage
@@ -114,11 +115,46 @@ project/
 
 **Required folders for every new project:** `tests/`, `docs/`, `research/`
 
-**The `tests/` folder rules:**
-- ALL tests go here (unit, integration, e2e)
-- ALL random/one-off scripts go here
-- The `tests/` folder is ALWAYS in `.gitignore` — never committed
-- If you create a script that won't be permanent, put it in `tests/scripts/`
+**DEEPDIVE.md — Living System Narrative:**
+
+Every project MUST have a `DEEPDIVE.md` file at the root. This is not documentation — it's a detailed narrative explaining HOW and WHY the system is built the way it is.
+
+**When to update DEEPDIVE.md:**
+- After ANY architectural change
+- After ANY significant refactor
+- When adding new integration patterns
+- When removing code (explain WHY it was removed)
+- When making decisions that future agents need to understand
+
+**DEEPDIVE.md must cover:**
+- **System layout** — Why files are organized this way, why this tech stack
+- **Data flow** — How data moves through the system, from ingestion to output
+- **Key decisions** — Every non-obvious choice, including alternatives rejected and WHY
+- **Gotchas and landmines** — Known failure modes, edge cases that bite
+- **Interconnections** — How services/Modules communicate, what depends on what
+- **Why things work** — Not just WHAT the code does, but WHY it was designed that way
+
+**DEEPDIVE.md is NOT:**
+- A substitute for inline comments
+- A restatement of what code does (assume the code is self-documenting)
+- Static — it MUST be updated when the system changes
+
+**Example DEEPDIVE.md entry:**
+```markdown
+## Why the API is Split into public/admin
+
+We split the API into port 8000 (public, read-only+search) and port 8004 
+(admin, localhost-only, full CRUD) because:
+
+- The ingestion pipeline needs to write without auth overhead
+- Admin operations (scraper config, manual overrides) shouldn't be exposed
+- Public users only need search and read operations
+- This follows defense-in-depth: even if public API is compromised,
+  admin operations remain protected by network isolation
+
+Date: 2026-05-15
+Decision: Split API into dual ports (migration 009)
+```
 
 ---
 
@@ -308,15 +344,66 @@ logger.error("Failed to process %s: %s", item_id, str(e))
 
 ## 15. Git Workflow
 
+**Commit Messages — Sound Human, Not AI:**
+
+Write commits as if explaining to a colleague why this change exists:
+
+```
+Good (human-sounding):
+"Prevented race condition in token refresh by adding mutex lock around 
+auth state mutation. Previously, concurrent requests could cause the 
+refresh callback to fire twice, resulting in a 401 loop."
+
+Bad (AI-sounding):
+"fix: fixed race condition in auth service"
+```
+
+**The WHY matters most:**
+- Explain the problem that existed before this change
+- Explain what the change does and why it solves the problem
+- If there were alternatives considered, note why you picked this one
+- Include any context that future developers (or agents) need to understand
+
+**Pattern:**
+```
+<type>: <what changed>
+
+<problem>: Why this needed fixing
+<solution>: What the change does and why
+<context>: Any important decisions, trade-offs, or gotchas
+```
+
+**Examples:**
+```
+api: Added JWT refresh endpoint to eliminate 401 loops
+
+The token refresh had a race condition where concurrent requests could
+trigger multiple refresh calls. Added mutex lock around auth state.
+Ref: https://github.com/org/repo/issues/1234
+```
+
+```
+frontend: Rewired timeline scrubber to use IntersectionObserver
+
+GSAP physics caused dot highlighting to desync when scrolling fast.
+IntersectionObserver 1px center tripwire provides reliable sync without
+third-party dependencies. Removed all physics, reduced bundle by 47KB.
+```
+
+```
+db: Added content_hash unique constraint to prevent duplicate ingestion
+
+Two scrapers could race and insert the same article from different RSS 
+feeds. Added unique constraint on content_hash with NULLS NOT DISTINCT.
+Migration 010 adds constraint with deduplication pass.
+```
+
+**Small commits with big explanations are fine.** A 3-line change can have a 10-line commit message explaining the problem it solves.
+
+---
+
 - **Small, focused commits.** One logical change per commit.
 - **Descriptive messages.** First line <72 chars, optional body for detail.
-  ```
-  api: add rate limiting middleware
-  
-  - Added Redis-backed rate limiter
-  - Configurable per-IP limits
-  - Returns 429 when exceeded
-  ```
 - **Never force push** to shared branches
 - **Branch naming:** `feature/name`, `fix/name`, `sprint-n`
 
@@ -524,3 +611,6 @@ Critic Agent: Reviews and provides feedback
 | 2026-06-03 | Initial standardized AGENTS.md from 21 project AGENTS.md files |
 | 2026-06-03 | Added Section 21: AI Agent Instruction Guidance from AgentBench/CAMEL research |
 | 2026-06-03 | Added tests/docs/research folder requirements, tests/ always gitignored, auto-commit after validation, rogue prevention rule |
+| 2026-06-03 | Added comprehensive pre-commit lint/vulture sweep requirement |
+| 2026-06-03 | Added human-sounding commit message guidelines with WHY-focused pattern |
+| 2026-06-03 | Added DEEPDIVE.md requirement for living system narrative documentation |
