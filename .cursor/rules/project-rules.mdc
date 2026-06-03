@@ -1,0 +1,54 @@
+# Cursor AI Rules
+
+> These rules are loaded automatically for this project. See `AGENTS.md` for full details.
+
+## Core Directives
+
+1. **Read AGENTS.md before any task** — All rules are defined there
+2. **Read DEEPDIVE.md** — System architecture narrative
+3. **Follow every section** — Core principles, commit protocol, testing, linting, etc.
+
+## Critical Enforcements
+
+### Pre-Commit Checklist
+```bash
+ruff check .
+ruff format .
+vulture .
+mypy .
+```
+**Do not commit until all pass.**
+
+### Required Folders
+Every project MUST have:
+- `tests/` — All tests + random scripts (in `.gitignore`)
+- `docs/` — Architecture documentation
+- `research/` — Whitepapers, references
+
+### Commit Style
+Human-sounding, WHY-focused messages. Example:
+```
+api: Added JWT refresh to prevent 401 loops
+
+The token refresh had a race condition where concurrent requests
+could trigger multiple refresh calls. Added mutex lock around auth state.
+```
+
+### DEEPDIVE.md
+Update after ANY architectural change. Document:
+- Why the system is built this way
+- Key decisions and trade-offs
+- Gotchas and failure modes
+
+## Prohibited
+- No PRs/issues/GitHub activity without explicit user approval
+- No dead code, unused imports, silent exception handlers
+- No commits without running lint/vulture sweep first
+
+## Validation
+Before marking complete:
+- [ ] Tests pass
+- [ ] No vulture findings
+- [ ] Type check clean
+- [ ] DEEPDIVE.md updated if needed
+- [ ] Human commit message
