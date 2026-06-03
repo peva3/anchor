@@ -23,6 +23,17 @@
 2. `git commit -m "Descriptive commit message"` — describe WHAT changed and WHY
 3. `git push origin <branch>`
 
+**GitHub Actions (if `gh` command is available):**
+- After running tests/validation and all checks pass, automatically commit and push the changes
+- Use `gh` to verify auth status before attempting pushes
+- If `gh` works, assume push permission is granted and push
+
+**IMPORTANT — Never Go Rogue:**
+- **NEVER** create PRs, issues, comments, or any GitHub activity without **explicit user approval**
+- The agent must wait for the user to explicitly request: "yes, create the PR", "yes, post that comment", etc.
+- Exception: The user explicitly authorizes automated commits/pushes (which is covered above)
+- When in doubt, ask first
+
 **Author identity (already configured globally):**
 - Username: `peva3`
 - Email: `user@example.com`
@@ -84,17 +95,30 @@ project/
 ├── src/                    # Source code
 │   ├── api/               # API routes/endpoints
 │   ├── models/            # Data models/schemas
-│   ├── services/          # Business logic
-│   ├── core/              # Config, logging, exceptions
-│   └── tests/             # Tests (mirror source structure)
-├── docs/                  # Architecture docs, ADRs
-├── scripts/               # CLI/tools
+│   ├── services/           # Business logic
+│   └── core/              # Config, logging, exceptions
+├── tests/                  # All tests, one-off scripts, random tooling
+│   ├── unit/              # Unit tests
+│   ├── integration/       # Integration tests
+│   └── scripts/           # Random scripts (gitignored)
+├── docs/                  # Architecture docs, ADRs, runbooks
+├── research/              # Research files, whitepapers, references
+├── scripts/               # CLI/tools (version controlled)
 ├── docker/                # Dockerfiles, compose
 ├── .env.example           # Environment template
+├── .gitignore             # Git ignore (ALWAYS includes tests/)
 ├── README.md              # Setup and usage
 ├── AGENTS.md              # This file
 └── TODO.md                # Task tracking
 ```
+
+**Required folders for every new project:** `tests/`, `docs/`, `research/`
+
+**The `tests/` folder rules:**
+- ALL tests go here (unit, integration, e2e)
+- ALL random/one-off scripts go here
+- The `tests/` folder is ALWAYS in `.gitignore` — never committed
+- If you create a script that won't be permanent, put it in `tests/scripts/`
 
 ---
 
@@ -484,3 +508,4 @@ Critic Agent: Reviews and provides feedback
 |------|--------|
 | 2026-06-03 | Initial standardized AGENTS.md from 21 project AGENTS.md files |
 | 2026-06-03 | Added Section 21: AI Agent Instruction Guidance from AgentBench/CAMEL research |
+| 2026-06-03 | Added tests/docs/research folder requirements, tests/ always gitignored, auto-commit after validation, rogue prevention rule |
