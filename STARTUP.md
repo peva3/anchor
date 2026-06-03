@@ -8,7 +8,7 @@
 First, create the required folder structure:
 
 ```bash
-mkdir -p src/api src/models src/services src/core tests/unit tests/integration tests/scripts docs/adr research papers github whitepapers scripts docker .github .cursor/rules .windsurf .continue .claude/projects
+mkdir -p src/api src/models src/services src/core tests/unit tests/integration tests/scripts docs/adr docs/workflows research papers github whitepapers scripts docker/.github workflows .github .cursor/rules .windsurf .continue .claude/projects
 ```
 
 ## PHASE 2: Create All Agent Configuration Files
@@ -29,8 +29,12 @@ Read AGENTS.md before making any changes. Follow every section:
 - Section 5: Project Structure (tests/, docs/, research/ folders required)
 - Section 9: Linting (full vulture sweep before every commit)
 - Section 15: Human-sounding commits (WHY-focused, not AI-sounding)
-- Section 22-26: Multi-agent patterns, verification gates, failure modes, gotchas
-- Section 27: Code Quality Standards
+- Section 27: Code Quality Standards (Python idioms, anti-patterns, security)
+- Section 28: Tech Stack Playbook (FastAPI, Next.js, Gin, etc.)
+- Section 29: Operational Patterns (circuit breaker, DLQ, middleware, cache)
+- Section 30: Health Endpoint Specification
+- Section 31: Production Security Patterns
+- Section 32: Docker Support
 
 **Never go rogue.** Do not create PRs, issues, or GitHub activity without explicit user approval.
 
@@ -526,7 +530,51 @@ EXTERNAL_API_URL=
 ENABLE_FEATURE_X=false
 ```
 
-### 3.3 Create README.md
+### 3.3 Create docker-compose.yml
+
+```yaml
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://app:app@postgres:5432/app
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./data:/app/data
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+### 3.4 Create README.md
 
 ```markdown
 # CHANGE_ME — Project Name
@@ -714,11 +762,16 @@ git commit -m "Initial project setup
 - Added .claude/config.json with project settings
 - Created .gitignore with tests/ always excluded
 - Created .env.example template
+- Created docker-compose.yml with postgres and redis
 - Created README.md with quick start guide
 - Created TODO.md for task tracking
 - Created DEEPDIVE.md as living system narrative
-- Created AGENTS.md with full project rules
-- Created docs/AGENT_INSTRUCTIONS.md as universal fallback"
+- Created AGENTS.md with 32 sections (all patterns from standardized-markdown)
+- Created docs/AGENT_INSTRUCTIONS.md as universal fallback
+- Created .github/workflows/ for CI/CD
+- Created operational patterns: circuit breaker, DLQ, middleware stack
+- Created security patterns: prompt injection, audit logging, key encryption
+- Created Docker support with Dockerfile and Kubernetes templates"
 ```
 
 ---
@@ -729,7 +782,7 @@ After completing all phases, your project will have:
 
 | File/Folder | Purpose |
 |-------------|---------|
-| `AGENTS.md` | Complete project rules for AI agents |
+| `AGENTS.md` | Complete project rules (32 sections) |
 | `DEEPDIVE.md` | System architecture narrative |
 | `CLAUDE.md` | Claude Code instructions |
 | `CLAUDE.desktop.md` | Claude desktop app instructions |
@@ -739,13 +792,50 @@ After completing all phases, your project will have:
 | `.continue/config.md` | Continue.dev configuration |
 | `docs/AGENT_INSTRUCTIONS.md` | Universal fallback instructions |
 | `.claude/config.json` | Claude project settings |
+| `docker-compose.yml` | Development environment |
 | `.gitignore` | Git ignore (tests/ always excluded) |
 | `.env.example` | Environment variable template |
 | `README.md` | Project documentation |
 | `TODO.md` | Task tracking |
+| `.github/workflows/` | CI/CD pipelines |
 | `src/` | Source code directory |
 | `tests/` | Test directory (gitignored) |
 | `docs/` | Documentation directory |
 | `research/` | Research files directory |
 
 All AI agents reading from this project will find comprehensive guidance and follow consistent patterns.
+
+## Key Sections in AGENTS.md
+
+1. Core Principles
+2. Commit Protocol
+3. Shell Execution Rules
+4. Code Style (English-only)
+5. Project Structure (tests/, docs/, research/ required)
+6. TODO.md Standard
+7. Docker/Deployment
+8. Testing Requirements
+9. Linting & Type Checking (vulture sweep)
+10. Error Handling Patterns
+11. Configuration Management
+12. API Design
+13. Security Best Practices
+14. Logging Standards
+15. Git Workflow (human-sounding commits)
+16. Documentation Requirements
+17. Dependency Management
+18. Performance Considerations
+19. Build & Deployment
+20. External Integrations
+21. AI Agent Instruction Guidance
+22. Multi-Agent Cooperation Patterns
+23. Verification Gates
+24. Common Failure Modes
+25. Common Gotchas
+26. Getting Help
+27. Code Quality Standards
+28. Tech Stack Playbook
+29. Operational Patterns (circuit breaker, DLQ, middleware, cache)
+30. Health Endpoint Specification
+31. Production Security Patterns
+32. Docker Support
