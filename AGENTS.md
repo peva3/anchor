@@ -1968,6 +1968,855 @@ Is it embedded/firmware?
 
 ---
 
+## 29. Operational Patterns
+
+Production-hardened patterns for reliability and resilience.
+
+### 29.1 Circuit Breaker Pattern
+
+Prevents cascading failures by stopping requests to a failing service.
+
+```python
+from enum import Enum
+from datetime import datetime, timedelta
+from typing import Callable, Any
+import asyncio
+
+class CircuitState(Enum):
+    CLOSED = "closed"      # Normal operation
+    OPEN = "open"           # Failing, reject requests
+    HALF_OPEN = "half_open"  # Testing if service recovered
+
+class CircuitBreaker:
+    def __init__(
+        self,
+        failure_threshold: int = 5,
+        success_threshold: int = 2,
+        timeout: float = 60.0,
+        quota_reset_timeout: float = 3600.0
+    ):
+        self.failure_threshold = failure_threshold
+        self.success_threshold = success_threshold
+        self.timeout = timeout
+        self.quota_reset_timeout = quota_reset_timeout
+
+        self.failures = 0
+        self.successes = 0
+        self.last_failure_time: datetime | None = None
+        self.state = CircuitState.CLOSED
+
+    def call(self, func: Callable, *args, **kwargs) -> Any:
+        if self.state == CircuitState.OPEN:
+            if self._should_attempt_reset():
+                self.state = CircuitState.HALF_OPEN
+            else:
+                raise CircuitBreakerOpenError(f"Circuit open for {func.__name__}")
+
+        try:
+            result = func(*args, **kwargs)
+            self._on_success()
+            return result
+        except Exception as e:
+            self._on_failure()
+            raise
+
+    def _should_attempt_reset(self) -> bool:
+        if self.last_failure_time is None:
+            return True
+        elapsed = (datetime.now() - self.last_failure_time).total_seconds()
+        return elapsed >= self.timeout
+
+    def _on_success(self):
+        self.failures = 0
+        if self.state == CircuitState.HALF_OPEN:
+            self.successes += 1
+            if self.successes >= self.success_threshold:
+                self.state = CircuitState.CLOSED
+                self.successes = 0
+        self.last_failure_time = None
+
+    def _on_failure(self):
+        self.failures += 1
+        self.successes = 0
+        self.last_failure_time = datetime.now()
+
+        if self.failures >= self.failure_threshold:
+            self.state = CircuitState.OPEN
+
+class CircuitBreakerOpenError(Exception):
+    """Raised when circuit is open and request is rejected."""
+    pass
+
+class CircuitBreakerManager:
+    """Manages multiple circuit breakers for different services."""
+    _instance: 'CircuitBreakerManager | None' = None
+
+    def __init__(self):
+        self._breakers: dict[str, CircuitBreaker] = {}
+
+    @classmethod
+    def get_instance(cls) -> 'CircuitBreakerManager':
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    def get_breaker(self, name: str, **kwargs) -> CircuitBreaker:
+        if name not in self._breakers:
+            self._breakers[name] = CircuitBreaker(**kwargs)
+        return self._breakers[name]
+```
+
+**When to use:**
+- External API calls that may fail intermittently
+- Database connections that can time out
+- Any service call where failure is possible and cascading failures are dangerous
+
+**Configuration guidelines:**
+- `failure_threshold=5` — Open after 5 consecutive failures
+- `success_threshold=2` — Close after 2 successes in half-open
+- `timeout=60` — Try reset after 60 seconds
+
+---
+
+### 29.2 Dead Letter Queue (DLQ) Pattern
+
+Handles background task failures with retry and escalation.
+
+```python
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from enum import Enum
+import random
+
+class DLQStatus(Enum):
+    FAILED = "failed"
+    RETRYING = "retrying"
+    DEAD = "dead"
+    RESOLVED = "resolved"
+
+@dataclass
+class DLQEntry:
+    id: int
+    task_name: str
+    payload: dict
+    status: DLQStatus
+    attempts: int
+    max_attempts: int
+    next_retry: datetime
+    created_at: datetime
+    last_error: str | None
+
+class DeadLetterQueue:
+    def __init__(
+        self,
+        db_session,
+        max_attempts: int = 5,
+        base_delay: float = 1.0,
+        max_delay: float = 60.0
+    ):
+        self.db = db_session
+        self.max_attempts = max_attempts
+        self.base_delay = base_delay
+        self.max_delay = max_delay
+
+    def enqueue(self, task_name: str, payload: dict, error: str):
+        """Add failed task to DLQ."""
+        entry = DLQEntry(
+            id=None,
+            task_name=task_name,
+            payload=payload,
+            status=DLQStatus.FAILED,
+            attempts=1,
+            max_attempts=self.max_attempts,
+            next_retry=datetime.now() + timedelta(seconds=self.base_delay),
+            created_at=datetime.now(),
+            last_error=error
+        )
+        self.db.add(entry)
+        self.db.commit()
+
+    def process(self, handler: Callable[[dict], Any]) -> list[dict]:
+        """Process DLQ entries with exponential backoff."""
+        processed = []
+        now = datetime.now()
+
+        entries = self.db.query(DLQEntry).filter(
+            DLQEntry.status.in_([DLQStatus.FAILED, DLQStatus.RETRYING]),
+            DLQEntry.next_retry <= now,
+            DLQEntry.attempts < DLQEntry.max_attempts
+        ).all()
+
+        for entry in entries:
+            try:
+                handler(entry.payload)
+                entry.status = DLQStatus.RESOLVED
+                processed.append({"id": entry.id, "status": "resolved"})
+            except Exception as e:
+                self._handle_failure(entry, str(e))
+
+        self.db.commit()
+        return processed
+
+    def _handle_failure(self, entry: DLQEntry, error: str):
+        entry.attempts += 1
+        entry.last_error = error
+
+        if entry.attempts >= entry.max_attempts:
+            entry.status = DLQStatus.DEAD
+        else:
+            entry.status = DLQStatus.RETRYING
+            delay = min(self.base_delay * (2 ** entry.attempts), self.max_delay)
+            delay += random.uniform(0, 0.1 * delay)
+            entry.next_retry = datetime.now() + timedelta(seconds=delay)
+
+    def get_stats(self) -> dict:
+        """Get DLQ statistics for monitoring."""
+        return {
+            "failed": self.db.query(DLQEntry).filter_by(status=DLQStatus.FAILED).count(),
+            "retrying": self.db.query(DLQEntry).filter_by(status=DLQStatus.RETRYING).count(),
+            "dead": self.db.query(DLQEntry).filter_by(status=DLQStatus.DEAD).count(),
+            "resolved": self.db.query(DLQEntry).filter_by(status=DLQStatus.RESOLVED).count(),
+        }
+```
+
+**When to use:**
+- Background tasks that can fail intermittently
+- Tasks where failure should not block the main request
+- Any async job that needs retry with backoff
+
+---
+
+### 29.3 Middleware Stack Pattern
+
+Layer multiple concerns cleanly with a middleware chain.
+
+```python
+from fastapi import FastAPI, Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+import uuid
+import time
+import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
+
+# 1. Request ID Middleware — UUID propagation
+class RequestIDMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
+        request.state.request_id = request_id
+
+        response = await call_next(request)
+        response.headers["X-Request-ID"] = request_id
+        return response
+
+# 2. Request Size Middleware — Prevent large payloads
+class RequestSizeMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, max_size: int = 10 * 1024 * 1024):
+        super().__init__(app)
+        self.max_size = max_size
+
+    async def dispatch(self, request: Request, call_next):
+        if request.method in ("POST", "PUT", "PATCH"):
+            content_length = request.headers.get("content-length")
+            if content_length and int(content_length) > self.max_size:
+                return Response(content="Request too large", status_code=413)
+        return await call_next(request)
+
+# 3. Request Timeout Middleware
+class TimeoutMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, timeout: float = 30.0):
+        super().__init__(app)
+        self.timeout = timeout
+
+    async def dispatch(self, request: Request, call_next):
+        try:
+            response = await asyncio.wait_for(call_next(request), timeout=self.timeout)
+            return response
+        except asyncio.TimeoutError:
+            return Response(content="Request timeout", status_code=504)
+
+# 4. Slow Query Middleware — Log slow requests
+class SlowQueryMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, threshold: float = 1.0):
+        super().__init__(app)
+        self.threshold = threshold
+
+    async def dispatch(self, request: Request, call_next):
+        start = time.time()
+        response = await call_next(request)
+        duration = time.time() - start
+
+        if duration > self.threshold:
+            logger.warning(
+                f"Slow request: {request.method} {request.url.path} "
+                f"took {duration:.2f}s [request_id={getattr(request.state, 'request_id', '')}]"
+            )
+        return response
+
+# 5. Metrics Middleware — Prometheus-style metrics
+class MetricsMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app):
+        super().__init__(app)
+        self.requests_total = {}
+        self.request_durations = []
+
+    async def dispatch(self, request: Request, call_next):
+        start = time.time()
+        response = await call_next(request)
+        duration = time.time() - start
+
+        key = f"{request.method}_{request.url.path}"
+        self.requests_total[key] = self.requests_total.get(key, 0) + 1
+        self.request_durations.append(duration)
+
+        return response
+
+# Register all middleware in order
+app = FastAPI()
+app.add_middleware(RequestIDMiddleware)
+app.add_middleware(RequestSizeMiddleware)
+app.add_middleware(TimeoutMiddleware)
+app.add_middleware(SlowQueryMiddleware)
+app.add_middleware(MetricsMiddleware)
+```
+
+**Middleware order matters:**
+1. RequestID (first, sets up tracing)
+2. RequestSize (validate before processing)
+3. Timeout (prevent hanging requests)
+4. SlowQuery (measure after processing)
+5. Metrics (record after everything)
+
+---
+
+### 29.4 Semantic Cache Pattern
+
+LRU cache with TTL and optional Redis backend.
+
+```python
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any
+import hashlib
+import json
+
+@dataclass
+class CacheEntry:
+    key: str
+    value: Any
+    created_at: datetime
+    ttl: int
+    hits: int = 0
+
+    def is_expired(self) -> bool:
+        return (datetime.now() - self.created_at).total_seconds() > self.ttl
+
+class SemanticCache:
+    """LRU cache with TTL, optional Redis backend."""
+
+    def __init__(self, max_size: int = 1000, default_ttl: int = 3600):
+        self.max_size = max_size
+        self.default_ttl = default_ttl
+        self.cache: dict[str, CacheEntry] = {}
+
+    def _make_key(self, data: dict) -> str:
+        normalized = json.dumps(data, sort_keys=True)
+        return hashlib.md5(normalized.encode()).hexdigest()
+
+    def get(self, data: dict) -> Any | None:
+        key = self._make_key(data)
+        entry = self.cache.get(key)
+        if entry is None or entry.is_expired():
+            if entry:
+                del self.cache[key]
+            return None
+        entry.hits += 1
+        return entry.value
+
+    def set(self, data: dict, value: Any, ttl: int | None = None):
+        key = self._make_key(data)
+        if len(self.cache) >= self.max_size:
+            lru_key = min(self.cache, key=lambda k: self.cache[k].hits)
+            del self.cache[lru_key]
+        self.cache[key] = CacheEntry(
+            key=key, value=value,
+            created_at=datetime.now(),
+            ttl=ttl or self.default_ttl
+        )
+
+    def invalidate(self, pattern: str | None = None):
+        if pattern is None:
+            self.cache.clear()
+        else:
+            keys_to_remove = [k for k in self.cache if pattern in k]
+            for key in keys_to_remove:
+                del self.cache[key]
+
+    def get_stats(self) -> dict:
+        total_hits = sum(e.hits for e in self.cache.values())
+        return {
+            "size": len(self.cache),
+            "max_size": self.max_size,
+            "total_hits": total_hits,
+        }
+```
+
+---
+
+## 30. Health Endpoint Specification
+
+Every production service MUST implement a comprehensive health check.
+
+### 30.1 Health Check Design
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+from datetime import datetime
+import time
+
+app = FastAPI()
+start_time = time.time()
+
+class SubsystemStatus(BaseModel):
+    status: str
+    message: str | None = None
+    latency_ms: float | None = None
+
+class HealthResponse(BaseModel):
+    status: str
+    version: str
+    uptime_seconds: float
+    subsystems: dict[str, SubsystemStatus]
+    timestamp: str
+
+@app.get("/health")
+async def health_check() -> HealthResponse:
+    subsystems = {}
+    subsystems["database"] = await check_database()
+    subsystems["cache"] = await check_cache()
+    subsystems["external_api"] = await check_external_api()
+    subsystems["background_tasks"] = check_background_tasks()
+    subsystems["dlq"] = check_dlq_status()
+
+    overall_status = determine_overall_status(subsystems)
+
+    return HealthResponse(
+        status=overall_status,
+        version=get_version(),
+        uptime_seconds=time.time() - start_time,
+        subsystems=subsystems,
+        timestamp=datetime.now().isoformat()
+    )
+```
+
+### 30.2 What to Check Per Subsystem
+
+| Subsystem | Check | Degraded | Unhealthy |
+|-----------|-------|----------|-----------|
+| **Database** | Query `SELECT 1` | >100ms | >1s or error |
+| **Cache (Redis)** | `PING` command | >50ms | >500ms or error |
+| **External API** | HTTP GET | >500ms | >2s or 5xx |
+| **Background Tasks** | Count running vs max | >80% capacity | >100% |
+| **DLQ** | Count dead letters | >100 dead | >1000 dead |
+| **Disk** | Available space | <20% free | <10% free |
+| **Memory** | RSS vs limit | >80% used | >95% used |
+
+### 30.3 Response Format
+
+```json
+{
+  "status": "degraded",
+  "version": "1.2.3",
+  "uptime_seconds": 86400,
+  "timestamp": "2026-06-03T12:00:00Z",
+  "subsystems": {
+    "database": {"status": "healthy", "latency_ms": 12},
+    "cache": {"status": "degraded", "message": "Redis PING took 450ms"},
+    "external_api": {"status": "unhealthy", "message": "Connection timeout"}
+  }
+}
+```
+
+### 30.4 Kubernetes Probe Configuration
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+```
+
+---
+
+## 31. Production Security Patterns
+
+Hardening patterns for production deployments.
+
+### 31.1 Prompt Injection Detection
+
+Heuristic detection for common prompt injection patterns.
+
+```python
+import re
+from typing import List
+
+class PromptInjectionDetector:
+    PRE_FILTER_PATTERNS = [
+        r"system\s*:", r"system\s*-", r"\[INST\]",
+        r"<\|im_start\|>", r"<\|im_end\|>", r"\\[system\\]",
+    ]
+
+    INJECTION_PATTERNS = [
+        (r"(?i)(ignore\s+(previous|all|above)\s+(instructions?|rules?|prompt))", "system_prompt_override"),
+        (r"(?i)(you\s+are\s+a\s+dan|do\s+anything\s+now|jailbreak)", "persona_hijack"),
+        (r"<\|im_start\|>", "token_injection"),
+        (r"(?i)(ignore.*routing|override.*model)", "routing_manipulation"),
+        (r"(base64|decode|exec|eval).*['\"]", "encoding_bypass"),
+        (r"<!--.*-->", "hidden_comment"),
+    ]
+
+    def __init__(self):
+        self.pre_filter = re.compile("|".join(self.PRE_FILTER_PATTERNS), re.IGNORECASE)
+
+    def check(self, text: str) -> dict:
+        threats = []
+        if not self.pre_filter.search(text):
+            return {"is_suspicious": False, "threats": [], "threat_level": "NONE"}
+
+        for pattern, name in self.INJECTION_PATTERNS:
+            if re.search(pattern, text, re.IGNORECASE):
+                threats.append(name)
+
+        return {
+            "is_suspicious": len(threats) > 0,
+            "threats": threats,
+            "threat_level": self._calculate_threat_level(threats)
+        }
+
+    def _calculate_threat_level(self, threats: List[str]) -> str:
+        if not threats:
+            return "NONE"
+        elif len(threats) == 1 and threats[0] in ["token_injection", "hidden_comment"]:
+            return "LOW"
+        elif len(threats) <= 2:
+            return "MEDIUM"
+        return "HIGH"
+```
+
+### 31.2 Admin Audit Logging
+
+Track all admin actions for security and compliance.
+
+```python
+from datetime import datetime
+from pydantic import BaseModel
+from typing import Optional
+
+class AdminAuditLog(BaseModel):
+    id: int
+    admin_user_id: int
+    action: str
+    target_type: str
+    target_id: Optional[str]
+    changes: dict
+    ip_address: str
+    user_agent: str
+    timestamp: datetime
+    success: bool
+    error_message: Optional[str] = None
+
+class AuditLogger:
+    def log(
+        self, admin_user_id: int, action: str, target_type: str,
+        target_id: str | None, changes: dict, request: Request,
+        success: bool = True, error: str | None = None
+    ):
+        entry = AdminAuditLog(
+            id=None, admin_user_id=admin_user_id, action=action,
+            target_type=target_type, target_id=target_id, changes=changes,
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent", ""),
+            timestamp=datetime.now(), success=success, error_message=error
+        )
+        self.db.add(entry)
+        self.db.commit()
+```
+
+### 31.3 API Key Encryption
+
+Encrypt sensitive keys at rest using Fernet.
+
+```python
+from cryptography.fernet import Fernet
+
+class KeyEncryptor:
+    def __init__(self, encryption_key: bytes):
+        self.fernet = Fernet(encryption_key)
+
+    @classmethod
+    def generate_key(cls) -> bytes:
+        return Fernet.generate_key()
+
+    def encrypt(self, plaintext: str) -> str:
+        return self.fernet.encrypt(plaintext.encode()).decode()
+
+    def decrypt(self, ciphertext: str) -> str:
+        return self.fernet.decrypt(ciphertext.encode()).decode()
+```
+
+### 31.4 Admin IP Whitelist
+
+Restrict admin endpoints to specific IPs.
+
+```python
+from fastapi import FastAPI, Request, HTTPException
+import ipaddress
+
+class AdminIPWhitelist:
+    def __init__(self, allowed_cidrs: list[str]):
+        self.networks = [ipaddress.ip_network(cidr) for cidr in allowed_cidrs]
+
+    def is_allowed(self, client_ip: str) -> bool:
+        try:
+            ip = ipaddress.ip_address(client_ip)
+            return any(ip in network for network in self.networks)
+        except ValueError:
+            return False
+```
+
+### 31.5 Security CI/CD Workflow
+
+Weekly vulnerability scanning with auto-issue creation.
+
+```yaml
+# .github/workflows/security.yml
+name: Security Scan
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Monday 8 AM UTC
+
+jobs:
+  vulnerabilities:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pip-audit safety
+      - run: pip-audit --format=json --output=pip-audit.json || true
+      - run: safety check --json --output=safety.json || true
+      - uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('pip-audit.json', 'utf8'));
+            if (data.vulnerabilities?.length > 0) {
+              github.rest.issues.create({
+                title: 'Security Vulnerabilities Detected',
+                body: 'pip-audit found ' + data.vulnerabilities.length + ' vulnerabilities',
+                labels: ['security', 'vulnerability']
+              });
+            }
+```
+
+---
+
+## 32. Docker Support
+
+Production Docker deployment patterns.
+
+### 32.1 Dockerfile Best Practices
+
+```dockerfile
+FROM python:3.12-slim
+
+# Create non-root user
+RUN groupadd --gid 1000 router && \
+    useradd --uid 1000 --gid router --shell /bin/bash router
+
+# Virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Application
+COPY --chown=router:router . /app
+WORKDIR /app
+RUN mkdir -p /app/data /app/logs && chown router:router /app/data /app/logs
+
+USER router
+ENTRYPOINT ["python", "-m", "router.entrypoint"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import httpx; httpx.get('http://localhost:8000/health').raise_for_status()"
+
+LABEL org.opencontainers.image.title="Router Service"
+LABEL org.opencontainers.image.version="1.0.0"
+```
+
+### 32.2 Docker Compose for Development
+
+```yaml
+version: '3.9'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://router:router@postgres:5432/router
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: router
+      POSTGRES_USER: router
+      POSTGRES_PASSWORD: router
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+### 32.3 Multi-GPU Docker Compose
+
+```yaml
+services:
+  app:
+    build: .
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0,1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+```
+
+### 32.4 Kubernetes Deployment Template
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  DATABASE_URL: "postgresql://user:pass@postgres:5432/db"
+  REDIS_URL: "redis://redis:6379/0"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+type: Opaque
+stringData:
+  ENCRYPTION_KEY: "YOUR-FERNET-KEY"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: app
+          image: app:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+  selector:
+    app: app
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+```
+
+---
+
 ## Change Log
 
 | Date | Change |
@@ -1981,3 +2830,4 @@ Is it embedded/firmware?
 | 2026-06-03 | Added Sections 22-26: Multi-agent patterns, verification gates, failure modes, common gotchas, getting help |
 | 2026-06-03 | Added Section 27: Comprehensive code quality standards (Python idioms, anti-patterns, security, performance, testing, error handling) |
 | 2026-06-03 | Added Section 28: Default tech stack playbook (FastAPI, Next.js, Gin, databases, decision tree, anti-recommendations) |
+| 2026-06-03 | Added Sections 29-32: Operational patterns (circuit breaker, DLQ, middleware, semantic cache), health endpoint spec, production security (prompt injection, audit logging, key encryption, IP whitelist, CI workflow), Docker support (Dockerfile, compose, Kubernetes) |
