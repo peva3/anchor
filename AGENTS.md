@@ -206,14 +206,29 @@ pytest --cov=. --cov-report=term-missing  # With coverage
 
 ## 9. Linting & Type Checking
 
-Run before every commit:
+**Before EVERY commit, run a full cleanup sweep:**
+
 ```bash
-ruff check . && ruff format .    # Python
-mypy .                           # Python type check (if available)
-npm run lint                     # JavaScript/TypeScript
+ruff check .                  # Lint
+ruff format .                 # Format
+ruff check --select=E,F,W     # Explicit errors/warnings
+vulture .                     # Find dead code (uncalled functions)
+mypy .                        # Type check (if available)
 ```
 
-Fix all findings before committing. Do not disable rules without good reason and a comment.
+**The sweep must prove:**
+- No unused imports, variables, or functions
+- No functions that are defined but never called
+- No dead-end code paths (code with no return/raise at end)
+- No type errors
+- No lint errors
+
+**If vulture reports any findings:**
+- Delete the unused code immediately
+- If you're unsure whether code is truly dead, search for all references with `grep -r "function_name" .`
+- Only keep code that has a proven production call path
+
+**Do not commit until the sweep is clean.**
 
 ---
 
