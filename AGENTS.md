@@ -604,6 +604,322 @@ Critic Agent: Reviews and provides feedback
 
 ---
 
+## 22. Multi-Agent Cooperation Patterns
+
+Based on CAMEL (arXiv:2303.17760) and MetaGPT (arXiv:2308.00352).
+
+### 22.1 Role Definition Template
+
+Every multi-agent task requires explicit role definitions:
+
+```yaml
+role: Senior <Domain> Engineer
+goal: <Specific outcome being sought>
+backstory: |
+  You are a seasoned engineer known for <expertise>.
+  You approach problems by <methodology>.
+constraints:
+  - Do not <forbidden action>
+  - Always <required action>
+  - Stop when <termination condition>
+```
+
+### 22.2 Sequential Handoff Pattern (Assembly Line)
+
+For workflows where agents pass work sequentially (MetaGPT-style):
+
+```
+Product Manager → Architect → Engineer → QA → Deploy
+```
+
+**Rules:**
+1. Each agent has explicit input/output contracts
+2. Verification gate at each handoff before proceeding
+3. Document any deviations at handoff boundaries
+4. Supervisor agent tracks overall progress
+
+**Example:**
+```
+Agent 1 (PM): Defines requirements → outputs SPEC.md
+Agent 2 (Architect): Reviews SPEC → outputs architecture.md
+Agent 3 (Engineer): Implements → outputs code + tests
+Agent 4 (QA): Verifies → outputs test report
+```
+
+### 22.3 Hierarchical Pattern
+
+For supervisor/worker architectures:
+
+```
+Supervisor Agent
+├── Worker 1 (specific subtask)
+├── Worker 2 (specific subtask)
+└── Worker 3 (specific subtask)
+```
+
+**Rules:**
+1. Supervisor assigns clear sub-tasks with boundaries
+2. Workers report results to supervisor
+3. Supervisor aggregates and decides next steps
+4. Timeout on workers — if exceeded, supervisor escalates
+
+### 22.4 Collaborative Pattern
+
+For peer-to-peer agent cooperation:
+
+```
+Agent A ←→ Shared Context ←→ Agent B
+              ↓
+          Critic Agent
+```
+
+**Rules:**
+1. Agents share a common context (document, state, memory)
+2. Critic agent reviews and provides feedback
+3. Agents iterate based on critique
+4. Termination when consensus reached or max iterations hit
+
+### 22.5 Multi-Agent Termination Criteria
+
+For all patterns, define:
+- **Max iterations** — Stop after N cycles even if not complete
+- **Consensus threshold** — When to stop (e.g., 2 of 3 agents agree)
+- **Escalation path** — What to do when termination reached without success
+- **Context snapshot** — Save state before termination for resume
+
+---
+
+## 23. Verification Gates
+
+Before proceeding to the next step, verify explicitly.
+
+### 23.1 Format Validation
+
+Output must match expected schema:
+
+```python
+# Validate structured output
+import jsonschema
+jsonschema.validate(instance=output, schema=expected_format)
+```
+
+### 23.2 Action Validation
+
+Action must be valid for current state:
+
+```python
+# Check state before acting
+if not is_valid_action(current_state, proposed_action):
+    raise InvalidActionError(f"Cannot {action} in state {current_state}")
+```
+
+### 23.3 Context Validation
+
+No context limit exceeded:
+
+```
+Before each major step:
+- Estimate tokens needed for remaining work
+- If remaining context < 20%, summarize/snapshot current state
+- If context limit would be exceeded, flush and resume fresh
+```
+
+### 23.4 Termination Validation
+
+Completion criteria must be met:
+
+```
+completion_checklist:
+  - [ ] Output matches expected format
+  - [ ] All functions have production call paths
+  - [ ] No unused imports/variables (vulture clean)
+  - [ ] Tests pass
+  - [ ] Lint clean
+  - [ ] Type check clean
+  - [ ] Documentation updated (DEEPDIVE.md if needed)
+```
+
+### 23.5 Error Recovery Hierarchy
+
+When validation fails:
+
+1. **Retry** (max 3 attempts, exponential backoff: 1s, 2s, 4s)
+2. **Alternative approach** — Try different method to achieve same goal
+3. **Fallback** — Degrade gracefully (skip non-critical, continue core)
+4. **Escalate** — Report detailed error with what was attempted, let user decide
+
+---
+
+## 24. Common Failure Modes
+
+Based on AgentBench (arXiv:2308.03688) findings on LLM agent failures.
+
+### 24.1 Invalid Format (IF)
+
+**Cause:** Agent doesn't follow output format instructions.
+
+**Prevention:**
+- Provide explicit schema with examples
+- Use JSON schema validation
+- Give exactly one valid output format
+
+**Recovery:**
+- Show example of correct format
+- Retry with stricter constraints
+
+### 24.2 Invalid Action (IA)
+
+**Cause:** Format correct but action is invalid for current state.
+
+**Prevention:**
+- Validate state before suggesting actions
+- Provide explicit list of valid actions
+- Include state machine documentation
+
+**Recovery:**
+- Report current state and valid actions
+- Suggest valid alternative
+
+### 24.3 Task Limit Exceeded (TLE)
+
+**Cause:** No solution found after maximum iterations/rounds.
+
+**Prevention:**
+- Define clear completion criteria upfront
+- Set maximum iteration count
+- Implement early termination when progress stalls
+
+**Recovery:**
+- Save current state for manual review
+- Report what was tried and why it failed
+- Ask user for guidance on alternative approach
+
+### 24.4 Context Limit Exceeded (CLE)
+
+**Cause:** Interaction history exceeds max context.
+
+**Prevention:**
+- Summarize context periodically (every ~50% of context)
+- Snapshot key decisions to external storage
+- Start fresh session with summary if needed
+
+**Recovery:**
+- Save all context to file
+- Start new session with summarized state
+- Resume from checkpoint
+
+### 24.5 Hallucination Failures
+
+**Cause:** Agent generates plausible but incorrect information.
+
+**Prevention:**
+- Require source citations in research tasks
+- Validate against known facts before accepting
+- Use tool outputs as ground truth, not agent memory
+
+**Recovery:**
+- Cross-check with authoritative source
+- Flag as uncertain if cannot verify
+
+---
+
+## 25. Common Gotchas
+
+Lessons learned from multiple projects — things that regularly bite developers.
+
+### 25.1 Python Version Mismatches
+- Ensure Python 3.12+ for modern projects
+- Use `python3 -m venv` to specify version explicitly
+- Check with `python --version` before installing packages
+
+### 25.2 Shell Command Failures
+- Remember `snip` prepends to all commands automatically
+- Use `bash -c '...'` format for built-ins (`cd`, `export`, `source`)
+- Direct `cd` commands will fail
+
+### 25.3 Environment Variables
+- Always create `.env` from `.env.example`
+- Never commit `.env` (it's in `.gitignore`)
+- Missing env vars cause silent failures — check logs
+
+### 25.4 Package Conflicts
+- Use fresh virtual environments
+- Install from lockfiles, not individual packages
+- Run `pip freeze` to see exact versions installed
+
+### 25.5 Type Errors
+- Run `mypy` before committing
+- Don't use `Any` — use `unknown` if type is truly unknown
+- Generic types need explicit parameters: `list[str]` not `list`
+
+### 25.6 Import Order
+- Ruff auto-fixes import order: `ruff check --fix .`
+- Stdlib → third-party → local, alphabetical within groups
+- Run format check before committing
+
+### 25.7 Race Conditions
+- Concurrent operations on shared state need locks
+- Test concurrent access explicitly
+- Log when acquiring/releasing locks for debugging
+
+### 25.8 Testing edge cases
+- Test the empty case (empty list, empty string, None)
+- Test the overflow case (very large input)
+- Test the concurrent case (multiple simultaneous calls)
+
+### 25.9 Git Mistakes
+- Never `git add .` — add specific files
+- Check `git diff --cached` before committing
+- Use `git status` to verify what will be pushed
+
+### 25.10 Docker Debugging
+- Use `docker compose logs <service>` to see what's failing
+- `docker compose exec <service> bash` to get shell inside
+- Restart with `docker compose restart <service>`
+
+---
+
+## 26. Getting Help
+
+When stuck on a problem.
+
+### 26.1 Self-Service First
+
+1. Check project documentation in `/docs/`
+2. Search `/research/` for similar patterns or whitepapers
+3. Review past commits for similar fixes: `git log --grep="keyword"`
+4. Run linting/smoke tests — actual errors often reveal the issue
+5. Search codebase with `grep -r "pattern" .` for similar implementations
+
+### 26.2 Framework-Specific Resources
+
+```
+LangChain:    https://docs.langchain.com/
+AutoGPT:      https://docs.agpt.co/
+CAMEL:        https://docs.camel-ai.org/
+MetaGPT:      https://deepwisdom.com/
+Anthropic:   https://docs.anthropic.com/
+OpenAI:      https://platform.openai.com/docs/
+```
+
+### 26.3 When to Escalate
+
+Ask the user when:
+- Problem requires making decisions with trade-offs (not clear cut)
+- Fix requires changing architecture rather than code
+- Issue is not in code but in requirements/expectations
+- You've been stuck for more than 15 minutes with no progress
+
+### 26.4 How to Ask for Help
+
+When escalating, provide:
+- What you were trying to do
+- What you tried
+- What happened vs what expected
+- Relevant error messages or logs
+
+---
+
 ## Change Log
 
 | Date | Change |
@@ -614,3 +930,4 @@ Critic Agent: Reviews and provides feedback
 | 2026-06-03 | Added comprehensive pre-commit lint/vulture sweep requirement |
 | 2026-06-03 | Added human-sounding commit message guidelines with WHY-focused pattern |
 | 2026-06-03 | Added DEEPDIVE.md requirement for living system narrative documentation |
+| 2026-06-03 | Added Sections 22-26: Multi-agent patterns, verification gates, failure modes, common gotchas, getting help |
