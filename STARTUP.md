@@ -8,7 +8,7 @@
 First, create the required folder structure:
 
 ```bash
-mkdir -p src/api src/models src/services src/core tests/unit tests/integration tests/scripts docs/adr docs/workflows research papers github whitepapers scripts docker/.github workflows .github .cursor/rules .windsurf .continue .claude/projects
+mkdir -p src/api src/models src/services src/core tests/unit tests/integration tests/scripts docs/adr docs/workflows research papers github whitepapers scripts docker .github .cursor/rules .windsurf .continue .claude
 ```
 
 ## PHASE 2: Create All Agent Configuration Files
@@ -24,17 +24,17 @@ mkdir -p src/api src/models src/services src/core tests/unit tests/integration t
 **All project rules, patterns, and requirements are defined in AGENTS.md.**
 
 Read AGENTS.md before making any changes. Follow every section:
-- Section 1: Core Principles (no dead code, test-first, proven integration)
-- Section 2: Commit Protocol (auto-push after validation if gh works)
-- Section 5: Project Structure (tests/, docs/, research/ folders required)
-- Section 9: Linting (full vulture sweep before every commit)
+- Section 1-9: Core principles, commit protocol, shell execution, code style, project structure, TODO.md, Docker, testing, linting
 - Section 15: Human-sounding commits (WHY-focused, not AI-sounding)
-- Section 27: Code Quality Standards (Python idioms, anti-patterns, security)
-- Section 28: Tech Stack Playbook (FastAPI, Next.js, Gin, etc.)
-- Section 29: Operational Patterns (circuit breaker, DLQ, middleware, cache)
-- Section 30: Health Endpoint Specification
-- Section 31: Production Security Patterns
-- Section 32: Docker Support
+- Section 27: Code Quality Standards (Python idioms, anti-patterns, security, performance)
+- Section 28: Tech Stack Playbook (FastAPI, Next.js, Gin, databases, decision tree)
+- Section 29-32: Operational patterns, health endpoints, production security, Docker/K8s
+- Section 33-36: PR size standards, AI anti-pattern detection, PR template, NEVER list
+- Section 37-40: Pre-commit hooks, CI/CD, semantic versioning, coverage enforcement
+- Section 41-44: Observability, Infrastructure as Code, database backups, secrets management
+- Section 45-49: Flaky tests, mutation testing, benchmarks, contract tests, chaos engineering
+- Section 50: Intentional Minimalism (decision ladder, tradeoff comments, safety carve-outs)
+- Section 51: Instruction Architecture (lazy loading, self-maintenance, context budgets)
 
 **Never go rogue.** Do not create PRs, issues, or GitHub activity without explicit user approval.
 
@@ -51,7 +51,7 @@ For system architecture details, see DEEPDIVE.md in the project root.
 ## Required Reading
 
 **You MUST read these files before working:**
-1. `AGENTS.md` — All project rules and conventions (mandatory)
+1. `AGENTS.md` — All project rules and conventions (51 sections, mandatory)
 2. `DEEPDIVE.md` — System architecture and design decisions
 
 ## Critical Rules from AGENTS.md
@@ -67,12 +67,26 @@ ruff check . && ruff format . && vulture . && mypy .
 - `research/` — Whitepapers, references
 
 ### Commit Style
-Explain WHY changes were made, not just WHAT changed.
+Human-sounding, WHY-focused messages. See Section 15.
 
-### Prohibited
+### PR Standards (Section 33)
+- Max 800 lines per PR, 500 for complex logic
+- Single feature per PR
+- Use the PR template (Section 35)
+
+### AI Code Quality (Section 34)
+Self-check against anti-patterns: think first, spot laziness, uncertainty, bloat.
+
+### Decision Ladder (Section 50)
+Every implementation: YAGNI → stdlib → native → existing dep → one line → minimum code.
+
+### Prohibited (Section 36 — NEVER List)
 - NO PRs, issues, or GitHub activity without explicit user approval
 - NO dead code or unused imports
 - NO commits without passing full lint/vulture sweep
+- NO mutable default arguments, circular imports, bare excepts
+- NO eval()/exec() on user input
+- NO force push to shared branches
 
 ## Architecture Context
 
@@ -80,6 +94,7 @@ See DEEPDIVE.md for detailed system narrative including:
 - Why the project is structured this way
 - Key architectural decisions and trade-offs
 - Known failure modes and gotchas
+- Data flow through the system
 ```
 
 ### 2.3 Create .github/copilot-instructions.md
@@ -92,28 +107,30 @@ See DEEPDIVE.md for detailed system narrative including:
 ## Required Reading
 
 **Before any task, read these files:**
-- `AGENTS.md` — All project rules and conventions
+- `AGENTS.md` — All project rules and conventions (51 sections)
 - `DEEPDIVE.md` — System architecture narrative
 - `docs/` — Project documentation
 
 ## Critical Rules
 
-1. **No dead code** — Remove unused functions, imports, variables immediately
-2. **Test-first** — Write tests before code, verify all pass before committing
-3. **Full cleanup sweep** before every commit:
-   ```bash
-   ruff check . && ruff format . && vulture . && mypy .
-   ```
-4. **tests/ folder** — All tests and random scripts go here; always in `.gitignore`
-5. **docs/ and research/** — Create for every new project
-6. **Human-sounding commits** — Explain WHY changes were made, not just WHAT changed
-7. **DEEPDIVE.md** — Update after any architectural change
+1. **No dead code** — Remove unused functions, imports, variables immediately (Section 1)
+2. **Test-first** — Write tests before code, verify all pass before committing (Section 8)
+3. **Full cleanup sweep** before every commit: `ruff check . && ruff format . && vulture . && mypy .` (Section 9)
+4. **tests/ folder** — All tests and random scripts go here; always in `.gitignore` (Section 5)
+5. **docs/ and research/** — Create for every new project (Section 5)
+6. **Human-sounding commits** — Explain WHY changes were made (Section 15)
+7. **DEEPDIVE.md** — Update after any architectural change (Section 5)
+8. **PR size limit** — 800 lines max, 500 for complex logic (Section 33)
+9. **Decision ladder** — YAGNI → stdlib → native → existing dep → one line → minimum (Section 50)
+10. **Tradeoff comments** — Name the ceiling and upgrade trigger for intentional shortcuts (Section 50.2)
 
 ## Prohibited Actions
 
-- **NEVER** create PRs, issues, or GitHub activity without explicit user approval
-- **NEVER** leave dead code, stubs, or silent exception handlers
-- **NEVER** commit without running the full lint/vulture sweep first
+- **NEVER** create PRs, issues, or GitHub activity without explicit user approval (Section 2)
+- **NEVER** leave dead code, stubs, or silent exception handlers (Section 1)
+- **NEVER** commit without running the full lint/vulture sweep first (Section 9)
+- **NEVER** use mutable defaults, bare excepts, eval/exec, or circular imports (Section 27.2)
+- **NEVER** submit code you haven't tested (Section 34.5)
 
 ## Project Structure
 
@@ -124,7 +141,7 @@ project/
 ├── docs/             # Architecture docs
 ├── research/         # Research files
 ├── DEEPDIVE.md       # System narrative
-├── AGENTS.md         # This file
+├── AGENTS.md         # This file (51 sections)
 └── TODO.md           # Task tracking
 ```
 
@@ -137,6 +154,8 @@ Before marking any task complete:
 - [ ] `mypy .` clean (if Python)
 - [ ] Human-sounding commit message explaining WHY
 - [ ] DEEPDIVE.md updated if architecture changed
+- [ ] PR under 800 lines, single feature
+- [ ] AI anti-pattern self-check passed (Section 34)
 ```
 
 ### 2.4 Create .cursor/rules/project-rules.mdc
@@ -148,9 +167,9 @@ Before marking any task complete:
 
 ## Core Directives
 
-1. **Read AGENTS.md before any task** — All rules are defined there
+1. **Read AGENTS.md before any task** — All rules are defined there (51 sections)
 2. **Read DEEPDIVE.md** — System architecture narrative
-3. **Follow every section** — Core principles, commit protocol, testing, linting, etc.
+3. **Follow every section** — Core principles, commit protocol, testing, linting, CI/CD, security, etc.
 
 ## Critical Enforcements
 
@@ -167,7 +186,15 @@ Every project MUST have:
 - `research/` — Whitepapers, references
 
 ### Commit Style
-Human-sounding, WHY-focused messages.
+Human-sounding, WHY-focused messages (Section 15).
+
+### PR Standards
+- 800 lines max, 500 for complex logic (Section 33)
+- Single feature per PR (Section 33.3)
+- Use the PR template (Section 35)
+
+### AI Code Quality (Section 34)
+Self-check: think first, spot laziness, uncertainty, bloat.
 
 ### DEEPDIVE.md
 Update after ANY architectural change. Document:
@@ -179,6 +206,8 @@ Update after ANY architectural change. Document:
 - No PRs/issues/GitHub activity without explicit user approval
 - No dead code, unused imports, silent exception handlers
 - No commits without running lint/vulture sweep first
+- No mutable default arguments, bare excepts, eval/exec (Section 27.2)
+- No force push to shared branches (Section 36.2)
 
 ## Validation
 Before marking complete:
@@ -187,6 +216,8 @@ Before marking complete:
 - [ ] Type check clean
 - [ ] DEEPDIVE.md updated if needed
 - [ ] Human commit message
+- [ ] PR under 800 lines
+- [ ] AI anti-pattern self-check passed
 ```
 
 ### 2.5 Create .windsurf/config.md
@@ -194,7 +225,8 @@ Before marking complete:
 ```markdown
 # Windsurf AI Configuration
 
-> Project-level rules for Windsurf Code agent. See `AGENTS.md` for complete guidelines.
+> Project-level rules for the Windsurf IDE agent.
+> See `AGENTS.md` (51 sections) for complete guidelines.
 
 ## How to Use
 
@@ -220,20 +252,29 @@ project/
 ├── docs/          # Documentation
 ├── research/      # Research files
 ├── DEEPDIVE.md    # System narrative (update on architecture changes)
-├── AGENTS.md      # Project rules (this file references it)
+├── AGENTS.md      # Project rules (51 sections)
 └── TODO.md        # Task tracking
 ```
 
 ## Critical Rules
 
-| Rule | Description |
-|------|-------------|
-| No dead code | Remove unused functions/imports immediately |
-| Test-first | Write tests before code |
-| Human commits | WHY-focused, not "fix: bug" |
-| Auto-push | After validation, if gh works, push |
-| Never rogue | No GitHub activity without user approval |
-| Update DEEPDIVE | After any architectural change |
+| Rule | Section |
+|------|---------|
+| No dead code | 1 |
+| Test-first | 8 |
+| Full lint/vulture sweep before commit | 9 |
+| Human-sounding commits (WHY-focused) | 15 |
+| PR under 800 lines, single feature | 33 |
+| AI anti-pattern self-check | 34 |
+| Pre-commit hooks mandatory | 37 |
+| CI/CD pipeline standards | 38 |
+| Semantic versioning + changelog | 39 |
+| Code coverage enforcement (80% floor) | 40 |
+| Decision ladder (YAGNI → minimum) | 50 |
+| Tradeoff comments with named ceilings | 50.2 |
+| Auto-push after validation | 2 |
+| Never rogue (no GitHub without approval) | 2 |
+| Update DEEPDIVE after arch changes | 5 |
 
 ## Prohibited Actions
 
@@ -241,6 +282,8 @@ project/
 - Leaving dead code or unused imports
 - Committing without lint/vulture sweep passing
 - Skipping tests or validation
+- Force pushing to shared branches
+- Mutable default arguments, bare excepts, eval/exec
 ```
 
 ### 2.6 Create .continue/config.md
@@ -248,7 +291,7 @@ project/
 ```markdown
 # Continue.dev Configuration
 
-> Config for Continue.dev AI assistant. See `AGENTS.md` for full rules.
+> Config for Continue.dev AI assistant. See `AGENTS.md` (51 sections) for full rules.
 
 ## Workspace Rules
 
@@ -276,7 +319,7 @@ All must pass before committing.
 
 ## Commit Guidelines
 
-Human-sounding commit messages that explain WHY:
+Human-sounding commit messages that explain WHY (Section 15):
 ```
 <type>: <what changed>
 
@@ -285,21 +328,34 @@ Human-sounding commit messages that explain WHY:
 <context>: Decisions, trade-offs, gotchas
 ```
 
+## PR Standards (Section 33)
+- 800 lines max, 500 for complex logic
+- Single feature per PR
+- Use PR template (Section 35)
+
+## Decision Ladder (Section 50)
+Before writing code: YAGNI → stdlib → native → existing dep → one line → minimum.
+
 ## Prohibited
 
 - GitHub PRs/issues without explicit user approval
 - Dead code or unused imports
 - Skipping lint/vulture sweep
 - Skipping tests
+- Force push to shared branches
+- Mutable defaults, bare excepts, eval/exec, circular imports
 
 ## Quick Reference
 
-| Command | Purpose |
-|---------|---------|
-| `ruff check .` | Lint check |
-| `ruff format .` | Format code |
-| `vulture .` | Find dead code |
-| `mypy .` | Type check |
+| Command | Purpose | Section |
+|---------|---------|---------|
+| `ruff check .` | Lint check | 9 |
+| `ruff format .` | Format code | 9 |
+| `vulture .` | Find dead code | 9 |
+| `mypy .` | Type check | 9 |
+| `pre-commit install` | Install git hooks | 37 |
+| `pytest --cov=. --cov-fail-under=80` | Tests + coverage | 8, 40 |
+| `mutmut run --paths-to-mutate=src/` | Mutation testing | 46 |
 ```
 
 ### 2.7 Create docs/AGENT_INSTRUCTIONS.md
@@ -312,7 +368,7 @@ Human-sounding commit messages that explain WHY:
 
 ## For Any AI Agent
 
-1. **Read `AGENTS.md`** before starting any work — it contains all project rules
+1. **Read `AGENTS.md`** before starting any work — it contains all project rules (51 sections)
 2. **Read `DEEPDIVE.md`** for system architecture context
 3. **Follow all sections** in AGENTS.md
 
@@ -333,24 +389,50 @@ Every project must have:
 - **`research/`** — Whitepapers and references
 - **`DEEPDIVE.md`** — Living system narrative (update after architecture changes)
 
-## Prohibited Actions
+## Prohibited Actions (Section 36 — NEVER List)
 
 1. **No GitHub activity** without explicit user approval (PRs, issues, comments)
 2. **No dead code** — Remove unused functions/imports immediately
 3. **No silent failures** — No `except Exception: pass`
 4. **No commits** without passing full lint/vulture sweep
+5. **No mutable defaults** — Use `None` + create new, or `field(default_factory=...)`
+6. **No bare excepts** — Catch specific exception types
+7. **No eval()/exec()** on user input
+8. **No force push** to shared branches
 
 ## Commit Message Style
 
-Human-sounding, WHY-focused.
+Human-sounding, WHY-focused (Section 15).
 
-## Multi-Agent Cooperation
+## PR Standards (Section 33)
+- 800 lines max per PR
+- Single feature per PR
+- Use PR template with HUMAN/AGENT sections (Section 35)
+
+## AI Code Quality (Section 34)
+Self-check before submitting:
+- Think first — explain architecture before coding
+- Spot laziness — trivial tests, wide types, catch-n-log
+- Spot uncertainty — defensive code, redundant checks, excessive try/except
+- Spot bloat — commenting on changes, over-logging, future-proofing
+
+## Multi-Agent Cooperation (Sections 22-23)
 
 When working with other agents:
 - Define explicit roles (Role/Goal/Backstory pattern)
 - Sequential handoffs with verification gates
 - Termination criteria defined upfront
 - Error recovery: retry → alternative → fallback → escalate
+
+## Decision Ladder (Section 50)
+
+Before writing any code, check each rung:
+1. YAGNI — Does this need to exist?
+2. Stdlib — Does the language already ship this?
+3. Native — Does the platform already provide this?
+4. Existing dep — Is this already in the project?
+5. One line — Can one line do it?
+6. Minimum — Shortest implementation that works
 
 ## Quick Checklist
 
@@ -360,6 +442,10 @@ When working with other agents:
 - [ ] Write human-sounding commit messages
 - [ ] Update DEEPDIVE.md after architectural changes
 - [ ] Never go rogue — ask for approval for GitHub activity
+- [ ] PR under 800 lines, single feature
+- [ ] AI anti-pattern self-check passed
+- [ ] Decision ladder applied to every implementation
+- [ ] Tradeoff comments for intentional shortcuts
 ```
 
 ### 2.8 Create .claude/config.json
@@ -380,7 +466,11 @@ When working with other agents:
     "enforce_test_folder_gitignore": true,
     "enforce_docs_research_folders": true,
     "auto_commit_after_validation": true,
-    "no_rogue_github_activity": true
+    "no_rogue_github_activity": true,
+    "enforce_pr_size_limits": true,
+    "enforce_decision_ladder": true,
+    "enforce_tradeoff_comments": true,
+    "enforce_precommit_hooks": true
   },
   "validation": {
     "pre_commit_checklist": [
@@ -393,43 +483,9 @@ When working with other agents:
       "tests/",
       "docs/",
       "research/"
-    ]
-  }
-}
-```
-
-### 2.9 Create .claude/projects/standardized-markdown.json
-
-```json
-{
-  "project": {
-    "name": "CHANGE_ME",
-    "description": "Project description — update this",
-    "readme": "README.md",
-    "always_read": [
-      "AGENTS.md",
-      "DEEPDIVE.md"
-    ]
-  },
-  "rules": {
-    "enforce_vulture_sweep": true,
-    "enforce_test_folder_gitignore": true,
-    "enforce_docs_research_folders": true,
-    "auto_commit_after_validation": true,
-    "no_rogue_github_activity": true
-  },
-  "validation": {
-    "pre_commit_checklist": [
-      "ruff check .",
-      "ruff format .",
-      "vulture .",
-      "mypy ."
     ],
-    "required_folders": [
-      "tests/",
-      "docs/",
-      "research/"
-    ]
+    "pr_size_limit_lines": 800,
+    "coverage_threshold_percent": 80
   }
 }
 ```
@@ -438,316 +494,81 @@ When working with other agents:
 
 ### 3.1 Create .gitignore
 
+The template includes:
 ```
-# Environment and secrets
-.env
-*.pem
-*.key
-secrets/
-credentials/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual environments
-venv/
-ENV/
-env/
-.venv/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Testing - ALWAYS gitignore tests
-tests/
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.hypothesis/
-
-# Logs
-*.log
-logs/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Docker
-docker-compose.override.yml
-
-# Type check
-.mypy_cache/
+.env, *.pem, __pycache__/, *.pyc, venv/, .vscode/, tests/ (always gitignored),
+logs/, .coverage, docker-compose.override.yml, .mypy_cache/, .terraform/, pacts/
 ```
+See `.gitignore` in the standardized-markdown repo for the complete template.
 
 ### 3.2 Create .env.example
 
-```markdown
-# Environment Variables Template
-# Copy this to .env and fill in values
-
-# Application
+```
 APP_NAME=CHANGE_ME
 APP_ENV=development
-APP_DEBUG=true
-
-# API Keys (never commit real keys)
-OPENAI_API_KEY=
-ANTHROPIC_API_KEY=
-
-# Database
 DATABASE_URL=postgresql://user:pass@localhost:5432/dbname
-
-# External Services
-EXTERNAL_API_KEY=
-EXTERNAL_API_URL=
-
-# Feature Flags
-ENABLE_FEATURE_X=false
 ```
 
 ### 3.3 Create docker-compose.yml
 
-```yaml
-version: '3.9'
-
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://app:app@postgres:5432/app
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - ./data:/app/data
-
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: app
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-
-volumes:
-  postgres_data:
-  redis_data:
-```
+Use the template from Section 32.2 or the standardized-markdown repo's template
+with PostgreSQL, Redis, healthchecks, and named volumes.
 
 ### 3.4 Create README.md
 
+Minimal template:
 ```markdown
-# CHANGE_ME — Project Name
+# PROJECT_NAME
 
-Brief description of what this project does.
+Brief description.
 
 ## Quick Start
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up environment
-cp .env.example .env
-
-# Run tests
+\```bash
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt && cp .env.example .env
 pytest
+\```
 
-# Start the application
-python src/main.py
-```
-
-## Project Structure
-
-```
-project/
-├── src/              # Source code
-├── tests/            # All tests (gitignored)
-├── docs/             # Documentation
-├── research/          # Research files
-├── AGENTS.md         # AI agent guidance
-├── DEEPDIVE.md       # System architecture
-└── TODO.md           # Task tracking
-```
-
-## Documentation
-
-- [AGENTS.md](AGENTS.md) — Full project rules and guidance
+## Docs
+- [AGENTS.md](AGENTS.md) — Full project rules (51 sections)
 - [DEEPDIVE.md](DEEPDIVE.md) — System architecture narrative
-- [docs/](docs/) — Additional documentation
-
-## Development
-
-### Setup
-
-```bash
-python -m venv venv
-source venv/bin/activate  # or `venv\Scripts\activate` on Windows
-pip install -r requirements.txt
-cp .env.example .env
-```
-
-### Running Tests
-
-```bash
-pytest
-```
-
-### Linting
-
-```bash
-ruff check . && ruff format . && vulture . && mypy .
-```
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guide
+- [SECURITY.md](SECURITY.md) — Security policy
 
 ## License
-
 MIT
 ```
 
-### 3.4 Create TODO.md
+### 3.5 Create TODO.md
 
+Use the standard template from Section 6 with `✅ Complete`, `🔄 In Progress`, `⬜ Not Started` legend.
+
+### 3.6 Create DEEPDIVE.md
+
+Use the template from Section 5 covering system overview, architecture decisions, data flow, key decisions with dates, and gotchas.
+
+### 3.7 Create AGENTS.md
+
+Copy AGENTS.md from the standardized-markdown repository (51 sections). Delete sections that don't apply to this project. Target ≤2,000 lines for project-specific use.
+
+### 3.8 Create CONTRIBUTING.md
+
+Minimal or copy from standardized-markdown:
 ```markdown
-# TODO.md — Project Name
-
-## Legend
-- ✅ Complete
-- 🔄 In Progress
-- ⬜ Not Started
-
-## Current Sprint / Phase
-
-| # | Status | Description |
-|---|--------|-------------|
-| 1 | ⬜ | First task |
-
-## Completed Sprints
-
-| Sprint | Status | Deliverable |
-|--------|--------|-------------|
-| 1   | ✅ | Initial project setup |
-
-## Notes
-
-- Document architectural decisions made during task completion
-- Record any deviations from original plan and why
+# Contributing
+See [AGENTS.md](AGENTS.md) Sections 33-36 for PR standards.
+- PRs under 800 lines, single feature
+- Run ruff/vulture/mypy before committing
+- Human-sounding, WHY-focused commits (Section 15)
 ```
 
-### 3.5 Create DEEPDIVE.md
+### 3.9 Create SECURITY.md
 
+Minimal or copy from standardized-markdown:
 ```markdown
-# DEEPDIVE.md — System Architecture Narrative
-
-> This file explains HOW and WHY the system is built the way it is.
-> It is a living document — update it after any architectural change.
-
-## System Overview
-
-What this system does and why it exists.
-
-## Architecture Decisions
-
-### Why This Tech Stack
-
-**Chosen:** Python + FastAPI + PostgreSQL + Redis
-
-**Alternatives considered:**
-- Django (rejected because: over-engineered for our needs)
-- Flask (rejected because: too minimal, would need to add too much)
-
-**Why this stack:** FastAPI gives us async performance with automatic OpenAPI docs. PostgreSQL handles our relational data well. Redis provides fast caching and Celery for background jobs.
-
-### Why This Directory Structure
-
+# Security Policy
+Do NOT open public issues for vulnerabilities. Use GitHub Security Advisories.
 ```
-src/
-├── api/          # FastAPI routes — clean separation of HTTP layer
-├── models/       # Pydantic models — input/output validation
-├── services/     # Business logic — all complexity lives here
-└── core/         # Config, logging, exceptions — shared infrastructure
-```
-
-**Key decisions:**
-- Business logic in `services/` not in route handlers
-- Models are pure data classes, no behavior
-- Core contains only infrastructure, no business logic
-
-## Data Flow
-
-### Request Lifecycle
-
-```
-Client → FastAPI Route (/api/xxx)
-      → Pydantic Validation (models/)
-      → Service Layer (services/) ← Business Logic
-      → Database/External APIs
-      → Response
-```
-
-### Why: Services Layer
-
-All business logic lives in services to:
-1. Make it testable without HTTP layer
-2. Allow multiple entrypoints (API, CLI, background jobs)
-3. Keep route handlers thin
-
-## Key Decisions
-
-### YYYY-MM-DD: Decision Title
-
-**Context:** What problem are we solving?
-
-**Decision:** What we chose to do.
-
-**Alternatives considered:**
-- Option A (rejected because: reason)
-- Option B (rejected because: reason)
-
-**Consequences:** What changed as a result.
-```
-
-### 3.6 Create AGENTS.md
-
-Copy the full AGENTS.md content from the standardized-markdown repository.
 
 ## PHASE 4: Initialize Git and Commit
 
@@ -757,21 +578,13 @@ git add .
 git commit -m "Initial project setup
 
 - Created full directory structure (src/, tests/, docs/, research/)
-- Added AI agent configuration files for Claude, Copilot, Cursor, Windsurf, Continue
-- Added CLAUDE.md, CLAUDE.desktop.md for Claude Code
-- Added .claude/config.json with project settings
+- Added AI agent configs for Claude, Copilot, Cursor, Windsurf, Continue
+- Added CLAUDE.md, CLAUDE.desktop.md, .claude/config.json
 - Created .gitignore with tests/ always excluded
-- Created .env.example template
-- Created docker-compose.yml with postgres and redis
-- Created README.md with quick start guide
-- Created TODO.md for task tracking
-- Created DEEPDIVE.md as living system narrative
-- Created AGENTS.md with 32 sections (all patterns from standardized-markdown)
-- Created docs/AGENT_INSTRUCTIONS.md as universal fallback
-- Created .github/workflows/ for CI/CD
-- Created operational patterns: circuit breaker, DLQ, middleware stack
-- Created security patterns: prompt injection, audit logging, key encryption
-- Created Docker support with Dockerfile and Kubernetes templates"
+- Created .env.example, docker-compose.yml, README.md
+- Created TODO.md, DEEPDIVE.md, CONTRIBUTING.md, SECURITY.md
+- Created AGENTS.md with 51 sections (standardized template)" && \
+git push origin main
 ```
 
 ---
@@ -782,7 +595,7 @@ After completing all phases, your project will have:
 
 | File/Folder | Purpose |
 |-------------|---------|
-| `AGENTS.md` | Complete project rules (32 sections) |
+| `AGENTS.md` | Complete project rules (51 sections) |
 | `DEEPDIVE.md` | System architecture narrative |
 | `CLAUDE.md` | Claude Code instructions |
 | `CLAUDE.desktop.md` | Claude desktop app instructions |
@@ -792,50 +605,34 @@ After completing all phases, your project will have:
 | `.continue/config.md` | Continue.dev configuration |
 | `docs/AGENT_INSTRUCTIONS.md` | Universal fallback instructions |
 | `.claude/config.json` | Claude project settings |
+| `CONTRIBUTING.md` | Contribution guidelines |
+| `SECURITY.md` | Security policy |
+| `LICENSE` | MIT License |
 | `docker-compose.yml` | Development environment |
 | `.gitignore` | Git ignore (tests/ always excluded) |
 | `.env.example` | Environment variable template |
 | `README.md` | Project documentation |
 | `TODO.md` | Task tracking |
-| `.github/workflows/` | CI/CD pipelines |
 | `src/` | Source code directory |
 | `tests/` | Test directory (gitignored) |
 | `docs/` | Documentation directory |
 | `research/` | Research files directory |
 
-All AI agents reading from this project will find comprehensive guidance and follow consistent patterns.
+## Key AGENTS.md Sections (51 Total)
 
-## Key Sections in AGENTS.md
-
-1. Core Principles
-2. Commit Protocol
-3. Shell Execution Rules
-4. Code Style (English-only)
-5. Project Structure (tests/, docs/, research/ required)
-6. TODO.md Standard
-7. Docker/Deployment
-8. Testing Requirements
-9. Linting & Type Checking (vulture sweep)
-10. Error Handling Patterns
-11. Configuration Management
-12. API Design
-13. Security Best Practices
-14. Logging Standards
-15. Git Workflow (human-sounding commits)
-16. Documentation Requirements
-17. Dependency Management
-18. Performance Considerations
-19. Build & Deployment
-20. External Integrations
-21. AI Agent Instruction Guidance
-22. Multi-Agent Cooperation Patterns
-23. Verification Gates
-24. Common Failure Modes
-25. Common Gotchas
-26. Getting Help
-27. Code Quality Standards
-28. Tech Stack Playbook
-29. Operational Patterns (circuit breaker, DLQ, middleware, cache)
-30. Health Endpoint Specification
-31. Production Security Patterns
-32. Docker Support
+| Sections | Domain |
+|----------|--------|
+| 1-9 | Core Principles, Commit Protocol, Shell Execution, Code Style, Project Structure, TODO.md, Docker, Testing, Linting |
+| 10-14 | Error Handling, Configuration, API Design, Security, Logging |
+| 15 | Git Workflow — human-sounding, WHY-focused commits |
+| 16-20 | Documentation, Dependencies, Performance, Build/Deployment, External Integrations |
+| 21-26 | AI Agent Guidance, Multi-Agent Cooperation, Verification Gates, Failure Modes, Gotchas, Getting Help |
+| 27 | Code Quality Standards — Python idioms, anti-patterns, security, performance |
+| 28 | Tech Stack Playbook — FastAPI, Next.js, Gin, databases, decision tree |
+| 29-32 | Operational Patterns, Health Endpoints, Production Security, Docker/K8s |
+| 33-36 | PR Size Standards, AI Anti-Pattern Detection, PR Template, NEVER List |
+| 37-41 | Pre-commit Hooks, CI/CD, Semantic Versioning, Code Coverage, Observability |
+| 42-44 | Infrastructure as Code, Database Backup/Recovery, Secrets Management |
+| 45-49 | Flaky Tests, Mutation Testing, Benchmarks, Contract Testing, Chaos Engineering |
+| 50 | Intentional Minimalism — decision ladder, tradeoff comments, safety carve-outs |
+| 51 | Instruction Architecture — lazy loading, self-maintenance, context budgets |
