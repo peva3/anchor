@@ -2817,6 +2817,2503 @@ spec:
 
 ---
 
+## 33. PR & Change Size Standards
+
+Hard numeric boundaries prevent unreviewable changes from being submitted. These limits apply to all changes, whether human or AI-authored.
+
+### 33.1 Size Limits — Hard Gates
+
+| Change Type | Max Lines | Rationale |
+|------------|-----------|-----------|
+| **All changes** | 800 lines total | Derived from code review research — beyond 800 lines, reviewer accuracy drops below 70% |
+| **Complex logic** | 500 lines | Architectural changes, algorithm rewrites, security-sensitive code — requires deeper review |
+| **Simple/mechanical** | 800 lines | Renames, formatting, type annotation additions — still must not exceed 800 |
+| **Single file** | 500 lines | If a file exceeds 500 lines of change, split into multiple PRs |
+
+**What counts as a "line of change":**
+- Added lines count
+- Modified lines count
+- Deleted lines count (deletions are still review burden)
+- Test files count toward the limit
+
+**What does NOT count:**
+- Generated code (OpenAPI clients, protobuf stubs, migration files)
+- Lockfiles (poetry.lock, package-lock.json, uv.lock)
+- Snapshot files (.snap, __snapshots__/)
+- Auto-formatted changes (run `ruff format` separately, commit separately)
+
+### 33.2 When Changes Exceed the Limit
+
+**DO NOT submit the oversized change.** Instead:
+
+1. **Split by concern.** Separate refactoring from feature work. Mechanical changes go in their own PR.
+2. **Split by layer.** Database migration in one PR → API changes in another → frontend in another.
+3. **Stack PRs.** PR #1 adds the API → merge → PR #2 adds the UI on top.
+4. **Pre-extract.** Do preparatory refactoring in a separate PR before the feature PR.
+
+**Example of splitting a 1,200-line feature:**
+```
+Original: 1,200 lines (new API + refactoring + tests)
+Split into:
+  PR #1: 350 lines — extract shared utilities (no behavior change)
+  PR #2: 280 lines — add database migration and model
+  PR #3: 420 lines — add API endpoints + tests
+  PR #4: 150 lines — wire into frontend
+```
+
+### 33.3 Single Feature Rule
+
+Each PR addresses exactly ONE concern:
+- One feature, one fix, one refactor, or one mechanical change
+- Do NOT mix "fix bug while I'm in the file" changes
+- Do NOT include "while I was here" formatting changes in a feature PR
+- If you find an unrelated bug, open a separate issue/PR
+
+**Good PR scopes:**
+```
+fix: Corrected token refresh race condition
+feat: Added pagination to search endpoint
+refactor: Extracted validation logic into shared module
+chore: Upgraded httpx to 0.27.0
+```
+
+**Bad PR scopes:**
+```
+fix: Corrected token refresh race condition AND refactored auth middleware AND updated logging format
+^--- Three unrelated changes, impossible to review or revert independently
+```
+
+### 33.4 Draft PR Conventions
+
+If code is evolving but useful for discussion:
+- Open PR in **draft mode** (GitHub "Create draft pull request")
+- Draft PRs are for discussion, not just unfinished work — use them to get early feedback on architecture
+- Mark as "Ready for review" only when all checks pass and change size is within limits
+- If the branch is not ready for any review, keep it local — do not open a PR
+
+### 33.5 FIRST-TIME CONTRIBUTOR PATH (for AI agents joining a project)
+
+When an agent starts work on a new project:
+1. First contribution should be a **small bug fix** (under 200 lines)
+2. This establishes understanding of project conventions and builds trust
+3. Do NOT submit a large feature as a first contribution
+4. Reputation matters — reviewers calibrate scrutiny based on contributor history
+5. If your first PR gets closed for being too large, do not take it personally — split and resubmit
+
+---
+
+## 34. AI Code Quality — Anti-Pattern Detection
+
+AI agents produce specific failure modes that human developers rarely create. Agents MUST self-check against these patterns before submitting code.
+
+### 34.1 Think First — Explain Before Coding
+
+The most common AI failure mode: jumping straight to code without understanding the system.
+
+**MANDATORY before writing any code:**
+1. **Read the relevant existing code** — understand patterns, conventions, and the surrounding architecture
+2. **Explain your approach** — describe the architecture and reasoning before implementation
+3. **Identify the integration points** — where does this change touch existing code?
+4. **Check for existing utilities** — is there already a helper/function/class that does this?
+
+**Red flag:** If you cannot explain WHY you chose this approach over alternatives, stop and think before coding.
+
+### 34.2 Spot the Laziness — Common LLM Shortcuts
+
+| Laziness Pattern | What It Looks Like | Why It's Bad |
+|-----------------|-------------------|--------------|
+| **Trivial tests** | `assert True`, `assert result is not None`, tests with no assertions | Creates false sense of coverage without testing behavior |
+| **Overly wide types** | `Optional[T]` everywhere, `Any` in function signatures | Hides real nullability contracts, defeats type checking |
+| **Catch-n-log** | `except Exception: logger.error(...)` without re-raise or proper handling | Swallows errors, leaves system in undefined state |
+| **Copy-paste without understanding** | Mirroring local patterns without knowing why they exist | Propagates anti-patterns, misses context-specific requirements |
+| **Unnecessary helpers** | Creating small helper methods referenced only once | Adds indirection without reducing complexity |
+| **Bool/flag parameters** | `foo(True, False)` — ambiguous at call site | Force callers to write hard-to-read code, hide intent |
+| **Negative tests for removed logic** | Tests that check behavior that no longer exists | Tests pass vacuously, provide zero value |
+
+### 34.3 Spot the Uncertainty — Signs the Agent Is Confused
+
+When an agent is uncertain about the right approach, it produces code with these tells:
+
+| Uncertainty Signal | Example | What It Means |
+|-------------------|---------|---------------|
+| **Numbering approaches** | "Here are 3 ways I fixed this..." | Agent tried multiple things, picked one without conviction |
+| **Overly defensive code** | Checking null 5 layers deep, validating already-validated data | Agent doesn't understand the data flow invariants |
+| **Excessive try/except** | Wrapping every call in try/except without specific handling | Agent doesn't know which operations can actually fail |
+| **Redundant null checks** | `if x is not None` on a value that is NEVER None by construction | Agent doesn't understand the type system or data model |
+| **Adding to "god objects"** | Adding methods to already-too-large classes | Agent thinks "this is where things go" without questioning the design |
+
+**Remediation when uncertainty signs appear:**
+1. Stop and read the relevant abstractions again
+2. Find examples of similar patterns in the existing codebase
+3. If the pattern is truly unclear, ask the user before proceeding
+4. Do NOT paper over uncertainty with defensive code
+
+### 34.4 Spot the Bloat — Unnecessary Additions
+
+| Bloat Pattern | What It Looks Like | What to Do Instead |
+|--------------|-------------------|-------------------|
+| **Commenting on the change, not the code** | "Changed the timeout from 30 to 60" | Comments should explain WHY the code is the way it is, not WHAT changed |
+| **Excessive tests** | 15 tests testing the same happy path with different inputs | Test boundaries: empty, single, many, error, edge cases |
+| **Logging everything** | `logger.info("Entering function")`, `logger.info("Exiting function")` | Log at boundaries, log decisions, log errors — not every step |
+| **Over-parameterization** | Making every constant configurable when it will never change | Default to constants, extract to config only when actually needed |
+| **Future-proofing** | Adding hooks, interfaces, or extension points "for later" | YAGNI — You Aren't Gonna Need It. Add when needed, not before. |
+
+### 34.5 You Are Responsible for the Final Code
+
+The chain of accountability is clear:
+1. The AI agent proposes code
+2. The AI agent tests the code
+3. The AI agent verifies the code against these anti-patterns
+4. The human reviews the final output
+
+**Do NOT:**
+- Submit code you haven't tested yourself
+- Blame "the model" for bad code — you ARE the model's quality filter
+- Assume the human will catch what you missed — your job is to catch it first
+
+### 34.6 Module/File Size Bounds
+
+| Limit | Threshold | Rationale |
+|-------|-----------|-----------|
+| **Module max** | 500 lines (excluding tests) | Beyond 500 lines, split into sub-modules |
+| **File max** | 800 lines (excluding tests) | Beyond 800 lines, add new functionality in new modules |
+| **Function max** | 50 lines | Extract sub-functions for complex logic |
+| **Class max** | 300 lines | Consider composition over inheritance for larger classes |
+
+**When a file exceeds the limit:**
+- Identify cohesive groups of functions — move to new module
+- Do NOT just split alphabetically or arbitrarily
+- Each new module should have a clear, single responsibility
+- Update imports across the codebase accordingly
+
+### 34.7 Platform Support Requirements
+
+Unless explicitly stated otherwise for the project:
+- Tests and features MUST support Linux, macOS, and Windows
+- No Unix-isms in cross-platform code (no `/tmp` hardcoding, no `os.fork`, no shell-specific commands)
+- Use `pathlib.Path` instead of string paths
+- Use `tempfile` module for temporary files, not `/tmp/` directly
+- If a feature is explicitly OS-specific, document the limitation and guard with `sys.platform` checks
+- CI must run on all three platforms if the project is cross-platform
+
+---
+
+## 35. PR Description Format & Template
+
+Every PR MUST use this template. AI agents are responsible for filling in both sections.
+
+### 35.1 PR Template
+
+```markdown
+## Description
+
+### What Changed
+
+<Describe what this PR does in plain language. Focus on behavior, not code.>
+
+### Why
+
+<Explain the problem this solves. Who benefits? What was broken or missing? How does this make things better?>
+
+### How
+
+<High-level approach. Mention key decisions: "Chose X over Y because Z." Do NOT list every file changed — that's what the diff is for.>
+
+### Testing
+
+<How was this tested? What commands should the reviewer run to verify?>
+
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+- [ ] Manual testing performed (describe what was tested)
+
+### Breaking Changes
+
+<List any breaking changes. If none, write "None.">
+
+### Screenshots (if UI changes)
+
+<Before/after screenshots or GIFs of UI changes.>
+
+---
+
+## AI Agent Disclosure
+
+<!-- HUMAN: The sections below were generated by an AI agent. Review carefully. -->
+
+### Agent Decision Log
+
+<Document any non-obvious decisions the agent made during implementation. Why were these choices made?>
+
+### Areas Needing Human Review
+
+<Point out specific code sections, architectural decisions, or edge cases the human reviewer should scrutinize.>
+
+### Agent Self-Check
+
+- [ ] Code follows project conventions (checked existing patterns)
+- [ ] No dead code (vulture clean)
+- [ ] No unused imports (ruff clean)
+- [ ] Type check passes (mypy clean)
+- [ ] Tests cover new behavior
+- [ ] Change size is within limits (under 800 lines)
+- [ ] No "laziness" anti-patterns (Section 34.2)
+- [ ] No "uncertainty" signals (Section 34.3)
+- [ ] No "bloat" additions (Section 34.4)
+```
+
+### 35.2 What the Description MUST Include
+
+| Element | Required? | Details |
+|---------|-----------|---------|
+| **What changed** | REQUIRED | Behavioral description, not code summary |
+| **Why** | REQUIRED | Problem statement, who benefits, root cause |
+| **How** | REQUIRED | Architectural approach, key decisions, trade-offs considered |
+| **Testing** | REQUIRED | Commands to run, what was manually tested |
+| **Breaking changes** | REQUIRED | Explicit "None" if no breaking changes — never leave blank |
+| **Agent disclosure** | REQUIRED for AI PRs | Must be present, CI may enforce this |
+
+### 35.3 What the Description MUST NOT Include
+
+| Forbidden | Reason | Example of Bad |
+|-----------|--------|---------------|
+| **Line number citations** | Lines change after merge, making references stale | "Changed the timeout on line 42" |
+| **File listing** | The diff already shows which files changed | "Modified: src/api.py, src/models.py, tests/test_api.py" |
+| **Code snippets in description** | Duplicates the diff, adds noise | Copying the function body into the description |
+| **"Summary" header** | The description IS the summary — no redundant header | "## Summary\n\nThis PR fixes a bug..." |
+| **Vague statements** | Wastes reviewer time | "Improved performance" without measurements |
+
+### 35.4 Human-Tested Checkbox (for AI-authored PRs)
+
+The `HUMAN:` section at the top of the template serves as a gate:
+- CI can be configured to check for content between `HUMAN:` and the human-tested checkbox
+- The human MUST add their verification before merging
+- The agent MUST NOT fill in the human verification section
+
+---
+
+## 36. Explicit Prohibitions — The "NEVER" List
+
+This section exists because general guidelines are too easy to rationalize around. These are bright lines.
+
+### 36.1 Code NEVER
+
+- **NEVER** use mutable default arguments (`def f(x=[])`) — use `None` + create new, or `field(default_factory=...)`
+- **NEVER** use bare `except:` — always catch specific exception types
+- **NEVER** use `except Exception: pass` — silent failure is forbidden. If truly non-critical, comment WHY
+- **NEVER** use `eval()`, `exec()`, or `compile()` on any user-supplied input
+- **NEVER** use string interpolation for SQL queries — always parameterized queries
+- **NEVER** use `os.system()` or `subprocess` with `shell=True` and untrusted input
+- **NEVER** import within functions to avoid circular imports — restructure the modules instead (exception: `TYPE_CHECKING` imports)
+- **NEVER** create small helper methods that are referenced only once — inline the logic
+- **NEVER** add `bool` or ambiguous `Optional` parameters that force callers to write `foo(False)` or `bar(None)` — use keyword-only arguments or separate methods
+
+### 36.2 Git NEVER
+
+- **NEVER** force push to shared branches (`main`, `develop`, any branch others might be using)
+- **NEVER** commit `.env` files, credentials, API keys, or secrets of any kind
+- **NEVER** `git add .` — add specific files by name, verify with `git diff --cached`
+- **NEVER** amend commits that have already been pushed
+- **NEVER** skip hooks (`--no-verify`, `--no-gpg-sign`) unless you have explicit permission and a documented reason
+- **NEVER** push directly to `main` or `master` — always use a feature branch and PR
+
+### 36.3 GitHub NEVER
+
+- **NEVER** create a PR without explicit user approval (per Section 2 "Never Go Rogue" rule)
+- **NEVER** comment on issues/PRs without explicit user approval
+- **NEVER** close issues or PRs that you did not open
+- **NEVER** assign reviewers or request changes without user direction
+- **NEVER** merge a PR without explicit user approval
+
+### 36.4 Testing NEVER
+
+- **NEVER** merge code that has failing tests
+- **NEVER** skip tests because "the change is small" — small changes cause big bugs
+- **NEVER** write tests that depend on execution order — every test must be independently runnable
+- **NEVER** write tests with `time.sleep()` to wait for async operations — use proper synchronization
+- **NEVER** write tests that pass vacuously (no assertions, or assertions that can never fail)
+- **NEVER** mark a task complete without running the full test suite
+
+### 36.5 Documentation NEVER
+
+- **NEVER** add general product or user-facing documentation to the `docs/` folder when using an LLM to generate it — docs should be human-curated
+- **NEVER** leave DEEPDIVE.md stale after an architectural change — update it as part of the change
+- **NEVER** comment self-evident operations — `# Increment counter by 1` above `counter += 1`
+- **NEVER** write docstrings that restate the function signature — explain WHY, not WHAT
+
+### 36.6 AI Agent NEVER
+
+- **NEVER** guess when you can verify — run the code, check the logs, read the actual file
+- **NEVER** assume a library is available — check `pyproject.toml` or `requirements.txt` first
+- **NEVER** add a dependency without checking if an existing dependency already provides that functionality
+- **NEVER** modify generated code (OpenAPI clients, protobuf stubs, migration files) — regenerate instead
+- **NEVER** skip linting/type-checking before committing — Section 9 sweep is mandatory
+- **NEVER** submit code you haven't tested — run the test suite, verify the behavior
+
+---
+
+## 37. Pre-Commit Hook Standards
+
+Pre-commit hooks are a MANDATORY gate, not an optional convenience. They enforce consistency before code ever reaches CI.
+
+### 37.1 Installation — MANDATORY First Step
+
+Before making any changes to a project, run:
+
+```bash
+pip install pre-commit
+pre-commit install
+pre-commit run --all-files
+```
+
+This installs the git hooks and validates the entire existing codebase. If `pre-commit run --all-files` fails, fix the failures before making any other changes.
+
+### 37.2 Standard Configuration Template
+
+Create `.pre-commit-config.yaml` at the project root:
+
+```yaml
+repos:
+  # --- UNIVERSAL HOOKS (every project) ---
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        name: Remove trailing whitespace
+      - id: end-of-file-fixer
+        name: Ensure files end with a newline
+      - id: check-yaml
+        name: Validate YAML syntax
+      - id: check-json
+        name: Validate JSON syntax
+      - id: check-toml
+        name: Validate TOML syntax
+      - id: check-added-large-files
+        name: Prevent files > 500KB
+        args: ['--maxkb=500']
+      - id: detect-private-key
+        name: Detect accidentally committed private keys
+      - id: detect-aws-credentials
+        name: Detect accidentally committed AWS credentials
+      - id: check-merge-conflict
+        name: Check for merge conflict markers
+      - id: mixed-line-ending
+        name: Normalize line endings
+        args: ['--fix=lf']
+
+  # --- PYTHON HOOKS ---
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.0
+    hooks:
+      - id: ruff
+        name: Lint Python (ruff)
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+        name: Format Python (ruff)
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        name: Type check (mypy)
+        additional_dependencies: [types-all]
+        args: [--ignore-missing-imports]
+
+  # --- SECURITY HOOKS ---
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.9
+    hooks:
+      - id: bandit
+        name: Security lint (bandit)
+        args: [-c, pyproject.toml, --skip=B101]
+        # B101: assert — used in tests, skip for production code scan
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets in code
+        args: ['--baseline', '.secrets.baseline']
+
+  # --- GENERAL HOOKS ---
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        name: Check spelling
+        args: [--write-changes]
+```
+
+### 37.3 What Each Hook Catches
+
+| Hook | Catches | Severity if Failed |
+|------|---------|--------------------|
+| **trailing-whitespace** | Whitespace at end of lines | Low — noisy diffs |
+| **end-of-file-fixer** | Missing newline at EOF | Low — POSIX compliance |
+| **check-yaml/json/toml** | Malformed config files | HIGH — breaks deployments |
+| **check-added-large-files** | Accidental large binary commits | HIGH — bloats repo |
+| **detect-private-key** | Committed SSH/PGP keys | CRITICAL — security incident |
+| **detect-aws-credentials** | Committed AWS keys | CRITICAL — security incident |
+| **check-merge-conflict** | Unresolved `<<<<<<<` markers | HIGH — breaks builds |
+| **ruff** | Lint violations | HIGH — code quality |
+| **ruff-format** | Format violations | Medium — consistency |
+| **mypy** | Type errors | HIGH — runtime bugs |
+| **bandit** | Security anti-patterns | HIGH — vulnerabilities |
+| **detect-secrets** | Any hardcoded secret | CRITICAL — data breach |
+
+### 37.4 Enforcement Policy
+
+- **Pre-commit hooks run on EVERY commit.** If a hook fails, the commit is blocked.
+- **CI runs the same hooks** on every push to verify hooks were not skipped.
+- **Skipping hooks requires:**
+  - Explicit user approval
+  - A documented reason in the commit message body (`--no-verify: reason`)
+  - The CI will still fail if hooks would have caught the issue
+- **Never commit `.pre-commit-config.yaml` changes** that remove hooks without project maintainer approval
+
+### 37.5 CI Verification
+
+```yaml
+# In ci.yml, add a pre-commit verification step:
+- name: Run pre-commit
+  run: pre-commit run --all-files --show-diff-on-failure
+```
+
+This catches cases where a developer skipped hooks locally.
+
+### 37.6 Detect-Secrets Baseline
+
+```bash
+# Generate initial baseline (existing secrets are whitelisted)
+detect-secrets scan > .secrets.baseline
+
+# Audit the baseline to ensure no real secrets were whitelisted
+detect-secrets audit .secrets.baseline
+
+# Commit the baseline so future scans catch NEW secrets only
+git add .secrets.baseline
+```
+
+---
+
+## 38. CI/CD Pipeline Standards
+
+Every project MUST have these standard CI/CD workflows. This section provides templates that work across any project.
+
+### 38.1 CI Pipeline — `.github/workflows/ci.yml`
+
+Runs on every push to any branch and every PR to main.
+
+```yaml
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install ruff mypy
+      - name: Ruff lint
+        run: ruff check .
+      - name: Ruff format check
+        run: ruff format --check .
+      - name: Mypy type check
+        run: mypy . --ignore-missing-imports
+
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio
+      - name: Run tests
+        run: pytest --cov=. --cov-fail-under=80 --cov-report=xml --cov-report=term-missing --junitxml=test-results.xml
+        env:
+          DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
+      - name: Upload coverage to Codecov
+        if: success() || failure()
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b1d2a1d8e5f6b3c4d9e0a1b2c3 # v4.6.0
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  build:
+    name: Build (if applicable)
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Build Docker image
+        run: docker build -t app:${{ github.sha }} .
+      - name: Verify image runs
+        run: docker run --rm app:${{ github.sha }} python -c "print('OK')"
+
+  pre-commit:
+    name: Pre-commit hooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: '3.12'
+      - run: pip install pre-commit
+      - run: pre-commit run --all-files --show-diff-on-failure
+```
+
+### 38.2 Release Pipeline — `.github/workflows/release.yml`
+
+```yaml
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Extract changelog
+        id: changelog
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          # Extract the section for this version from CHANGELOG.md
+          CHANGES=$(awk "/## \[${VERSION}\]/{flag=1; next} /## \[/{flag=0} flag" CHANGELOG.md)
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Build artifacts
+        run: |
+          pip install build
+          python -m build
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@c062e08bd53281541eafdbcacf16d7f6566b254f # v2.1.0
+        with:
+          body: ${{ steps.changelog.outputs.changes }}
+          files: dist/*
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### 38.3 Deployment Pipeline — `.github/workflows/deploy.yml`
+
+```yaml
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t registry.example.com/app:${GITHUB_SHA} .
+          docker push registry.example.com/app:${GITHUB_SHA}
+
+      - name: Deploy to staging
+        run: |
+          # Deploy command depends on infrastructure
+          echo "Deploying ${GITHUB_SHA} to staging..."
+
+      - name: Verify deployment
+        run: |
+          # Smoke test the deployed service
+          sleep 10
+          curl -f http://staging.example.com/health
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Deployment to staging failed for commit ${GITHUB_SHA}"
+
+  deploy-production:
+    name: Deploy to Production
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: echo "Production deployment requires manual approval"
+      # Production deployments should be triggered manually or via release
+```
+
+### 38.4 GitHub Actions SHA-Pinning Convention
+
+**CRITICAL:** All third-party GitHub Actions MUST be pinned to a full 40-character commit SHA:
+
+```yaml
+# CORRECT — pinned to SHA with version comment
+uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+# WRONG — mutable tag, could be hijacked
+uses: actions/checkout@v4
+uses: actions/checkout@main
+```
+
+- **Exception:** GitHub-authored actions (`actions/*`, `github/*`) are exempt from SHA-pinning
+- **Every third-party action** (community or vendor) MUST use full SHA
+- **The version tag comment** (`# v4.2.2`) is REQUIRED for human readability and audit
+- **Update SHAs** when upgrading action versions — never leave a stale SHA
+
+### 38.5 PR and Issue Templates
+
+Create these files in `.github/`:
+
+**`.github/PULL_REQUEST_TEMPLATE.md`:**
+```markdown
+<!-- See AGENTS.md Section 35 for the full PR template -->
+
+## Description
+### What Changed
+### Why
+### How
+### Testing
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+
+### Breaking Changes
+
+## AI Agent Disclosure
+### Agent Decision Log
+### Areas Needing Human Review
+### Agent Self-Check
+- [ ] Code follows project conventions
+- [ ] No dead code (vulture clean)
+- [ ] No unused imports (ruff clean)
+- [ ] Type check passes (mypy clean)
+- [ ] Tests cover new behavior
+- [ ] Change size is within limits (under 800 lines)
+```
+
+**`.github/ISSUE_TEMPLATE/bug_report.md`:**
+```markdown
+---
+name: Bug Report
+about: Report a bug or unexpected behavior
+title: 'bug: '
+labels: ['bug']
+assignees: []
+---
+
+### Description
+<Clear, concise description of the bug>
+
+### Steps to Reproduce
+1.
+2.
+3.
+
+### Expected Behavior
+<What should have happened>
+
+### Actual Behavior
+<What actually happened, including error messages>
+
+### Environment
+- OS:
+- Python version:
+- Project version:
+```
+
+### 38.6 Branch Protection Rules
+
+Configure these in GitHub repository settings → Branches → Branch protection rules:
+
+| Rule | Value | Rationale |
+|------|-------|-----------|
+| **Require PR before merging** | Enabled | No direct pushes to main |
+| **Require approvals** | 1 minimum | At least one reviewer |
+| **Dismiss stale reviews** | Enabled | Re-review after new commits |
+| **Require status checks** | Enabled | CI must pass before merge |
+| **Required checks** | lint, test, build, pre-commit | All CI jobs must pass |
+| **Require branches to be up to date** | Enabled | Must merge main into branch first |
+| **Require conversation resolution** | Enabled | All review threads resolved |
+| **Require linear history** | Disabled (team preference) | Squash merges handle this |
+| **Do not allow bypass** | Enabled for admins too | No one bypasses protection |
+
+---
+
+## 39. Semantic Versioning & Changelog
+
+### 39.1 Semantic Versioning Rules
+
+Follow [SemVer 2.0.0](https://semver.org/) strictly:
+
+| Version Component | Increment When | Example |
+|------------------|----------------|---------|
+| **MAJOR** (`X.0.0`) | Incompatible API changes | Removing an endpoint, changing response format, changing behavior of existing API |
+| **MINOR** (`0.X.0`) | Backward-compatible functionality | Adding a new endpoint, adding optional parameters, deprecating with warnings |
+| **PATCH** (`0.0.X`) | Backward-compatible bug fixes | Fixing a calculation error, correcting a typo in output, performance improvements with no API change |
+
+**What constitutes a "breaking change":**
+- Removing an API endpoint
+- Changing response field names or types
+- Removing or renaming public functions/classes
+- Changing the behavior of existing functionality (even if signature is the same)
+- Changing default values that alter behavior
+- Dropping support for a Python version
+- Changing environment variable names
+
+**What is NOT a breaking change:**
+- Adding new API endpoints
+- Adding optional parameters with defaults
+- Adding new functions/classes
+- Bug fixes that restore intended behavior
+- Internal refactoring (no public API change)
+- Documentation-only changes
+
+### 39.2 Keep a Changelog Format
+
+Use the [Keep a Changelog](https://keepachangelog.com/) format in `CHANGELOG.md`:
+
+```markdown
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- New feature A
+- New feature B
+
+### Changed
+- Modified behavior of X for better Y
+
+### Deprecated
+- Feature Z will be removed in v3.0.0
+
+### Removed
+- Removed deprecated feature W
+
+### Fixed
+- Bug where X would crash on Y input
+
+### Security
+- Fixed vulnerability in authentication flow
+
+## [1.2.0] - 2026-06-15
+
+### Added
+- Pagination support for list endpoints
+- Health check endpoint with per-subsystem status
+
+## [1.1.0] - 2026-06-01
+
+### Added
+- User authentication system
+
+### Fixed
+- Race condition in token refresh (#42)
+
+## [1.0.0] - 2026-05-15
+
+### Added
+- Initial release
+```
+
+**Rules:**
+- **Every release MUST have a CHANGELOG entry** — no exceptions
+- **Entries are grouped by type:** Added, Changed, Deprecated, Removed, Fixed, Security
+- **Each entry describes the change** from the USER's perspective, not the developer's
+- **The [Unreleased] section** is updated as changes are merged
+- **On release**, [Unreleased] is moved to a versioned section with the release date
+- **Do NOT** list every commit — summarize user-visible changes
+- **Do NOT** include internal refactoring, dependency updates (unless they fix security issues), or tooling changes
+
+### 39.3 Conventional Commits for Changelog Automation
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) format for all commit messages:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+**Types and their CHANGELOG mapping:**
+
+| Type | CHANGELOG Section | Example |
+|------|------------------|---------|
+| `feat:` | Added | `feat: add pagination to search endpoint` |
+| `fix:` | Fixed | `fix: prevent race condition in token refresh` |
+| `docs:` | (not in changelog) | `docs: update API documentation` |
+| `style:` | (not in changelog) | `style: format with ruff` |
+| `refactor:` | (not in changelog) | `refactor: extract validation logic` |
+| `perf:` | Changed | `perf: improve query performance 3x` |
+| `test:` | (not in changelog) | `test: add edge case tests for pagination` |
+| `chore:` | (not in changelog) | `chore: update dependencies` |
+| `ci:` | (not in changelog) | `ci: add coverage enforcement to CI` |
+
+**Breaking changes:**
+- Add `!` after the type: `feat!: remove deprecated v1 endpoint`
+- Or add `BREAKING CHANGE:` in the footer:
+  ```
+  feat: migrate to v2 API
+
+  BREAKING CHANGE: The /v1/ endpoints are no longer available.
+  All clients must migrate to /v2/ before upgrading.
+  ```
+
+### 39.4 Git Tags
+
+```bash
+# Create an annotated tag (NOT lightweight)
+git tag -a v1.2.3 -m "Release v1.2.3
+
+### Added
+- Pagination support for list endpoints
+- Health check endpoint with per-subsystem status
+
+### Fixed
+- Race condition in token refresh (#42)
+"
+
+# Push tags to remote
+git push origin v1.2.3
+
+# Verify tag exists
+git tag -l "v*"
+```
+
+### 39.5 Release Automation
+
+Tools for automating releases:
+
+| Tool | When to Use | Setup Complexity |
+|------|-------------|-----------------|
+| **release-please** (Google) | Monorepos, conventional commits, automated CHANGELOG | Medium |
+| **semantic-release** | Node.js/JS projects with conventional commits | Low |
+| **Manual + script** | Small projects, infrequent releases | Low |
+
+**Minimum release process for any project:**
+1. All changes merged to main via PR
+2. CI passes on main
+3. Update CHANGELOG.md (move [Unreleased] to versioned section)
+4. Commit: `chore: release v1.2.3`
+5. Tag: `git tag -a v1.2.3 -m "Release v1.2.3"`
+6. Push: `git push origin main --tags`
+7. Verify release appears in GitHub Releases
+
+---
+
+## 40. Code Coverage Enforcement
+
+Coverage is a necessary but insufficient quality metric. It tells you what code is NOT tested, not whether the tests are good.
+
+### 40.1 Coverage Thresholds — Hard Enforcement
+
+| Scope | Threshold | Enforcement |
+|-------|-----------|-------------|
+| **Project overall** | 80% line coverage | CI fails if below (`--cov-fail-under=80`) |
+| **Critical paths** | 95%+ | Auth, payment, data mutation — manual review required |
+| **New code** | 90%+ | New functions should not reduce overall coverage |
+| **Branch coverage** | 75%+ | Measures if both sides of every branch are tested |
+
+### 40.2 CI Configuration
+
+```yaml
+# In ci.yml test job:
+- name: Run tests with coverage
+  run: |
+    pytest \
+      --cov=. \
+      --cov-fail-under=80 \
+      --cov-report=xml:coverage.xml \
+      --cov-report=term-missing \
+      --cov-report=html:coverage-html \
+      --junitxml=test-results.xml \
+      tests/
+```
+
+### 40.3 Coverage Configuration — `.coveragerc` or `pyproject.toml`
+
+```toml
+# pyproject.toml
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/__init__.py",
+    "src/main.py",               # Entrypoint, hard to unit test
+    "src/core/config.py",        # Pure config, tested implicitly
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 80
+
+[tool.coverage.html]
+directory = "coverage-html"
+
+# Lines to exclude from coverage
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+    "pragma: no cover",
+]
+```
+
+### 40.4 Excluding Code from Coverage
+
+```python
+# Use for code that genuinely cannot be tested:
+def _debug_only_function():  # pragma: no cover
+    """Used only during development debugging."""
+    ...
+
+# Use for platform-specific code:
+if sys.platform == "win32":  # pragma: no cover
+    def platform_specific():
+        ...
+
+# NEVER use 'no cover' to avoid writing tests
+# NEVER use 'no cover' because "it's hard to test"
+# ONLY use 'no cover' when testing is truly impossible (debug tools, platform guards)
+```
+
+### 40.5 Branch Coverage — Why It Matters
+
+Line coverage is deceptive. This function has 100% line coverage but 50% branch coverage:
+
+```python
+def divide(a: int, b: int) -> float | None:
+    if b == 0:                    # Branch: True or False
+        return None               # Only tested with b=0
+    return a / b                  # Only tested with b!=0
+```
+
+To get 100% branch coverage, you need tests for both `b == 0` and `b != 0`.
+
+**Enable branch coverage:**
+```bash
+pytest --cov=. --cov-branch --cov-report=term-missing
+```
+
+### 40.6 What Coverage Cannot Tell You
+
+Coverage does NOT measure:
+- **Test quality** — A test with no assertions has 100% coverage but zero value
+- **Edge case coverage** — Tests might call functions but not exercise boundary conditions
+- **Integration correctness** — Unit tests with 100% coverage can still miss integration bugs
+- **Behavioral correctness** — Covered code can still produce wrong results
+
+**Therefore:** Coverage is a floor, not a ceiling. Meeting the threshold is the minimum. Good tests are the goal.
+
+---
+
+## 41. Observability Standards
+
+Production systems require structured observability — you cannot debug what you cannot see.
+
+### 41.1 Structured Logging
+
+ALL logs in production MUST be structured JSON, not human-readable text.
+
+```python
+import json
+import logging
+from datetime import datetime, timezone
+from typing import Any
+import uuid
+
+class JSONFormatter(logging.Formatter):
+    """Format logs as structured JSON for machine processing."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        log_entry: dict[str, Any] = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "severity": record.levelname,
+            "message": record.getMessage(),
+            "logger": record.name,
+            "module": record.module,
+            "function": record.funcName,
+            "line": record.lineno,
+        }
+
+        # Include trace context if available
+        if hasattr(record, "trace_id"):
+            log_entry["trace_id"] = record.trace_id
+        if hasattr(record, "span_id"):
+            log_entry["span_id"] = record.span_id
+        if hasattr(record, "correlation_id"):
+            log_entry["correlation_id"] = record.correlation_id
+
+        # Include exception info if present
+        if record.exc_info and record.exc_info[1]:
+            log_entry["exception"] = {
+                "type": type(record.exc_info[1]).__name__,
+                "message": str(record.exc_info[1]),
+            }
+
+        # Include extra fields passed via log call
+        if hasattr(record, "extra_fields"):
+            log_entry.update(record.extra_fields)
+
+        return json.dumps(log_entry)
+
+# Setup
+handler = logging.StreamHandler()
+handler.setFormatter(JSONFormatter())
+logging.getLogger().addHandler(handler)
+```
+
+**Log level usage:**
+| Level | When to Use | Example |
+|-------|-------------|---------|
+| **DEBUG** | Per-request details, internal state transitions | "Cache hit for key abc123" |
+| **INFO** | Business operations, lifecycle events | "Processed batch of 42 items in 1.2s" |
+| **WARNING** | Recoverable issues, degraded state | "Retry 2/3 after timeout (123ms)" |
+| **ERROR** | Failures that need investigation | "Failed to connect to database after 3 retries" |
+| **CRITICAL** | System-level failures | "Out of disk space, cannot continue" |
+
+### 41.2 Distributed Tracing with OpenTelemetry
+
+Every service MUST propagate trace context across boundaries.
+
+```python
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+from opentelemetry.instrumentation.redis import RedisInstrumentor
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+
+def setup_tracing(service_name: str, otlp_endpoint: str):
+    """Initialize OpenTelemetry tracing for this service."""
+    tracer_provider = TracerProvider()
+
+    # Export to OTLP collector (Jaeger, Grafana Tempo, etc.)
+    exporter = OTLPSpanExporter(endpoint=otlp_endpoint, insecure=True)
+    tracer_provider.add_span_processor(BatchSpanProcessor(exporter))
+
+    # Set global tracer provider
+    trace.set_tracer_provider(tracer_provider)
+
+    # Auto-instrument libraries
+    FastAPIInstrumentor().instrument()
+    HTTPXClientInstrumentor().instrument()
+    RedisInstrumentor().instrument()
+    SQLAlchemyInstrumentor().instrument()
+
+    return trace.get_tracer(service_name)
+
+# Usage — create spans for custom operations
+tracer = setup_tracing("my-service", "http://otel-collector:4317")
+
+async def process_order(order_id: str):
+    with tracer.start_as_current_span("process_order") as span:
+        span.set_attribute("order.id", order_id)
+        span.add_event("order.validated", {"items": 3})
+
+        # Nested spans for sub-operations
+        with tracer.start_as_current_span("charge_payment"):
+            result = await charge(order_id)
+
+        span.set_attribute("order.status", result.status)
+        return result
+```
+
+### 41.3 Prometheus Metrics
+
+Standard metrics every service MUST export:
+
+```python
+from prometheus_client import Counter, Histogram, Gauge, Info
+from prometheus_client import generate_latest, REGISTRY
+
+# REQUIRED metrics for any web service
+REQUEST_COUNT = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "endpoint", "status"]
+)
+
+REQUEST_DURATION = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request duration in seconds",
+    ["method", "endpoint"],
+    buckets=[0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+)
+
+REQUEST_IN_PROGRESS = Gauge(
+    "http_requests_in_progress",
+    "Currently in-flight HTTP requests"
+)
+
+ERROR_COUNT = Counter(
+    "errors_total",
+    "Total errors by type",
+    ["error_type", "service"]
+)
+
+# Application-specific metrics
+DB_QUERY_DURATION = Histogram(
+    "db_query_duration_seconds",
+    "Database query duration",
+    ["operation", "table"]
+)
+
+CACHE_HIT_RATIO = Gauge(
+    "cache_hit_ratio",
+    "Cache hit ratio (0.0-1.0)"
+)
+
+TASK_QUEUE_SIZE = Gauge(
+    "task_queue_size",
+    "Number of tasks waiting in queue",
+    ["queue_name"]
+)
+
+# Expose metrics endpoint
+@app.get("/metrics")
+async def metrics():
+    return Response(
+        content=generate_latest(REGISTRY),
+        media_type="text/plain"
+    )
+```
+
+### 41.4 Correlation IDs
+
+Every request MUST carry a correlation ID through the entire system.
+
+```python
+from contextvars import ContextVar
+
+correlation_id_var: ContextVar[str] = ContextVar("correlation_id", default="")
+
+class CorrelationIDMiddleware(BaseHTTPMiddleware):
+    """Extract or generate correlation ID for every request."""
+
+    async def dispatch(self, request: Request, call_next):
+        # Extract from header or generate new
+        correlation_id = request.headers.get(
+            "X-Correlation-ID",
+            request.headers.get("X-Request-ID", str(uuid.uuid4()))
+        )
+
+        # Set in context var for this request
+        correlation_id_var.set(correlation_id)
+
+        # Propagate to downstream calls via context
+        response = await call_next(request)
+        response.headers["X-Correlation-ID"] = correlation_id
+        return response
+```
+
+### 41.5 PII Redaction in Logs
+
+NEVER log personally identifiable information. Implement automatic redaction:
+
+```python
+import re
+
+PII_PATTERNS = [
+    (r'\b[\w\.-]+@[\w\.-]+\.\w{2,}\b', '[EMAIL]'),              # Email
+    (r'\b\d{3}-\d{2}-\d{4}\b', '[SSN]'),                        # SSN
+    (r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b', '[CC]'),   # Credit card
+    (r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', '[IP]'),       # IP (in user content)
+    (r'Bearer\s+[A-Za-z0-9\-\._~\+\/]+=*', 'Bearer [TOKEN]'),   # Auth tokens
+    (r'api[_-]?key[=:]\s*[A-Za-z0-9]+', 'api_key=[REDACTED]'),  # API keys in params
+]
+
+def sanitize_for_logging(value: str) -> str:
+    """Redact PII before logging."""
+    for pattern, replacement in PII_PATTERNS:
+        value = re.sub(pattern, replacement, value, flags=re.IGNORECASE)
+    return value
+
+# Usage
+logger.info("User input: %s", sanitize_for_logging(user_input))
+```
+
+### 41.6 Service Level Objectives (SLOs)
+
+Define and monitor these for every production service:
+
+| SLO | Target | Measurement |
+|-----|--------|-------------|
+| **Availability** | 99.9% | Successful requests / total requests |
+| **Latency (p50)** | < 50ms | Median response time |
+| **Latency (p95)** | < 200ms | 95th percentile response time |
+| **Latency (p99)** | < 500ms | 99th percentile response time |
+| **Error rate** | < 0.1% | Error responses / total responses |
+| **Error budget burn rate** | < 1x | Rate of consuming error budget |
+
+**Error budget:** If SLO is 99.9% availability, the error budget is 0.1%. This is ~43 minutes of allowed downtime per month. Track consumption.
+
+---
+
+## 42. Infrastructure as Code
+
+Infrastructure must be defined in code, not configured manually through a web console. Every project that deploys to cloud infrastructure requires IaC.
+
+### 42.1 Tool Selection
+
+| Tool | Language | When to Use |
+|------|----------|-------------|
+| **Terraform** | HCL | Enterprise, multi-cloud, large teams, existing HCL ecosystem |
+| **OpenTofu** | HCL | Terraform-compatible, open-source fork (preferred for new projects) |
+| **Pulumi** | TypeScript/Python/Go | Developer-friendly, type-safe, application teams |
+| **Crossplane** | YAML (K8s CRDs) | Kubernetes-native, GitOps control loops |
+
+### 42.2 Terraform/OpenTofu Project Structure
+
+```
+terraform/
+├── main.tf              # Provider configuration, remote state backend
+├── variables.tf         # Input variables with types and descriptions
+├── outputs.tf            # Output values (connection strings, endpoints, ARNs)
+├── versions.tf           # Provider version constraints
+├── terraform.tfvars      # Variable values (non-sensitive)
+├── network.tf            # VPC, subnets, security groups, NAT gateways
+├── compute.tf            # Compute instances, Kubernetes cluster, load balancers
+├── database.tf           # RDS/Cloud SQL, backups, parameter groups
+├── cache.tf              # Redis/ElastiCache configuration
+├── secrets.tf            # Secrets Manager / Vault references
+├── monitoring.tf         # Alerts, dashboards, log groups
+├── iam.tf                # Service accounts, roles, policies
+└── environments/
+    ├── dev.tfvars
+    ├── staging.tfvars
+    └── prod.tfvars
+```
+
+### 42.3 Core Configuration Template
+
+**`versions.tf`:**
+```hcl
+terraform {
+  required_version = ">= 1.8.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.50"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
+  }
+
+  backend "s3" {
+    bucket         = "mycompany-terraform-state"
+    key            = "myproject/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    dynamodb_table = "terraform-locks"
+  }
+}
+```
+
+**`variables.tf`:**
+```hcl
+variable "environment" {
+  description = "Deployment environment (dev, staging, prod)"
+  type        = string
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "Environment must be dev, staging, or prod."
+  }
+}
+
+variable "instance_count" {
+  description = "Number of compute instances"
+  type        = number
+  default     = 3
+}
+
+variable "database_password" {
+  description = "Master database password"
+  type        = string
+  sensitive   = true
+}
+
+variable "enable_deletion_protection" {
+  description = "Prevent accidental deletion of resources"
+  type        = bool
+  default     = true
+}
+```
+
+**`outputs.tf`:**
+```hcl
+output "database_endpoint" {
+  description = "Database connection endpoint"
+  value       = aws_db_instance.main.endpoint
+  sensitive   = true
+}
+
+output "load_balancer_dns" {
+  description = "Load balancer DNS name"
+  value       = aws_lb.main.dns_name
+}
+
+output "service_url" {
+  description = "Public URL of the deployed service"
+  value       = "https://${var.environment}.example.com"
+}
+```
+
+### 42.4 Multi-Environment Pattern
+
+```bash
+# Initialize (one-time per environment)
+terraform init -backend-config="environments/dev.backend.tfvars"
+
+# Plan changes
+terraform plan -var-file="environments/dev.tfvars" -out=dev.plan
+
+# Apply changes
+terraform apply dev.plan
+
+# Destroy (caution!) — only for ephemeral environments
+terraform destroy -var-file="environments/dev.tfvars"
+```
+
+### 42.5 State Management Rules
+
+| Rule | Detail |
+|------|--------|
+| **Remote state REQUIRED** | Never store state locally — use S3, GCS, Azure Blob, or Terraform Cloud |
+| **State locking REQUIRED** | Use DynamoDB (AWS), Cloud Storage lock (GCP), or equivalent |
+| **Never edit state manually** | Use `terraform state mv/rm/import` commands only |
+| **State encryption at rest** | Enable server-side encryption on state bucket |
+| **State backup** | Enable versioning on state bucket, retain at least 30 days |
+| **Workspace per environment** | Separate state per environment (dev/staging/prod) — never share state |
+
+### 42.6 Pre-Deploy Checklist
+
+Before `terraform apply`:
+- [ ] `terraform fmt --recursive` passes (standardized formatting)
+- [ ] `terraform validate` passes (syntax and reference validation)
+- [ ] `terraform plan` reviewed — no unexpected destroy/replace operations
+- [ ] Sensitive outputs are marked `sensitive = true`
+- [ ] Deletion protection is enabled on stateful resources (databases, storage)
+- [ ] Terraform plan output is saved to version control for audit
+
+---
+
+## 43. Database Backup & Recovery
+
+Data loss is a resume-generating event. Every project with persistent data MUST implement backup and recovery.
+
+### 43.1 Backup Schedule
+
+| Frequency | Retention | Purpose |
+|-----------|-----------|---------|
+| **Daily** | 7 days | Point-in-time recovery for recent mistakes |
+| **Weekly** | 4 weeks | Extended recovery window for delayed-discovered issues |
+| **Monthly** | 12 months | Long-term compliance and audit requirements |
+
+This is the **Grandfather-Father-Son** retention pattern.
+
+### 43.2 PostgreSQL Backup Implementation
+
+```python
+import subprocess
+import gzip
+import shutil
+from datetime import datetime, timedelta
+from pathlib import Path
+
+class DatabaseBackup:
+    def __init__(
+        self,
+        db_url: str,
+        backup_dir: Path,
+        retention_daily: int = 7,
+        retention_weekly: int = 4,
+        retention_monthly: int = 12
+    ):
+        self.db_url = db_url
+        self.backup_dir = backup_dir
+        self.retention_daily = retention_daily
+        self.retention_weekly = retention_weekly
+        self.retention_monthly = retention_monthly
+
+    def create_backup(self) -> Path:
+        """Create a compressed backup of the database."""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        sql_path = self.backup_dir / f"backup_{timestamp}.sql"
+        gz_path = self.backup_dir / f"backup_{timestamp}.sql.gz"
+
+        try:
+            # Dump database
+            subprocess.run(
+                ["pg_dump", self.db_url, "-f", str(sql_path)],
+                check=True,
+                capture_output=True,
+                timeout=3600  # 1 hour timeout for large databases
+            )
+
+            # Compress
+            with open(sql_path, "rb") as f_in:
+                with gzip.open(gz_path, "wb") as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+
+            # Remove uncompressed
+            sql_path.unlink()
+
+            return gz_path
+
+        except subprocess.TimeoutExpired:
+            sql_path.unlink(missing_ok=True)
+            raise RuntimeError("Backup timed out after 1 hour")
+        except Exception:
+            sql_path.unlink(missing_ok=True)
+            gz_path.unlink(missing_ok=True)
+            raise
+
+    def rotate_backups(self):
+        """Apply retention policy — delete expired backups."""
+        backups = sorted(self.backup_dir.glob("backup_*.sql.gz"))
+
+        now = datetime.now()
+        kept_daily = []
+        kept_weekly = []
+        kept_monthly = []
+
+        for backup_path in backups:
+            try:
+                backup_date = datetime.strptime(
+                    backup_path.name, "backup_%Y%m%d_%H%M%S.sql.gz"
+                )
+            except ValueError:
+                continue
+
+            age_days = (now - backup_date).days
+
+            if age_days <= self.retention_daily:
+                kept_daily.append(backup_path)
+                continue
+
+            if age_days <= self.retention_weekly * 7:
+                # Keep one per week (Monday)
+                if backup_date.weekday() == 0:
+                    kept_weekly.append(backup_path)
+                    continue
+
+            if age_days <= self.retention_monthly * 30:
+                # Keep one per month (1st of month)
+                if backup_date.day == 1:
+                    kept_monthly.append(backup_path)
+                    continue
+
+            # Expired — delete
+            backup_path.unlink()
+
+    def list_backups(self) -> list[dict]:
+        """List available backups with metadata."""
+        backups = sorted(self.backup_dir.glob("backup_*.sql.gz"), reverse=True)
+        return [
+            {
+                "filename": p.name,
+                "size_bytes": p.stat().st_size,
+                "size_mb": round(p.stat().st_size / (1024 * 1024), 2),
+                "timestamp": datetime.strptime(
+                    p.name, "backup_%Y%m%d_%H%M%S.sql.gz"
+                ).isoformat()
+            }
+            for p in backups
+        ]
+```
+
+### 43.3 Restore Procedure
+
+```bash
+# 1. Stop application (prevent writes during restore)
+docker compose stop app
+
+# 2. Drop existing database (CAUTION — data loss)
+docker compose exec postgres dropdb -U postgres mydb
+
+# 3. Create fresh database
+docker compose exec postgres createdb -U postgres mydb
+
+# 4. Restore from backup
+gunzip -c /backups/backup_20260615_120000.sql.gz | \
+    docker compose exec -T postgres psql -U postgres mydb
+
+# 5. Start application
+docker compose start app
+
+# 6. Verify restore
+curl -f http://localhost:8000/health
+```
+
+### 43.4 Backup Verification
+
+Automated restore test — validates backup integrity:
+
+```python
+def verify_backup(backup_path: Path, test_db_url: str) -> bool:
+    """Restore backup to ephemeral test database and verify."""
+    try:
+        # Restore to test database
+        subprocess.run(
+            f"gunzip -c {backup_path} | psql {test_db_url}",
+            shell=True, check=True, capture_output=True, timeout=600
+        )
+
+        # Verify critical tables exist and have data
+        result = subprocess.run(
+            f"psql {test_db_url} -c \"SELECT count(*) FROM information_schema.tables WHERE table_schema='public'\"",
+            shell=True, check=True, capture_output=True, text=True
+        )
+
+        table_count = int(result.stdout.strip().split('\n')[-2].strip())
+        return table_count > 0
+
+    except Exception as e:
+        logger.error("Backup verification failed for %s: %s", backup_path.name, e)
+        return False
+    finally:
+        # Clean up test database
+        subprocess.run(
+            f"psql {test_db_url} -c \"DROP SCHEMA public CASCADE; CREATE SCHEMA public\"",
+            shell=True, capture_output=True
+        )
+```
+
+### 43.5 Backup Monitoring
+
+Alert if:
+- **Backup failed** — No successful backup in past 25 hours
+- **Backup size anomaly** — Today's backup is <50% or >200% of average
+- **Verification failed** — Latest backup failed verification test
+- **Off-site sync failed** — S3/GCS replication error
+- **Retention violation** — More backups than configured retention policy allows
+
+### 43.6 Off-Site Backup Replication
+
+```bash
+# Sync backups to S3 (run after each backup)
+aws s3 sync /var/backups/ s3://mycompany-backups/myproject/ \
+    --storage-class STANDARD_IA \
+    --sse AES256
+
+# Verify sync
+aws s3 ls s3://mycompany-backups/myproject/ --recursive | wc -l
+```
+
+---
+
+## 44. Secrets Management
+
+Secrets in code is the #2 cause of security incidents (after phishing). Every project MUST use a tiered secrets strategy.
+
+### 44.1 Tiered Secrets Strategy
+
+| Tier | Tool | When to Use | Security Level |
+|------|------|-------------|----------------|
+| **Local Development** | `.env` files (never committed) | Individual developers | Low — single developer |
+| **Team Development** | Doppler / 1Password CLI | Small teams, shared secrets | Medium — access controlled |
+| **CI/CD** | GitHub Secrets / GitLab CI Variables | Build pipeline secrets | Medium — scoped to repo |
+| **GitOps** | SOPS + Age/PGP | Encrypted secrets in git, decrypted at deploy | High — encrypted at rest |
+| **Cloud-Native** | AWS Secrets Manager / Azure Key Vault / GCP Secret Manager | Cloud provider managed, IAM-integrated | High — managed rotation |
+| **Enterprise** | HashiCorp Vault | Dynamic secrets, leasing, audit logging, PKI | Highest — full audit trail |
+
+### 44.2 SOPS + Age Encryption (GitOps Pattern)
+
+```bash
+# Install SOPS and age
+brew install sops age
+
+# Generate age key
+age-keygen -o ~/.config/sops/age/keys.txt
+
+# Create .sops.yaml configuration
+cat > .sops.yaml << 'EOF'
+creation_rules:
+  - path_regex: secrets/dev\.yaml$
+    age: >-
+      age1abc123...
+  - path_regex: secrets/prod\.yaml$
+    age: >-
+      age1xyz789...
+EOF
+
+# Encrypt secrets file
+sops --encrypt secrets.yaml > secrets.enc.yaml
+
+# Edit encrypted file
+sops secrets.enc.yaml
+
+# Decrypt at deploy time
+sops --decrypt secrets.enc.yaml > secrets.yaml
+```
+
+### 44.3 Secrets That MUST Be Managed
+
+| Secret Type | Storage | Rotation | Justification |
+|------------|---------|----------|---------------|
+| **Database passwords** | Vault / Secrets Manager | 90 days | Primary data access |
+| **API keys (third-party)** | Vault / Secrets Manager | 90 days | External service access |
+| **Encryption keys** | Vault / KMS | 365 days | Data encryption at rest |
+| **JWT signing secrets** | Vault / Secrets Manager | 90 days | Auth token integrity |
+| **TLS certificates** | Cert Manager / ACM | Auto-renew | HTTPS termination |
+| **OAuth client secrets** | Vault / Secrets Manager | 180 days | Third-party auth |
+| **Webhook secrets** | Vault / Secrets Manager | 90 days | Inbound verification |
+| **CI/CD deploy tokens** | GitHub Secrets / Vault | 90 days | Deployment pipeline |
+
+### 44.4 Secret Rotation Pattern
+
+```python
+from cryptography.fernet import Fernet
+from datetime import datetime, timedelta
+import base64
+
+class SecretRotator:
+    def __init__(self, vault_client, key_path: str, rotation_days: int = 90):
+        self.vault = vault_client
+        self.key_path = key_path
+        self.rotation_days = rotation_days
+
+    def needs_rotation(self) -> bool:
+        """Check if secret is due for rotation."""
+        metadata = self.vault.read_metadata(self.key_path)
+        created = datetime.fromisoformat(metadata["created_time"])
+        age_days = (datetime.now() - created).days
+        return age_days >= self.rotation_days
+
+    def rotate(self) -> None:
+        """Rotate a secret with zero-downtime dual-key window."""
+        # 1. Generate new secret
+        new_key = base64.urlsafe_b64encode(Fernet.generate_key()).decode()
+        old_key = self.vault.read_secret(self.key_path)["value"]
+
+        # 2. Store new key alongside old (dual-key window)
+        self.vault.write_secret(f"{self.key_path}_new", {"value": new_key})
+
+        # 3. Deploy new key to all services
+        self._deploy_key(new_key)
+
+        # 4. Promote new key to primary
+        self.vault.write_secret(self.key_path, {"value": new_key, "previous": old_key})
+
+        # 5. Remove temporary key
+        self.vault.delete_secret(f"{self.key_path}_new")
+
+        # 6. Monitor for old-key failures (grace period)
+        # After grace period, old key is no longer valid
+
+    def _deploy_key(self, key: str) -> None:
+        """Deploy new key to all services."""
+        # Trigger config reload on all instances
+        # Implementation depends on deployment architecture
+        pass
+```
+
+### 44.5 Secret Scanning in CI
+
+```yaml
+# Add to ci.yml
+- name: Scan for secrets
+  uses: gitleaks/gitleaks-action@v2
+  with:
+    config-path: .gitleaks.toml
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# Or with truffleHog
+- name: Scan for secrets
+  run: |
+    pip install trufflehog3
+    trufflehog3 --format json --output trufflehog-report.json .
+```
+
+### 44.6 Secrets Management Rules
+
+- **NEVER** commit secrets to git — enforced by pre-commit `detect-secrets` and CI scanning
+- **NEVER** share secrets via email, Slack, or any unencrypted channel
+- **NEVER** hardcode secrets in Docker images — use runtime injection
+- **NEVER** log secrets — implement PII redaction (Section 41.5)
+- **ALWAYS** use a secrets manager (not `.env` files) for production
+- **ALWAYS** rotate secrets on a schedule — automate rotation
+- **ALWAYS** use least privilege — each service gets only the secrets it needs
+- **ALWAYS** use ephemeral credentials when possible (Vault dynamic secrets, OIDC tokens)
+- **ALWAYS** audit secret access — who accessed, when, from where
+- **NEVER** reuse secrets across environments — dev and prod must have different credentials
+
+---
+
+## 45. Flaky Test Management
+
+Flaky tests (tests that pass and fail intermittently without code changes) erode trust in the test suite. They are a top cause of CI burnout and deployment delays.
+
+### 45.1 Four Sources of Flakiness (Google Classification)
+
+| Source | Example | Frequency |
+|--------|---------|-----------|
+| **The tests themselves** | Improper initialization, ordering dependencies, race conditions in test code | Most common |
+| **The test framework** | Resource allocation errors, scheduling collisions, test runner bugs | Uncommon |
+| **The application (SUT)** | Slow responses, memory leaks, genuine non-determinism | Common |
+| **OS/hardware/network** | Network instability, disk errors, CI resource exhaustion | Common in CI |
+
+### 45.2 Flaky Test Detection
+
+```python
+# pytest.ini
+[pytest]
+# Re-run failed tests to detect flakiness
+addopts =
+    --reruns 2
+    --reruns-delay 1
+    --only-rerun "AssertionError"
+    --only-rerun "TimeoutError"
+```
+
+```bash
+# Install rerun plugin
+pip install pytest-rerunfailures
+
+# Run tests with retry (detects flaky tests)
+pytest --reruns 3 --reruns-delay 1
+
+# Create a report of flaky tests
+pytest --reruns 3 --rerun-flaky-report=flaky_report.json
+```
+
+### 45.3 Quarantine Mechanism
+
+When a flaky test is discovered, quarantine it immediately — do NOT delete it:
+
+```python
+import pytest
+
+@pytest.mark.flaky(reason="Intermittent timeout in CI, ticket #1234")
+def test_thing_that_flakes():
+    """This test is quarantined — it does NOT block CI but IS tracked."""
+    result = do_something()
+    assert result is not None
+```
+
+```ini
+# pytest.ini — exclude quarantined tests from CI
+[pytest]
+markers =
+    flaky: Test is known to be flaky (see ticket for details)
+```
+
+**Quarantine process:**
+1. **Detect** — Identify flaky test from CI failures
+2. **Quarantine** — Add `@pytest.mark.flaky` marker with reason and ticket reference
+3. **Track** — Create an issue to fix the flaky test within 7 days
+4. **Fix** — Root-cause the flakiness (not just re-run)
+5. **Unquarantine** — Remove the marker after the fix is verified stable for 10+ CI runs
+
+### 45.4 Remediation Strategies
+
+| Problem | Wrong Fix | Right Fix |
+|---------|-----------|-----------|
+| **Ordering dependency** | Renumber tests to run in order | Make each test create its own fixtures, use `@pytest.fixture(autouse=False)` |
+| **Shared mutable state** | Add `time.sleep(1)` between tests | Reset state in fixture teardown, isolate test data by test |
+| **Time-dependent tests** | Use wide time tolerances (e.g., ±5s) | Freeze time with `freezegun` or inject a clock |
+| **External dependency flaky** | Skip test if external service is down | Mock external services, add contract tests for actual integration |
+| **Race condition in app** | Increase test timeout | Fix the race condition (add proper synchronization) |
+| **CI resource contention** | Run tests sequentially | Profile test resource usage, add resource requests/limits |
+
+### 45.5 NEVER Do These for Flaky Tests
+
+- **NEVER** delete a failing test without understanding why it failed
+- **NEVER** add `time.sleep()` to a test — fix the synchronization, don't paper over it
+- **NEVER** increase a timeout arbitrarily — understand why it's slow
+- **NEVER** mark a test as "known flaky" without creating a fix ticket — quarantine expires
+- **NEVER** skip a flaky test without a documented reason
+- **NEVER** allow flaky tests to accumulate — fix them within SLA (7 days)
+
+### 45.6 Test Isolation Principles
+
+Every test must be:
+- **Independent** — Can run in any order, in parallel, or alone
+- **Self-contained** — Creates its own fixtures, doesn't depend on prior test state
+- **Deterministic** — Same inputs produce same outputs every run
+- **Hermetic** — No external dependencies (network, database, filesystem) unless explicitly an integration test
+- **Fast** — Unit tests < 1s each, integration tests < 10s each
+
+```python
+# CORRECT — isolated test
+@pytest.fixture
+def fresh_user():
+    """Each test gets its own user — no shared state."""
+    return User(name="Test User", email="test@example.com")
+
+def test_user_creation(fresh_user):
+    assert fresh_user.name == "Test User"
+
+def test_user_email_update(fresh_user):
+    fresh_user.email = "updated@example.com"
+    assert fresh_user.email == "updated@example.com"
+    # Does NOT affect test_user_creation — they get different fixtures
+
+# WRONG — interdependent tests
+created_user_id = None
+
+def test_create_user():
+    global created_user_id
+    user = create_user("Alice")
+    created_user_id = user.id
+    assert user.id is not None
+
+def test_update_user():
+    # DEPENDS on test_create_user running first — will fail if run alone
+    update_user(created_user_id, name="Bob")
+```
+
+---
+
+## 46. Mutation Testing
+
+Line/branch coverage tells you what code EXECUTES — mutation testing tells you what code is actually TESTED (tested meaning: tests fail when code behavior changes).
+
+### 46.1 What Mutation Testing Does
+
+Mutation testing introduces small bugs ("mutants") into your code and checks if your tests catch them:
+
+```python
+# Original code
+def is_adult(age: int) -> bool:
+    return age >= 18
+
+# Mutant 1: Relational operator replacement
+def is_adult(age: int) -> bool:
+    return age > 18  # Changed >= to > — test should catch this
+
+# Mutant 2: Constant replacement
+def is_adult(age: int) -> bool:
+    return age >= 0  # Changed 18 to 0 — test should catch this
+
+# Mutant 3: Statement deletion
+def is_adult(age: int) -> bool:
+    pass  # Entire body removed — test should catch this
+```
+
+If your tests PASS for any mutant, that mutant "survived" — meaning the code is not properly tested. The goal is to kill >95% of mutants.
+
+### 46.2 Setup with mutmut
+
+```bash
+# Install mutmut
+pip install mutmut
+
+# Run mutation testing
+mutmut run --paths-to-mutate=src/
+
+# Show results
+mutmut results
+
+# Show surviving mutants
+mutmut show
+
+# Apply surviving mutants to source (for inspection)
+mutmut apply <mutant_id>
+```
+
+### 46.3 CI Integration
+
+```yaml
+# In CI — run on main branch or weekly
+mutation-test:
+  name: Mutation Testing
+  runs-on: ubuntu-latest
+  if: github.ref == 'refs/heads/main'
+  strategy:
+    matrix:
+      python-version: ['3.12']
+  steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      with:
+        python-version: ${{ matrix.python-version }}
+    - run: pip install -r requirements.txt mutmut
+    - name: Run mutation tests
+      run: |
+        mutmut run --paths-to-mutate=src/ || true
+        mutmut results
+    - name: Check mutation score
+      run: |
+        # Parse mutmut results and fail if below threshold
+        SCORE=$(mutmut results | grep "Killed" | awk '{print $2}')
+        if [ "$SCORE" -lt 850 ]; then  # 85% kill rate
+          echo "Mutation score too low: ${SCORE}/1000"
+          exit 1
+        fi
+```
+
+### 46.4 Arid Node Configuration
+
+Not all code benefits from mutation testing. Configure mutmut to skip "arid nodes" — AST nodes where mutants are unproductive:
+
+**.mutmut-cache or pyproject.toml:**
+```toml
+[tool.mutmut]
+paths_to_mutate = ["src"]
+backup = false
+runner = "python -m pytest"
+
+[tool.mutmut.exclude]
+# Skip these — mutants here don't produce useful signals
+functions = [
+    "__repr__",
+    "__str__",
+    "__init__",
+    "log_*",
+    "_log_*",
+]
+
+paths = [
+    "*/tests/*",
+    "*/migrations/*",
+    "src/core/logging.py",
+    "src/core/config.py",
+]
+```
+
+### 46.5 Arid Node Types to Skip
+
+| Node Type | Why Skip | Example |
+|-----------|----------|---------|
+| **Logging statements** | Changing log messages doesn't affect behavior | `logger.info("Processing %s", id)` |
+| **Error messages** | Changing error text doesn't change logic | `raise ValueError("Invalid input")` |
+| **Tuning parameters** | Changing a constant without domain knowledge is noise | `TIMEOUT = 30` |
+| **Mocked dependencies** | Mutating mock setup tests the mock, not the code | `mock_db.save.return_value = True` |
+| **Idiomatic patterns** | Language idioms where any change is always a bug | `if items is None: items = []` |
+| **Debug-only code** | Code that only runs in development | `if DEBUG: show_debug_panel()` |
+
+### 46.6 Mutation Score Interpretation
+
+| Score | Meaning | Action |
+|-------|---------|--------|
+| **90%+** | Excellent — tests are catching behavior changes | Maintain |
+| **80-90%** | Good — some gaps, investigate survivors | Add tests for survivors |
+| **70-80%** | Fair — significant untested behavior | Prioritize gap closure |
+| **<70%** | Poor — tests are mostly worthless | Major test overhaul needed |
+
+### 46.7 Targeting Mutation Testing
+
+Don't mutation test the entire codebase every time. Target:
+
+1. **Changed code** — Only mutation test files modified in the current PR
+2. **Critical paths** — Auth, payment, data mutation — always mutation test
+3. **New code** — 100% mutation score required for new functions
+4. **Legacy code** — Mutation test incrementally as you refactor
+
+```bash
+# Mutation test only changed files
+git diff --name-only HEAD~1 | grep '\.py$' | grep -v tests/ | xargs mutmut run
+```
+
+---
+
+## 47. Performance Benchmark Testing
+
+Performance regressions are bugs. They should be caught in CI, not in production by users complaining about slowness.
+
+### 47.1 Setup with pytest-benchmark
+
+```bash
+pip install pytest-benchmark
+```
+
+```python
+# tests/benchmarks/test_performance.py
+import pytest
+
+def test_model_scoring_benchmark(benchmark):
+    """Scoring 1000 items must complete under 50ms."""
+    items = generate_test_items(1000)
+
+    result = benchmark(scoring_function, items)
+
+    assert result is not None
+
+def test_db_query_benchmark(benchmark, db_session):
+    """List query with 10k rows must complete under 100ms."""
+    # Populate test data
+    for i in range(10_000):
+        db_session.add(Item(name=f"item_{i}"))
+    db_session.commit()
+
+    result = benchmark(
+        lambda: db_session.query(Item).filter(Item.name.like("item_99%")).all()
+    )
+
+    assert len(result) > 0
+
+def test_api_endpoint_benchmark(benchmark, client):
+    """GET /api/items must complete under 30ms p95."""
+    response = benchmark(client.get, "/api/items?limit=50")
+    assert response.status_code == 200
+```
+
+### 47.2 Time Budget Assertions
+
+```python
+def test_critical_path_with_time_budget(benchmark):
+    """Critical path operations have hard time budgets."""
+    budget_ms = {
+        "validate_token": 5,
+        "check_permission": 10,
+        "fetch_user": 20,
+        "serialize_response": 5,
+    }
+
+    for operation, max_ms in budget_ms.items():
+        fn = get_operation(operation)
+        benchmark.name = f"time_budget_{operation}"
+
+        result = benchmark(fn, test_input())
+
+        # Assert median time is within budget
+        stats = benchmark.stats
+        assert stats.stats.median < max_ms / 1000.0, \
+            f"{operation}: median {stats.stats.median*1000:.1f}ms exceeds budget {max_ms}ms"
+```
+
+### 47.3 CI Integration
+
+```yaml
+# Performance regression detection in CI
+benchmark:
+  name: Performance Benchmarks
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    - name: Run benchmarks
+      run: |
+        pytest tests/benchmarks/ \
+          --benchmark-only \
+          --benchmark-json=benchmark_results.json \
+          --benchmark-autosave
+
+    - name: Compare against baseline
+      run: |
+        pytest-benchmark compare HEAD~1 HEAD --group-by=name
+
+    - name: Fail on regression
+      run: |
+        # Parse results and fail if any benchmark regressed >10%
+        python scripts/check_benchmark_regression.py benchmark_results.json
+
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: pytest
+        output-file-path: benchmark_results.json
+        alert-threshold: 120%  # Alert if >20% regression
+        comment-on-alert: true
+        fail-on-alert: true
+        auto-push: false
+```
+
+### 47.4 What to Benchmark
+
+| Category | What to Measure | Target |
+|----------|----------------|--------|
+| **API endpoints** | Response time p50, p95, p99 | <50ms p95 for reads, <200ms p95 for writes |
+| **Database queries** | Query execution time | <20ms for simple queries, <100ms for joins |
+| **Serialization** | JSON parse + serialize | <5ms for typical payload |
+| **Authentication** | Token validation | <10ms |
+| **Cache operations** | Get/Set operations | <2ms |
+| **Startup time** | Application boot to first request | <5s |
+| **Memory usage** | RSS after warmup | <500MB baseline |
+
+### 47.5 NEVER Do These for Benchmarks
+
+- **NEVER** run benchmarks on oversubscribed CI runners — use dedicated runners or control for noise
+- **NEVER** compare benchmarks across different machines — always use same hardware
+- **NEVER** accept a 20%+ regression without investigation
+- **NEVER** benchmark with unrealistic data volumes — test with production-scale data
+- **NEVER** benchmark only happy paths — measure worst-case performance too
+- **NEVER** skip benchmarking "because the change is small" — small changes cause big regressions
+
+---
+
+## 48. Contract Testing (Pact)
+
+Contract tests verify that service boundaries are respected — that providers meet consumer expectations and consumers don't depend on undocumented behavior.
+
+### 48.1 Consumer-Driven Contract Testing
+
+A **consumer** defines what it expects from a **provider**. The provider verifies it meets all consumers' expectations.
+
+```
+Consumer A (Web App) ──> expects GET /users/{id} returns {id, name, email}
+Consumer B (Mobile)  ──> expects GET /users/{id} returns {id, name, email, avatar_url}
+                          ↓
+Provider (User API) ───── Must satisfy ALL consumer expectations
+```
+
+### 48.2 Setup with Pact (Python)
+
+```bash
+pip install pact-python
+```
+
+### 48.3 Consumer Test (Defines Expectations)
+
+```python
+# tests/contract/consumer/test_user_api_contract.py
+import atexit
+import pytest
+from pact import Consumer, Provider
+
+pact = Consumer("WebApp").has_pact_with(
+    Provider("UserAPI"),
+    host_name="localhost",
+    port=1234,
+    pact_dir="./pacts"
+)
+
+pact.start_service()
+atexit.register(pact.stop_service)
+
+def test_get_user(pact: Pact):
+    """WebApp expects GET /users/{id} to return specific fields."""
+    expected_response = {
+        "id": 42,
+        "name": "Alice Smith",
+        "email": "alice@example.com"
+    }
+
+    (pact
+     .given("a user with id 42 exists")
+     .upon_receiving("a request for user 42")
+     .with_request("GET", "/users/42")
+     .will_respond_with(200, body=expected_response))
+
+    with pact:
+        result = UserAPIClient("http://localhost:1234").get_user(42)
+
+    assert result.id == 42
+    assert result.name == "Alice Smith"
+    assert result.email == "alice@example.com"
+    # Note: does NOT assert avatar_url — WebApp doesn't need it
+```
+
+### 48.4 Provider Verification (Satisfies Consumer Expectations)
+
+```bash
+# Run provider verification against running User API
+pact-verifier \
+  --provider-base-url=http://localhost:8000 \
+  --pact-url=./pacts/WebApp-UserAPI.json \
+  --provider-states-setup-url=http://localhost:8000/_pact/provider_states
+```
+
+```python
+# Provider state setup endpoint
+@app.post("/_pact/provider_states")
+async def provider_states(request: ProviderStateRequest):
+    """Set up test state for Pact verification."""
+    if request.state == "a user with id 42 exists":
+        db.add(User(id=42, name="Alice Smith", email="alice@example.com"))
+        db.commit()
+        return {"status": "ok"}
+    raise ValueError(f"Unknown state: {request.state}")
+```
+
+### 48.5 Contract Testing in CI
+
+```yaml
+contract-test:
+  name: Contract Tests
+  runs-on: ubuntu-latest
+  services:
+    user-api:
+      image: user-api:test
+      ports:
+        - 8000:8000
+  steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    - name: Generate consumer contracts
+      run: pytest tests/contract/consumer/ -k "consumer"
+
+    - name: Verify provider against contracts
+      run: |
+        pact-verifier \
+          --provider-base-url=http://localhost:8000 \
+          --pact-dir=./pacts/ \
+          --provider-states-setup-url=http://localhost:8000/_pact/provider_states
+
+    - name: Publish contracts to Pact Broker
+      run: |
+        pact-broker publish ./pacts/ \
+          --consumer-app-version=${{ github.sha }} \
+          --broker-base-url=https://pact-broker.example.com \
+          --broker-token=${{ secrets.PACT_BROKER_TOKEN }}
+
+    - name: Check if safe to deploy (can-i-deploy)
+      run: |
+        pact-broker can-i-deploy \
+          --pacticipant WebApp \
+          --version=${{ github.sha }} \
+          --to-environment production \
+          --broker-base-url=https://pact-broker.example.com \
+          --broker-token=${{ secrets.PACT_BROKER_TOKEN }}
+```
+
+### 48.6 What to Contract Test
+
+| Contract Type | When to Use | Example |
+|---------------|-------------|---------|
+| **API responses** | Always | Verify response schema, fields, types |
+| **Error responses** | Always | Verify error format, status codes |
+| **HTTP headers** | Often | Content-Type, auth headers |
+| **Query parameters** | When used | Filtering, pagination, sorting |
+| **Event schemas** | For event-driven | Message format, required fields |
+| **Async callbacks** | For webhooks | Callback URL, payload format |
+
+### 48.7 Contract Versioning
+
+```python
+# In consumer test, include version
+pact = Consumer("WebApp", version="1.2.3").has_pact_with(
+    Provider("UserAPI"),
+    pact_dir="./pacts"
+)
+
+# Pact Broker stores all versions, enables:
+# - Backward compatibility checking
+# - Can-I-Deploy checks
+# - Dependency graph visualization
+```
+
+---
+
+## 49. Chaos Engineering
+
+Chaos engineering validates that systems behave correctly under failure conditions. It is NOT random destruction — it is controlled experimentation.
+
+### 49.1 Principles (from Netflix Chaos Engineering)
+
+1. **Define "steady state"** — Metrics that represent normal behavior
+2. **Hypothesize** — Steady state will continue in both control and experimental groups
+3. **Introduce variables** — Simulate real-world failures (server crashes, network latency, resource exhaustion)
+4. **Disprove hypothesis** — Look for deviations from steady state
+5. **Minimize blast radius** — Start small, expand gradually
+
+### 49.2 Experiment Design Template
+
+Every chaos experiment MUST follow this template:
+
+```yaml
+experiment:
+  name: Database Connection Failure
+  hypothesis: >
+    When the primary database becomes unreachable for 30 seconds,
+    the application will serve stale data from cache and reconnect
+    automatically within 5 seconds of database recovery.
+  steady_state_metrics:
+    - p95_latency_ms < 200
+    - error_rate < 0.01
+    - cache_hit_ratio > 0.50
+  method:
+    - type: network_partition
+      target: database
+      duration_seconds: 30
+  blast_radius:
+    - environment: staging
+    - affected_services: [api]
+    - unaffected_services: [background_worker]
+  rollback:
+    trigger: error_rate > 0.10 OR p95_latency_ms > 1000 OR duration > 120
+    action: restore_network
+  success_criteria:
+    - error_rate stayed below 0.05
+    - p95_latency_ms stayed below 500
+    - No data corruption detected
+    - Application reconnected within 5s of database recovery
+```
+
+### 49.3 Failure Injection Patterns
+
+```python
+import asyncio
+import random
+from contextlib import asynccontextmanager
+from typing import Callable, Awaitable
+
+class FailureInjector:
+    """Inject controlled failures for chaos testing."""
+
+    def __init__(self, enabled: bool = False):
+        self.enabled = enabled
+
+    @asynccontextmanager
+    async def latency(self, min_ms: int = 50, max_ms: int = 500):
+        """Inject random latency into an operation."""
+        if self.enabled:
+            delay = random.uniform(min_ms, max_ms) / 1000
+            await asyncio.sleep(delay)
+        yield
+
+    async def maybe_fail(self, failure_rate: float = 0.1, error_type: type = Exception):
+        """Fail with given probability."""
+        if self.enabled and random.random() < failure_rate:
+            raise error_type("Chaos monkey says no")
+
+    async def maybe_timeout(self, timeout_rate: float = 0.1, duration_s: float = 30):
+        """Timeout with given probability."""
+        if self.enabled and random.random() < timeout_rate:
+            await asyncio.sleep(duration_s)
+            raise TimeoutError("Chaos timeout")
+
+# Usage in production code (gated by config)
+chaos = FailureInjector(enabled=config.CHAOS_ENGINEERING_ENABLED)
+
+async def fetch_data_from_db(query: str):
+    await chaos.maybe_fail(failure_rate=0.05, error_type=ConnectionError)
+    async with chaos.latency(min_ms=10, max_ms=200):
+        return await db.execute(query)
+```
+
+### 49.4 Chaos Experiment Library
+
+| Experiment | What It Tests | How to Run |
+|-----------|---------------|------------|
+| **Kill a service** | Failover, health checks, graceful degradation | `docker compose stop <service>` |
+| **Network latency** | Timeout handling, retry logic | `tc qdisc add dev eth0 root netem delay 500ms` |
+| **Network partition** | Service isolation, split-brain prevention | `iptables -A INPUT -s <service_ip> -j DROP` |
+| **CPU exhaustion** | Throttling, resource limits, priority scheduling | `stress --cpu 4 --timeout 60s` |
+| **Memory exhaustion** | OOM handling, graceful degradation | `stress --vm 2 --vm-bytes 1G --timeout 60s` |
+| **Disk full** | Error handling, cleanup, alerting | `dd if=/dev/zero of=/tmp/fill bs=1M count=1000` |
+| **DNS failure** | Caching, fallback IPs | `iptables -A OUTPUT -p udp --dport 53 -j DROP` |
+| **Dependency slow** | Circuit breaker, timeout configuration | Inject latency at proxy level |
+| **Clock skew** | Time-based logic, token expiry | Change system clock by ±5 minutes |
+| **Certificate expiry** | TLS handling, renewal automation | Use short-lived certs in staging |
+
+### 49.5 Game Day Checklist
+
+**Before game day:**
+- [ ] All observability tooling is in place (logs, metrics, traces, alerts)
+- [ ] Steady state metrics are defined and measurable
+- [ ] Blast radius is minimized (start with staging, one service)
+- [ ] Rollback plan is documented and tested
+- [ ] Communication channel is established (Slack channel, incident bridge)
+- [ ] All team members know the experiment is running
+
+**During game day:**
+- [ ] Announce experiment start
+- [ ] Inject failure
+- [ ] Observe system response (monitor dashboards)
+- [ ] Document observations in real time
+- [ ] If steady state is violated beyond hypothesis, abort immediately
+- [ ] Announce experiment end
+
+**After game day:**
+- [ ] Write post-mortem: what happened, what was learned, what needs to change
+- [ ] Create action items for any weaknesses discovered
+- [ ] Schedule fix implementation
+- [ ] Re-run experiment after fixes to verify improvement
+- [ ] Share learnings with the team
+
+### 49.6 Chaos Engineering Readiness
+
+Don't start chaos engineering unless:
+- [ ] You have comprehensive monitoring (metrics, logs, traces)
+- [ ] You have defined SLOs and steady state metrics
+- [ ] You have automated rollback/deployment
+- [ ] Your on-call rotation is established
+- [ ] You have run failure mode analysis (FMEA) on your architecture
+- [ ] Your blast radius can be contained to non-production environments first
+
+**Start simple:**
+1. First experiment: Kill a non-critical service in staging. Observe.
+2. Second: Add network latency to staging database. Observe.
+3. Third: Fill staging disk to 90%. Observe.
+4. Fourth: Move to production with minimal blast radius.
+5. Continue expanding scope as confidence grows.
+
+---
+
+
+---
+
 ## Change Log
 
 | Date | Change |
@@ -2831,3 +5328,7 @@ spec:
 | 2026-06-03 | Added Section 27: Comprehensive code quality standards (Python idioms, anti-patterns, security, performance, testing, error handling) |
 | 2026-06-03 | Added Section 28: Default tech stack playbook (FastAPI, Next.js, Gin, databases, decision tree, anti-recommendations) |
 | 2026-06-03 | Added Sections 29-32: Operational patterns (circuit breaker, DLQ, middleware, semantic cache), health endpoint spec, production security (prompt injection, audit logging, key encryption, IP whitelist, CI workflow), Docker support (Dockerfile, compose, Kubernetes) |
+| 2026-06-19 | Added Sections 33-36: PR & change size standards (800-line max, single feature, draft conventions, first-time contributor path), AI code quality anti-pattern detection (think first, spot laziness/uncertainty/bloat, accountability chain, module/file size bounds, platform support), PR description format & template (HUMAN/AGENT sections, mandatory elements, forbidden elements), explicit "NEVER" list (code, git, GitHub, testing, documentation, AI agent prohibitions) |
+| 2026-06-19 | Added Sections 37-41: Pre-commit hook standards (MANDATORY gate, standard config template, hook catalog, enforcement policy, detect-secrets baseline), CI/CD pipeline standards (ci.yml, release.yml, deploy.yml, SHA-pinning convention, PR/issue templates, branch protection rules), semantic versioning & changelog (semver rules, Keep a Changelog format, conventional commits mapping, git tags, release automation), code coverage enforcement (80% floor, branch coverage, CI fail-under gate, exclusions policy, coverage limitations), observability standards (structured JSON logging, OpenTelemetry distributed tracing, Prometheus metrics, correlation IDs, PII redaction, SLOs with error budgets) |
+| 2026-06-19 | Added Sections 42-45: Infrastructure as Code (Terraform/OpenTofu structure, provider config, multi-env pattern, state management rules, pre-deploy checklist), database backup & recovery (Grandfather-Father-Son retention, pg_dump implementation, restore procedure, backup verification, off-site replication, monitoring), secrets management (tiered strategy from .env to Vault, SOPS+Age encryption, rotation pattern, CI scanning, security rules), flaky test management (Google's four sources of flakiness, detection with pytest-rerunfailures, quarantine mechanism, remediation strategies, test isolation principles) |
+| 2026-06-19 | Added Sections 46-49: Mutation testing (mutmut setup, CI integration, arid node configuration, mutation score interpretation, targeted mutation testing), performance benchmark testing (pytest-benchmark, time budget assertions, CI regression detection, what to benchmark), contract testing with Pact (consumer-driven contracts, provider verification, CI integration with Pact Broker, versioning, what to contract test), chaos engineering (Netflix principles, experiment design template, failure injection patterns, experiment library, game day checklist, readiness assessment) |
