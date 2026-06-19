@@ -8,13 +8,13 @@
 
 ## 1. Core Principles
 
-- **No dead code.** Every function must be called by a production path. Remove unused imports, variables, and definitions immediately.
-- **No stubs.** Every function, module, component, and endpoint must have a real implementation.
-- **No silent failures.** Wrapped exception handlers (`except Exception: pass`) must have a comment explaining why the failure is non-critical. Log before swallowing.
-- **Test-first.** Every module should have corresponding tests. Tests must pass before moving on.
-- **Proven integration.** After building any component, verify it works end-to-end. Do not mark a task complete without verification.
-- **Cross-service contract tests.** When building features spanning multiple services, write integration tests that exercise the actual HTTP contracts between them.
-- **Trace every function call.** Before marking a module complete, verify every public function is called by a production path.
+- **No dead code.** Every function must be called by a production path. Remove unused imports, variables, and definitions immediately. *(How: Section 9 — vulture sweep before commit)*
+- **No stubs.** Every function, module, component, and endpoint must have a real implementation. *(How: Section 8 — test execution validates real output)*
+- **No silent failures.** Wrapped exception handlers (`except Exception: pass`) must have a comment explaining why the failure is non-critical. Log before swallowing. *(How: Section 10 — error handling patterns)*
+- **Test-first.** Every module should have corresponding tests. Tests must pass before moving on. *(How: Section 8, Section 40 — coverage enforcement)*
+- **Proven integration.** After building any component, verify it works end-to-end. Do not mark a task complete without verification. *(How: Section 23 — verification gates)*
+- **Cross-service contract tests.** When building features spanning multiple services, write integration tests that exercise the actual HTTP contracts between them. *(How: Section 48 — contract testing)*
+- **Trace every function call.** Before marking a module complete, verify every public function is called by a production path. *(How: Section 9 — vulture identifies uncalled functions)*
 
 ---
 
@@ -4636,7 +4636,7 @@ Flaky tests (tests that pass and fail intermittently without code changes) erode
 
 ### 45.2 Flaky Test Detection
 
-```python
+```ini
 # pytest.ini
 [pytest]
 # Re-run failed tests to detect flakiness
@@ -5636,14 +5636,17 @@ should be:
 
 Every instruction loaded into context costs tokens. Large AGENTS.md files can consume significant portions of the context window before the task even begins.
 
-**Rules for instruction size:**
+**Rules for PROJECT-SPECIFIC AGENTS.md files:**
 - **Total AGENTS.md ≤ 2,000 lines** — if longer, split into core + domain guides
 - **Per-request instruction budget ≤ 5,000 tokens** — measure this, don't guess
 - **Context headroom minimum: 70%** — at least 70% of context window must be available for the task itself
 - **Periodic context snapshot** — if context exceeds 50%, summarize key decisions to external storage before continuing
 
+**Exception — this template (standardized-markdown):**
+This repository is a universal template library, not a project-specific instruction file. It intentionally exceeds these limits. Individual projects should copy only relevant sections and keep the adapted AGENTS.md within the size budget. The full template serves as a reference — project AGENTS.md files should be lean subsets.
+
 **Size monitoring pattern:**
-```python
+```bash
 # Estimate token count of AGENTS.md (rough: 1 token ≈ 0.75 words)
 python -c "
 words = open('AGENTS.md').read().split()

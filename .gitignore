@@ -1,0 +1,16 @@
+tests/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.coverage
+coverage.xml
+coverage-html/
+.DS_Store
+*.swp
+*.swo
