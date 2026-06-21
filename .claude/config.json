@@ -1,7 +1,7 @@
 {
   "project": {
-    "name": "standardized-markdown",
-    "description": "Standardized AGENTS.md template with best practices for AI agent collaboration",
+    "name": "anchor",
+    "description": "Anchor — the production-grade AGENTS.md template for AI coding agents",
     "readme": "README.md",
     "agents": {
       "claude-code": {

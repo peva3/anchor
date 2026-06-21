@@ -1,15 +1,15 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/AGENTS.md-Standardized-8b5cf6?style=for-the-badge&logo=markdown&logoColor=white&labelColor=1a1a2e">
-  <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/badge/AGENTS.md-Standardized-8b5cf6?style=for-the-badge&logo=markdown&logoColor=white&labelColor=1a1a2e">
-  <img alt="AGENTS.md Standardized — production-grade AI agent instruction template" src="https://img.shields.io/badge/AGENTS.md-Standardized-8b5cf6?style=for-the-badge&logo=markdown&logoColor=white&labelColor=1a1a2e">
+  <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/Anchor-⚓_Keep_your_agents_grounded-3498db?style=for-the-badge&labelColor=1a1a2e">
+  <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/badge/Anchor-⚓_Keep_your_agents_grounded-3498db?style=for-the-badge&labelColor=1a1a2e">
+  <img alt="Anchor — the production-grade AGENTS.md template for AI coding agents" src="https://img.shields.io/badge/Anchor-⚓_Keep_your_agents_grounded-3498db?style=for-the-badge&labelColor=1a1a2e">
 </picture>
 
 <!-- BADGE BAR — trust signals, discoverability, social proof -->
 <p align="center">
-  <a href="https://github.com/peva3/standardized-markdown/stargazers"><img alt="GitHub Stars" src="https://img.shields.io/github/stars/peva3/standardized-markdown?style=flat-square&labelColor=1a1a2e&color=f1c40f"></a>
-  <a href="https://github.com/peva3/standardized-markdown/blob/main/LICENSE"><img alt="License MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square&labelColor=1a1a2e&color=3498db"></a>
-  <a href="https://github.com/peva3/standardized-markdown"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/peva3/standardized-markdown?style=flat-square&labelColor=1a1a2e&color=2ecc71"></a>
-  <a href="#-quick-start"><img alt="Quick Start" src="https://img.shields.io/badge/quick_start-in_60_seconds-e74c3c?style=flat-square&labelColor=1a1a2e"></a>
+  <a href="https://github.com/peva3/anchor/stargazers"><img alt="GitHub Stars" src="https://img.shields.io/github/stars/peva3/anchor?style=flat-square&labelColor=1a1a2e&color=f1c40f"></a>
+  <a href="https://github.com/peva3/anchor/blob/main/LICENSE"><img alt="License MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square&labelColor=1a1a2e&color=3498db"></a>
+  <a href="https://github.com/peva3/anchor"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/peva3/anchor?style=flat-square&labelColor=1a1a2e&color=2ecc71"></a>
+  <a href="#-quick-start"><img alt="Quick Start" src="https://img.shields.io/badge/set_your_anchor-in_60_seconds-e74c3c?style=flat-square&labelColor=1a1a2e"></a>
   <br>
   <img alt="Sections" src="https://img.shields.io/badge/51_sections-5%2C700_lines-e67e22?style=flat-square&labelColor=1a1a2e">
   <img alt="Research" src="https://img.shields.io/badge/research_backed-22_sources-9b59b6?style=flat-square&labelColor=1a1a2e">
@@ -17,8 +17,8 @@
 </p>
 
 <p align="center">
-  <b>The most comprehensive, research-backed AGENTS.md template for AI coding agents.</b><br>
-  <sub>Production readiness. Multi-agent cooperation. Quality enforcement. 51 sections distilled from 100+ real-world projects and academic research.</sub>
+  <b>Anchor — the production-grade AGENTS.md template for AI coding agents.</b><br>
+  <sub>Keep your agents grounded. 51 sections of battle-tested rules distilled from 100+ real-world projects, academic research, and production failures.</sub>
 </p>
 
 <p align="center">
@@ -37,18 +37,18 @@
 
 ```bash
 # 1. Clone the template
-git clone https://github.com/peva3/standardized-markdown.git
+git clone https://github.com/peva3/anchor.git
 
 # 2. Copy AGENTS.md into your project
-cp standardized-markdown/AGENTS.md ./your-project/AGENTS.md
+cp anchor/AGENTS.md ./your-project/AGENTS.md
 
 # 3. Copy supporting agent config files
-cp standardized-markdown/CLAUDE.md ./your-project/
-cp -r standardized-markdown/.cursor/rules/ ./your-project/.cursor/
-cp standardized-markdown/.github/copilot-instructions.md ./your-project/.github/
+cp anchor/CLAUDE.md ./your-project/
+cp -r anchor/.cursor/rules/ ./your-project/.cursor/
+cp anchor/.github/copilot-instructions.md ./your-project/.github/
 
 # 4. Optional — bootstrap an entire new project from scratch
-cp standardized-markdown/STARTUP.md ./your-new-project/STARTUP.md
+cp anchor/STARTUP.md ./your-new-project/STARTUP.md
 # Follow the STARTUP.md phases — it's a step-by-step guide for AI agents
 ```
 
@@ -131,7 +131,7 @@ cp standardized-markdown/STARTUP.md ./your-new-project/STARTUP.md
 ## 📁 File Structure
 
 ```
-standardized-markdown/
+anchor/
 ├── AGENTS.md                  # ⭐ The main template — 51 sections, copy this into your project
 ├── STARTUP.md                 # 🚀 AI agent bootstrap guide — builds a project from scratch in 4 phases
 ├── README.md                  # 📖 This file
@@ -195,7 +195,7 @@ Full research catalog: [`research/index.md`](research/index.md)
 ### For an existing project:
 ```bash
 # Copy the core template
-cp standardized-markdown/AGENTS.md ./my-project/AGENTS.md
+cp anchor/AGENTS.md ./my-project/AGENTS.md
 
 # Trim to fit — keep only relevant sections
 # Target: ≤2,000 lines for project-specific use (Section 51.3)
@@ -204,7 +204,7 @@ cp standardized-markdown/AGENTS.md ./my-project/AGENTS.md
 ### For a new project:
 ```bash
 # Copy STARTUP.md and follow its 4-phase bootstrap
-cp standardized-markdown/STARTUP.md ./my-new-project/
+cp anchor/STARTUP.md ./my-new-project/
 # Phase 1: Directory structure
 # Phase 2: All agent config files
 # Phase 3: .gitignore, .env.example, README.md, TODO.md, DEEPDIVE.md
@@ -308,4 +308,4 @@ MIT — use it, modify it, ship it. Attribution appreciated.
 
 ---
 
-<sub>Built by analyzing 100+ AGENTS.md files, 14 TODO.md files, 22 research papers, and production codebases. Every section eliminates a real failure mode. No filler.</sub>
+<sub>Anchor — keep your agents grounded. 51 sections. 0 filler. Built from 100+ real-world AGENTS.md files, 22 research papers, and production codebases.</sub>

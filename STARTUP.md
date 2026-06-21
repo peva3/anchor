@@ -499,7 +499,7 @@ The template includes:
 .env, *.pem, __pycache__/, *.pyc, venv/, .vscode/, tests/ (always gitignored),
 logs/, .coverage, docker-compose.override.yml, .mypy_cache/, .terraform/, pacts/
 ```
-See `.gitignore` in the standardized-markdown repo for the complete template.
+See `.gitignore` in the Anchor repo for the complete template.
 
 ### 3.2 Create .env.example
 
@@ -511,7 +511,7 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/dbname
 
 ### 3.3 Create docker-compose.yml
 
-Use the template from Section 32.2 or the standardized-markdown repo's template
+Use the template from Section 32.2 or the Anchor repo's template
 with PostgreSQL, Redis, healthchecks, and named volumes.
 
 ### 3.4 Create README.md
@@ -549,11 +549,23 @@ Use the template from Section 5 covering system overview, architecture decisions
 
 ### 3.7 Create AGENTS.md
 
-Copy AGENTS.md from the standardized-markdown repository (51 sections). Delete sections that don't apply to this project. Target ≤2,000 lines for project-specific use.
+Copy AGENTS.md from the Anchor repository (51 sections). Delete sections that don't apply to this project. Target ≤2,000 lines for project-specific use.
 
 ### 3.8 Create CONTRIBUTING.md
 
-Minimal or copy from standardized-markdown:
+Minimal or copy from the Anchor repo:
+
+```markdown
+# Contributing
+See [AGENTS.md](AGENTS.md) Sections 33-36 for PR standards.
+- PRs under 800 lines, single feature
+- Run ruff/vulture/mypy before committing
+- Human-sounding, WHY-focused commits (Section 15)
+```
+
+### 3.9 Create SECURITY.md
+
+Minimal or copy from the Anchor repo:
 ```markdown
 # Contributing
 See [AGENTS.md](AGENTS.md) Sections 33-36 for PR standards.

@@ -1,6 +1,6 @@
-# AGENTS.md — Standardized Project Guide
+# AGENTS.md — Anchor
 
-> Universal guidance for AI agents working on any project. Adapt sections to fit project scope.
+> The production-grade template for AI coding agent instructions. Adapt sections to fit project scope. Keep your agents grounded.
 >
 > **This file governs itself.** Agents working on AGENTS.md must follow all rules herein — the decision ladder, commit conventions, tradeoff comments, quality gates, and output discipline. No section should be added that future agents would need to explain away as inapplicable.
 
