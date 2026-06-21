@@ -36,9 +36,25 @@
 - Exception: The user explicitly authorizes automated commits/pushes (which is covered above)
 - When in doubt, ask first
 
+**IMPORTANT — Never Spend Money:**
+- **NEVER** create GitHub Actions workflows that use paid runners, consume API credits, or incur any financial cost without explicit user approval
+- **NEVER** enable GitHub features that trigger billing (GitHub Actions with large runners, GitHub Packages storage beyond free tier, Codespaces beyond free limits, GitHub Copilot for business, etc.)
+- **NEVER** sign up for paid services, create cloud resources, provision API keys with billing, or do anything that could generate a financial charge
+- **NEVER** modify billing settings, change plan tiers, or enable paid add-ons
+- **NEVER** create CI/CD workflows that call paid third-party APIs without confirmation
+- When in doubt — if an action involves any external service that might cost money — **ask first**
+
+**IMPORTANT — Always Use the User's Identity:**
+- **ALWAYS** use the configured author identity for ALL GitHub activity — commits, PRs, issues, comments, and any content attributed to a person
+- **NEVER** impersonate, use a different username, create a separate bot account, or sign commits as anyone other than the configured identity
+- **NEVER** attribute work to "the AI" or "the agent" in commit messages, PR descriptions, or comments — all work is attributed to the human author
+- **NEVER** claim the agent wrote something independent of the user's direction
+- The configured identity is the single source of truth for who authored all changes
+
 **Author identity (already configured globally):**
-- Username: `peva3`
-- Email: `user@example.com`
+- The agent should use the user's globally configured git identity for all commits
+- Never change git config `user.name` or `user.email` — use what is already set
+- Verify identity with `git config --global user.name` and `git config --global user.email` before first commit
 
 **Message format conventions:**
 - Prefix with scope when applicable: `api: add rate limiting`, `frontend: fix timeline scroll bug`
@@ -3127,7 +3143,26 @@ This section exists because general guidelines are too easy to rationalize aroun
 - **NEVER** assign reviewers or request changes without user direction
 - **NEVER** merge a PR without explicit user approval
 
-### 36.4 Testing NEVER
+### 36.4 Financial NEVER
+
+- **NEVER** create GitHub Actions workflows that use paid runners, consume API credits, or incur any financial cost without explicit user confirmation
+- **NEVER** enable GitHub features that trigger billing — large runners, Packages beyond free tier, Codespaces beyond free limits, Copilot for business, Advanced Security, etc.
+- **NEVER** sign up for paid cloud services, provision resources with billing attached, or register for API keys tied to a credit card
+- **NEVER** modify billing settings, change plan tiers, enable paid add-ons, or accept terms that involve financial commitment
+- **NEVER** create CI/CD workflows that call paid third-party APIs (e.g., paid SaaS monitoring, commercial testing services, paid deployment platforms) without explicit confirmation
+- **NEVER** purchase domains, SSL certificates, or any infrastructure that costs money
+- When in doubt — if any action involves an external service that could possibly charge money — **ask the user first**
+
+### 36.5 Identity NEVER
+
+- **NEVER** impersonate another user, use a different GitHub username, or create a separate bot account for any activity
+- **NEVER** sign commits, create PRs, post comments, or author any content under an identity other than the configured author
+- **NEVER** attribute work to "the AI" or "the agent" in commit messages, PR descriptions, issue comments, or documentation — all work is authored by and attributed to the human user
+- **NEVER** claim the agent acted independently — the user directs the agent, the user authors all output
+- **NEVER** configure git with a different username or email than what is already set globally
+- **NEVER** use an AI-generated signature, bot handle, or fake persona in any user-facing communication
+
+### 36.6 Testing NEVER
 
 - **NEVER** merge code that has failing tests
 - **NEVER** skip tests because "the change is small" — small changes cause big bugs
@@ -3136,7 +3171,7 @@ This section exists because general guidelines are too easy to rationalize aroun
 - **NEVER** write tests that pass vacuously (no assertions, or assertions that can never fail)
 - **NEVER** mark a task complete without running the full test suite
 
-### 36.5 Documentation NEVER
+### 36.7 Documentation NEVER
 
 - **NEVER** add general product or user-facing documentation to the `docs/` folder when using an LLM to generate it — docs should be human-curated
 - **NEVER** leave DEEPDIVE.md stale after an architectural change — update it as part of the change
