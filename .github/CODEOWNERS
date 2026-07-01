@@ -1,0 +1,7 @@
+# Per Section 38.6, branch protection requires CODEOWNERS.
+# Until specific maintainers are assigned, default to the upstream organization.
+# Replace with real GitHub handles when maintainers are confirmed.
+/AGENTS.md @peva3
+/STARTUP.md @peva3
+/tests/ @peva3
+/.github/ @peva3
