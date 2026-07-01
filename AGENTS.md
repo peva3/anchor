@@ -25,10 +25,12 @@
 2. `git commit -m "Descriptive commit message"` — describe WHAT changed and WHY
 3. `git push origin <branch>`
 
-**GitHub Actions (if `gh` command is available):**
-- After running tests/validation and all checks pass, automatically commit and push the changes
-- Use `gh` to verify auth status before attempting pushes
-- If `gh` works, assume push permission is granted and push
+**GitHub automation (if `gh` command is available):**
+- If the user has explicitly approved a commit and push, you may run them after validation
+- Use `gh auth status` to verify auth before attempting pushes
+- If `gh` is logged in, push to the user's remote using their configured identity
+- **NEVER** create GitHub Actions workflows, dependabot config, or any other GitHub-side automation without explicit per-file user approval — see Section 36.4a
+- **NEVER** create PRs, issues, or comments without explicit user approval (see "Never Go Rogue" below)
 
 **IMPORTANT — Never Go Rogue:**
 - **NEVER** create PRs, issues, comments, or any GitHub activity without **explicit user approval**
@@ -3157,6 +3159,20 @@ This section exists because general guidelines are too easy to rationalize aroun
 - **NEVER** purchase domains, SSL certificates, or any infrastructure that costs money
 - When in doubt — if any action involves an external service that could possibly charge money — **ask the user first**
 
+### 36.4a GitHub Automation NEVER (no Actions, no bot PRs)
+
+This subsection is broader than 36.4 (financial) and exists because the user owns the maintainer relationship with GitHub, not the agent. Even free-tier automation costs the user reviewer time, runs without their supervision, and creates artifacts (workflow runs, PRs, branches) that they must clean up.
+
+- **NEVER** create GitHub Actions workflow files (anything under `.github/workflows/*.yml` or `.github/workflows/*.yaml`) without explicit, per-workflow user approval. "It's just CI" is not approval.
+- **NEVER** create GitHub-side automation that opens pull requests or issues on the user's behalf (`dependabot.yml`, `renovate.json`, scheduled workflows, `gh-actions` cron triggers) without explicit user approval.
+- **NEVER** enable GitHub repository settings that trigger work the user has not requested (branch protection rules that auto-delete, required status checks that point at workflows the user did not approve, auto-merge rules, etc.) without explicit user approval.
+- **NEVER** add GitHub Apps, OAuth integrations, or third-party CI providers (Codecov, Snyk, CodeClimate, etc.) without explicit user approval — these commonly have paid tiers that auto-upgrade.
+- **NEVER** assume "free tier" means zero cost. Free Actions still cost minutes, storage, and the user's review queue. If the workflow runs on every PR, multiply by the PR cadence.
+- **DO** propose GitHub Actions as a recommendation when the user asks for CI, but wait for explicit approval before writing the file.
+- **DO** ship the audit script and pre-commit hooks (Section 37) — these run locally and need no GitHub-side automation.
+- **DO** ship PR/issue templates and CODEOWNERS — these are static markdown, not automation, and don't trigger Actions.
+- When in doubt — if a change touches `.github/workflows/`, `dependabot.yml`, `renovate.json`, or any repository setting that auto-runs something — **ask the user first**.
+
 ### 36.5 Identity NEVER
 
 - **NEVER** impersonate another user, use a different GitHub username, or create a separate bot account for any activity
@@ -3343,7 +3359,9 @@ git add .secrets.baseline
 
 ## 38. CI/CD Pipeline Standards
 
-Every project MUST have these standard CI/CD workflows. This section provides templates that work across any project.
+**Section 36.4a is in effect:** do not create any of the GitHub Actions workflows in this section without explicit, per-workflow user approval. The templates below are reference material — present them as a recommendation when the user asks for CI, but wait for approval before writing the file.
+
+The pre-commit hook (Section 37) and the audit script (`tests/test_agents_md_quality.py`) run locally and need no GitHub-side automation.
 
 ### 38.1 CI Pipeline — `.github/workflows/ci.yml`
 
@@ -5780,3 +5798,4 @@ Every non-obvious rule should be traceable to its source. This prevents cargo-cu
 | 2026-06-19 | Added Section 51: Instruction Architecture — trigger-based lazy loading (frontmatter triggers, domain-specific guides, simplest approach with docs/AGENT_DOMAIN_*.md), self-maintaining meta-instructions (agent proposes rule additions when user intervenes, signals for when to add vs what NOT to add), context budget awareness (2,000 line max, 5,000 token budget, 70% headroom minimum, size monitoring, trimming strategy), model capability awareness (tiered detail levels FULL/STANDARD/COMPACT, per-model-family quirks, fallback condensed appendix), instruction provenance tracking (annotated source citations, link-to-standard, date marking, periodic audit) |
 | 2026-07-01 | Self-audit: created DEEPDIVE.md, TODO.md, CHANGELOG.md, Dockerfile, docker-compose.yml, .env.example, .pre-commit-config.yaml, requirements-dev.txt, pytest.ini. Added GitHub infra: ci.yml, release.yml, PULL_REQUEST_TEMPLATE.md, ISSUE_TEMPLATE/, CODEOWNERS, dependabot.yml. Fixed duplicate 3.9 in STARTUP.md. Synced 7 platform configs to reference Sections 33/37/50.1/50.2. Removed duplicate .claude/projects/anchor.json. Rewrote audit script: cached reads, --strict mode, structural skip rule, scenario assertions, platform config presence check. Updated .gitignore to ship the audit script. |
 | 2026-07-01 | Added instruction provenance tags to Section 21 (AgentBench, CAMEL — links to `research/papers/full/`) per Section 51.5 |
+| 2026-07-01 | Added Section 36.4a — explicit "GitHub Automation NEVER" (no Actions workflows, no dependabot, no bot PRs) without per-file user approval. Removed `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `.github/dependabot.yml` that were created without explicit approval. Updated Section 2 and Section 38 to defer to 36.4a. |
