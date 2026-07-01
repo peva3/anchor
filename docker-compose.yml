@@ -1,0 +1,10 @@
+# Local development for the audit.
+# Build: docker compose build audit
+# Run:   docker compose run --rm audit
+services:
+  audit:
+    build: .
+    volumes:
+      - ./:/repo:ro
+    # Override the default entrypoint if you want to run pytest instead.
+    # command: ["pytest", "tests/"]

@@ -1,4 +1,7 @@
-tests/
+# Per Section 1, tests/ contents are scratch and not for the repo.
+# Exception: tests/test_agents_md_quality.py IS the deliverable audit and must ship.
+tests/scripts/
+tests/.test-cache/
 __pycache__/
 *.pyc
 *.pyo
