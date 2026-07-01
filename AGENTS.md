@@ -485,6 +485,10 @@ For each external API/service integrated:
 ## 21. AI Agent Instruction Guidance
 
 > Based on research from AgentBench (arXiv:2308.03688) and CAMEL (arXiv:2303.17760) on what makes AI agents effective.
+>
+> **Provenance** (per Section 51.5):
+> - **Sections 21.1, 24 (IF/IA/TLE/CLE failure modes)** — [AgentBench: A Benchmark for Evaluating LLMs as Agents](research/papers/full/agentbench-2308.03688.md) (arXiv:2308.03688, ICLR 2024)
+> - **Sections 22, 21.2 (role assignment, multi-agent cooperation)** — [CAMEL: Communicative Agents for "Mind" Exploration of LLM Society](research/papers/full/camel-2303.17760.md) (arXiv:2303.17760, NeurIPS 2023)
 
 ### 21.1 Critical Findings
 
@@ -5774,3 +5778,5 @@ Every non-obvious rule should be traceable to its source. This prevents cargo-cu
 | 2026-06-19 | Added Section 50: Intentional Minimalism — the simplicity-first architecture. Decision ladder (YAGNI→stdlib→native→existing dep→one line→minimum code), structured tradeoff comments with named ceilings and upgrade triggers, safety carve-outs defining domains never subject to minimalism (input validation, data loss prevention, security, accessibility, hardware calibration, explicit requests), code-first output discipline with ≤3-line explanations, over-engineering review vocabulary (delete/stdlib/native/yagni/shrink tags with net-line summaries), honesty boundaries preventing agents from making invalid claims (per-repo savings, unmeasured performance, unconfirmed bug fixes), tests-are-not-bloat exemption policy, and self-referential governance for AGENTS.md itself |
 | 2026-06-19 | Added self-referential governance header: AGENTS.md covers its own maintenance — agents editing it must follow all rules herein |
 | 2026-06-19 | Added Section 51: Instruction Architecture — trigger-based lazy loading (frontmatter triggers, domain-specific guides, simplest approach with docs/AGENT_DOMAIN_*.md), self-maintaining meta-instructions (agent proposes rule additions when user intervenes, signals for when to add vs what NOT to add), context budget awareness (2,000 line max, 5,000 token budget, 70% headroom minimum, size monitoring, trimming strategy), model capability awareness (tiered detail levels FULL/STANDARD/COMPACT, per-model-family quirks, fallback condensed appendix), instruction provenance tracking (annotated source citations, link-to-standard, date marking, periodic audit) |
+| 2026-07-01 | Self-audit: created DEEPDIVE.md, TODO.md, CHANGELOG.md, Dockerfile, docker-compose.yml, .env.example, .pre-commit-config.yaml, requirements-dev.txt, pytest.ini. Added GitHub infra: ci.yml, release.yml, PULL_REQUEST_TEMPLATE.md, ISSUE_TEMPLATE/, CODEOWNERS, dependabot.yml. Fixed duplicate 3.9 in STARTUP.md. Synced 7 platform configs to reference Sections 33/37/50.1/50.2. Removed duplicate .claude/projects/anchor.json. Rewrote audit script: cached reads, --strict mode, structural skip rule, scenario assertions, platform config presence check. Updated .gitignore to ship the audit script. |
+| 2026-07-01 | Added instruction provenance tags to Section 21 (AgentBench, CAMEL — links to `research/papers/full/`) per Section 51.5 |

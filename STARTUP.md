@@ -567,17 +567,6 @@ See [AGENTS.md](AGENTS.md) Sections 33-36 for PR standards.
 
 Minimal or copy from the Anchor repo:
 ```markdown
-# Contributing
-See [AGENTS.md](AGENTS.md) Sections 33-36 for PR standards.
-- PRs under 800 lines, single feature
-- Run ruff/vulture/mypy before committing
-- Human-sounding, WHY-focused commits (Section 15)
-```
-
-### 3.9 Create SECURITY.md
-
-Minimal or copy from standardized-markdown:
-```markdown
 # Security Policy
 Do NOT open public issues for vulnerabilities. Use GitHub Security Advisories.
 ```
