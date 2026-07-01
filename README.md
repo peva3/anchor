@@ -11,7 +11,7 @@
   <a href="https://github.com/peva3/anchor"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/peva3/anchor?style=flat-square&labelColor=1a1a2e&color=2ecc71"></a>
   <a href="#-quick-start"><img alt="Quick Start" src="https://img.shields.io/badge/set_your_anchor-in_60_seconds-e74c3c?style=flat-square&labelColor=1a1a2e"></a>
   <br>
-  <img alt="Sections" src="https://img.shields.io/badge/51_sections-5%2C700_lines-e67e22?style=flat-square&labelColor=1a1a2e">
+  <img alt="Sections" src="https://img.shields.io/badge/51_sections-5%2C780_lines-e67e22?style=flat-square&labelColor=1a1a2e">
   <img alt="Research" src="https://img.shields.io/badge/research_backed-22_sources-9b59b6?style=flat-square&labelColor=1a1a2e">
   <img alt="Platforms" src="https://img.shields.io/badge/works_with-8%2B_AI_agents-1abc9c?style=flat-square&labelColor=1a1a2e">
 </p>
@@ -264,8 +264,8 @@ The audit checks:
 | Metric | Value |
 |--------|-------|
 | **Sections** | 51 |
-| **Lines** | 5,740 |
-| **Words** | ~25,000 |
+| **Lines** | 5,780 |
+| **Words** | ~25,500 |
 | **Python code blocks** | 66 |
 | **Research sources** | 22 (12 papers, 10 projects) |
 | **Agent platforms supported** | 8+ |
