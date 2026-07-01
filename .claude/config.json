@@ -17,7 +17,11 @@
     "enforce_test_folder_gitignore": true,
     "enforce_docs_research_folders": true,
     "auto_commit_after_validation": true,
-    "no_rogue_github_activity": true
+    "no_rogue_github_activity": true,
+    "enforce_precommit_hooks": true,
+    "enforce_pr_size_limits": true,
+    "enforce_decision_ladder": true,
+    "enforce_tradeoff_comments": true
   },
   "validation": {
     "pre_commit_checklist": [
@@ -26,6 +30,22 @@
       "vulture .",
       "mypy ."
     ],
-    "required_folders": ["tests/", "docs/", "research/"]
+    "required_folders": [
+      "tests/",
+      "docs/",
+      "research/"
+    ],
+    "pr_size_limit_lines": 800,
+    "complex_logic_limit_lines": 500,
+    "coverage_threshold_percent": 80,
+    "decision_ladder_rungs": [
+      "yagni",
+      "stdlib",
+      "native",
+      "existing_dep",
+      "one_line",
+      "minimum"
+    ],
+    "tradeoff_comment_format": "ponytail: <what> / Upgrade to <what> if <trigger>"
   }
 }

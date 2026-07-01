@@ -17,7 +17,7 @@ ruff format .
 vulture .
 mypy .
 ```
-**Do not commit until all pass.**
+**Do not commit until all pass.** (Section 9)
 
 ### Required Folders
 Every project MUST have:
@@ -33,17 +33,33 @@ api: Added JWT refresh to prevent 401 loops
 The token refresh had a race condition where concurrent requests
 could trigger multiple refresh calls. Added mutex lock around auth state.
 ```
+See Section 15 for the full pattern.
 
-### DEEPDIVE.md
-Update after ANY architectural change. Document:
-- Why the system is built this way
-- Key decisions and trade-offs
-- Gotchas and failure modes
+### PR Standards (Section 33)
+- 800 lines max, 500 for complex logic
+- Single feature per PR
+- Use the PR template (Section 35)
+
+### AI Code Quality (Section 34)
+Self-check: think first, spot laziness, uncertainty, bloat.
+
+### Pre-Commit Hooks (Section 37)
+Mandatory. Install once: `pre-commit install`. Hooks run on every commit.
+
+### Decision Ladder (Section 50.1)
+Before any implementation: YAGNI → stdlib → native → existing dep → one line → minimum.
+
+### Tradeoff Comments (Section 50.2)
+For every intentional shortcut, document with `# ponytail: <what> / # Upgrade to <what> if <trigger>`.
 
 ## Prohibited
-- No PRs/issues/GitHub activity without explicit user approval
-- No dead code, unused imports, silent exception handlers
-- No commits without running lint/vulture sweep first
+- No PRs/issues/GitHub activity without explicit user approval (Section 2)
+- No dead code, unused imports, silent exception handlers (Section 1)
+- No commits without running lint/vulture sweep first (Section 9)
+- No mutable default arguments, bare excepts, eval/exec (Section 27.2)
+- No force push to shared branches (Section 36.2)
+- No PRs over 800 lines (Section 33)
+- No skipping pre-commit hooks (Section 37)
 
 ## Validation
 Before marking complete:
@@ -52,3 +68,8 @@ Before marking complete:
 - [ ] Type check clean
 - [ ] DEEPDIVE.md updated if needed
 - [ ] Human commit message
+- [ ] PR under 800 lines
+- [ ] Pre-commit hooks passed
+- [ ] AI anti-pattern self-check passed
+- [ ] Decision ladder applied
+- [ ] Tradeoff comments for shortcuts
