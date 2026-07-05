@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "source": "AGENTS.md — Anchor",
+  "description": "Core rule files distributed to all supported agents via Ruler",
+  "rules_dir": "rules",
+  "agent_overrides": {
+    "claude": {
+      "settings": ".claude/settings.json"
+    },
+    "cursor": {
+      "rules_dir": ".cursor/rules"
+    },
+    "copilot": {
+      "instructions": ".github/copilot-instructions.md"
+    },
+    "windsurf": {
+      "config": ".windsurf/config.md"
+    }
+  }
+}
