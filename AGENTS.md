@@ -6,6 +6,44 @@
 
 ---
 
+## Section Index
+
+| Domain | Sections | Covers |
+|--------|----------|--------|
+| **Core** | [1](#1-core-principles)–[9](#9-linting--type-checking) | Principles, commit protocol, shell rules, code style, project structure, TODO.md, Docker, testing, linting |
+| **Architecture** | [10](#10-error-handling-patterns)–[20](#20-external-integrations) | Error handling, config, API design, security, logging, git workflow, docs, deps, performance, build/deploy, external integrations |
+| **AI Agent Guidance** | [21](#21-ai-agent-instruction-guidance)–[28](#28-default-tech-stack-playbook) | Instruction guidance, multi-agent patterns, verification gates, failure modes, gotchas, getting help, code quality standards, tech stack playbook |
+| **Production Ops** | [29](#29-operational-patterns)–[32](#32-docker-support) | Operational patterns (circuit breaker, DLQ, middleware, cache), health endpoints, production security, Docker & Kubernetes |
+| **Process** | [33](#33-pr--change-size-standards)–[41](#41-observability-standards) | PR size standards, AI anti-pattern detection, PR template, NEVER list, pre-commit hooks, CI/CD pipelines, semantic versioning, code coverage, observability |
+| **Infrastructure** | [42](#42-infrastructure-as-code)–[44](#44-secrets-management) | IaC (Terraform), database backup & recovery, secrets management |
+| **Testing Excellence** | [45](#45-flaky-test-management)–[49](#49-chaos-engineering) | Flaky test management, mutation testing, performance benchmarks, contract testing (Pact), chaos engineering |
+| **Philosophy** | [50](#50-intentional-minimalism--the-simplicity-first-architecture)–[51](#51-instruction-architecture--context-economy--self-improvement) | Intentional minimalism (decision ladder), instruction architecture (lazy loading, self-maintenance, context budgets) |
+| **Enforcement** | [52](#52-rule-enforcement-architecture--from-advisory-to-deterministic) | Two-layer enforcement model, prose-to-hook compilation, evidence-first methodology, CI compliance gates |
+
+## Quick-Navigation Cheatsheet
+
+**Agent — how to find what you need without reading the entire document:**
+
+| I need to... | Go to Section |
+|-------------|---------------|
+| Commit code | [2](#2-commit-protocol), [15](#15-git-workflow), [9](#9-linting--type-checking) |
+| Create a PR | [33](#33-pr--change-size-standards), [35](#35-pr-description-format--template), [34](#34-ai-code-quality--anti-pattern-detection) |
+| Review a PR | [33.2](#332-when-changes-exceed-the-limit), [50.5](#505-over-engineering-review-vocabulary), [36](#36-explicit-prohibitions--the-never-list) |
+| Write tests | [8](#8-testing-requirements), [40](#40-code-coverage-enforcement), [45](#45-flaky-test-management) |
+| Fix a security issue | [13](#13-security-best-practices), [27.3](#273-security-constraints--mandatory), [31](#31-production-security-patterns), [44](#44-secrets-management) |
+| Set up a new project | [5](#5-project-structure-conventions), [37](#37-pre-commit-hook-standards), [38](#38-cicd-pipeline-standards), STARTUP.md |
+| Deploy to production | [32](#32-docker-support), [38.3](#383-deployment-pipeline--githubworkflowsdeployyml), [30](#30-health-endpoint-specification) |
+| Handle a flaky test | [45](#45-flaky-test-management) — quarantine, don't delete, fix within 7 days |
+| Debug a slow endpoint | [18](#18-performance-considerations), [41.6](#416-service-level-objectives-slos), [47](#47-performance-benchmark-testing) |
+| Add a dependency | [17](#17-dependency-management), [50.1](#501-the-decision-ladder--stop-at-the-first-rung-that-holds) (decision ladder rung 4) |
+| Refuse a dangerous request | [2](#2-commit-protocol) (Never Go Rogue + Never Spend Money), [36.4](#364-financial-never) — cite these sections |
+| Decide if code is too simple to test | [50.7](#507-tests-are-not-bloat) — one runnable check per non-trivial function |
+| Rollback a bad deployment | Rollback is always `git revert` first, then fix forward. Never fix on a broken deploy — roll back, then debug. |
+| Handle a merge conflict | Resolve by choosing the more recent change for logic, the clearer documentation for comments. Run full test suite after resolution. |
+| Rotate secrets | [44.4](#444-secret-rotation-pattern) — dual-key window pattern, deploy new key, promote, remove old |
+
+---
+
 ## 1. Core Principles
 
 - **No dead code.** Every function must be called by a production path. Remove unused imports, variables, and definitions immediately. *(How: Section 9 — vulture sweep before commit)*
@@ -15,6 +53,7 @@
 - **Proven integration.** After building any component, verify it works end-to-end. Do not mark a task complete without verification. *(How: Section 23 — verification gates)*
 - **Cross-service contract tests.** When building features spanning multiple services, write integration tests that exercise the actual HTTP contracts between them. *(How: Section 48 — contract testing)*
 - **Trace every function call.** Before marking a module complete, verify every public function is called by a production path. *(How: Section 9 — vulture identifies uncalled functions)*
+- **Navigate efficiently.** This document is long by design (universal template). Jump to [Section Index](#section-index) or [Quick-Navigation Cheatsheet](#quick-navigation-cheatsheet) instead of reading sequentially. For project-specific use, trim to ≤2,000 lines. *(How: Section 51.3)*
 
 ---
 
@@ -1989,6 +2028,53 @@ Is it embedded/firmware?
 - **MongoDB** — Use PostgreSQL for most cases (ACID, JSON support)
 - **REST framework (Django)** — Use FastAPI instead
 - **Express alone** — Use Fastify for new projects (faster, schema validation)
+
+### 28.12 Database Strategy — Shared vs Per-Service
+
+For multi-service/microservice systems, the database strategy evolves with project maturity:
+
+```
+Phase 1 — MVP / Starting Out (0→1):
+  Shared PostgreSQL database.
+  One schema per service (e.g., `users`, `orders`, `billing`).
+  Each service connects with different credentials, scoped to its schema.
+  PRO: Simple, single source of truth, easy joins, no distributed transactions.
+  CON: Schema coupling — services can peek at each other's tables.
+       Don't. Use schema-scoped credentials. Enforce in code review.
+
+Phase 2 — Growing / Pre-Production (1→N):
+  Shared database with strict schema isolation.
+  Separate schemas with per-schema users who can only see their own tables.
+  Start tracking cross-service query patterns — these become future service APIs.
+  Add read replicas if read volume exceeds write volume.
+
+Phase 3 — Production / Scale:
+  Database per critical service.
+  Services that need independent scaling, different backup schedules,
+  or different storage engines get their own database instances.
+  Services that are tightly coupled and always deployed together
+  can share a database instance (with separate schemas).
+  NEVER split a database that requires distributed transactions
+  across services without first refactoring to event-driven patterns.
+```
+
+**Rules:**
+- **Start with one database.** Do not create 5 databases for a 2-developer MVP. The operational burden exceeds the isolation benefit.
+- **Schema per service from day one.** `users` schema, `orders` schema, `billing` schema. Never mix service tables in the same schema. This makes the eventual split trivial — just move the schema to a new instance.
+- **Schema-scoped credentials from day one.** The `orders` service connects as `orders_user` who can only see `orders.*`. This prevents accidental cross-service table access.
+- **Split when you have a measurable reason, not because a blog post said so.** Valid triggers: (a) service needs different backup/restore schedule, (b) service needs different storage engine or instance size, (c) service needs independent horizontal scaling, (d) service needs different geographic deployment.
+- **Never split for "architecture purity."** If two services always deploy together, always scale together, and have the same availability requirements, they can share a database instance without shame.
+
+```python
+# Phase 1 example — env config per service
+# orders-service/.env
+DATABASE_URL=postgresql://orders_user:pass@postgres:5432/app?options=-c%20search_path%3Dorders
+#                                                            ^^^ schema-scoped
+
+# billing-service/.env  
+DATABASE_URL=postgresql://billing_user:pass@postgres:5432/app?options=-c%20search_path%3Dbilling
+#                                                              ^^^ different schema
+```
 
 ---
 
@@ -4756,7 +4842,7 @@ markers =
 
 ### 45.5 NEVER Do These for Flaky Tests
 
-- **NEVER** delete a failing test without understanding why it failed
+- **NEVER** delete a failing or flaky test without understanding why it failed — quarantine it first (Section 45.3), then root-cause within 7 days
 - **NEVER** add `time.sleep()` to a test — fix the synchronization, don't paper over it
 - **NEVER** increase a timeout arbitrarily — understand why it's slow
 - **NEVER** mark a test as "known flaky" without creating a fix ticket — quarantine expires
