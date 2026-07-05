@@ -66,6 +66,8 @@
 
 **GitHub automation (if `gh` command is available):**
 - If the user has explicitly approved a commit and push, you may run them after validation
+- Only commit/push when a LOGICAL UNIT OF WORK IS COMPLETE — never commit halfway through a feature, in the middle of debugging, or with known-broken state
+- Each commit should be a stable checkpoint that passes all tests independently
 - Use `gh auth status` to verify auth before attempting pushes
 - If `gh` is logged in, push to the user's remote using their configured identity
 - **NEVER** create GitHub Actions workflows, dependabot config, or any other GitHub-side automation without explicit per-file user approval — see Section 36.4a
@@ -464,6 +466,8 @@ Migration 010 adds constraint with deduplication pass.
 ```
 
 **Small commits with big explanations are fine.** A 3-line change can have a 10-line commit message explaining the problem it solves.
+
+**Note on brevity:** Section 50.4's output discipline (≤3 lines) applies to task-completion reports, NOT to commit messages. Commit messages follow THIS section's format (problem → solution → context). The rules do not conflict — they govern different domains.
 
 ---
 
@@ -5487,6 +5491,9 @@ Rung 5: One Line
   Can this be solved with a single, clear line of code?
   If one line does it, do not write a function. Do not create a class.
   Do not build an abstraction. One line is self-documenting.
+  **Guard:** If the one line is also UNREADABLE — deeply nested ternary,
+  chained regex, or a comprehension with 3+ conditions — it fails
+  the "clear" test. Drop to Rung 6 and write it legibly.
 
 Rung 6: Minimum Code That Works
   Write the shortest possible implementation that passes all tests.
@@ -5607,6 +5614,13 @@ Add when: <measurable trigger condition>
 - Do NOT list every function added (the diff shows that)
 - Do NOT include benchmark numbers unless requested or the improvement was the stated goal
 - Do NOT explain why you used a for-loop instead of a list comprehension (the ladder already decided that)
+
+**What this does NOT apply to (explicit carve-outs):**
+- **Commit messages** — These follow Section 15's detailed WHY format (problem → solution → context). Commit messages are not "output" — they're permanent project history.
+- **User-requested explanations** — If the user asks "why did you do X?", answer fully.
+- **Security decisions** — Safety override. If omitting the explanation could cause someone to reverse the security measure later, explain it.
+- **Architectural decisions in DEEPDIVE.md** — These need full context for future agents.
+- **When the next developer would need to understand constraints NOT visible in the code** — e.g., "we use O(n²) here because N is always < 100."
 
 ### 50.5 Over-Engineering Review Vocabulary
 
