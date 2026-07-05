@@ -1,7 +1,12 @@
 # Per Section 1, tests/ contents are scratch and not for the repo.
 # Exception: tests/test_agents_md_quality.py IS the deliverable audit and must ship.
+# All other test_*.py files are behavioral simulations for development only.
+tests/test_*.py
+!tests/test_agents_md_quality.py
 tests/scripts/
 tests/.test-cache/
+tests/*.json
+tests/*.html
 __pycache__/
 *.pyc
 *.pyo
