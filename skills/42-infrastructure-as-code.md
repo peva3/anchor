@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 42. Infrastructure as Code
 
@@ -48,7 +49,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.50"
+      version = "~> 5.80"
     }
     random = {
       source  = "hashicorp/random"
@@ -151,6 +152,19 @@ Before `terraform apply`:
 - [ ] Sensitive outputs are marked `sensitive = true`
 - [ ] Deletion protection is enabled on stateful resources (databases, storage)
 - [ ] Terraform plan output is saved to version control for audit
+
+### 42.7 CI Gating, Scanning & Drift
+
+- **Gate CI on plan, not just validate:** run `terraform plan -detailed-exitcode -var-file=...` in CI and fail the PR if the exit code is 2 (changes pending) or 1 (error) — the reviewer sees exactly what will change.
+- **IaC security scanning:** run `checkov` or `trivy config` (and `tfsec` where still supported) on every PR to catch insecure defaults (public egress, missing encryption, overly-broad IAM). Fail the build on HIGH/CRITICAL findings.
+- **Policy-as-code:** enforce organization rules with OPA/Sentinel (e.g. "no public S3 buckets", "state bucket encrypted") before apply.
+- **Drift detection:** schedule a periodic `terraform plan` (or use `terraform test` + a drift-detection CI job / Spacelift-style tooling) against each environment and alert when the plan shows changes — drift means config and reality have diverged.
+- **Refactoring:** use `moved` blocks and `terraform import` for state/code reconciliation — never edit state by hand.
+- **State hardening:** KMS/SSE-KMS encryption on the state bucket (not just SSE-S3), versioning + replication, and restrict write access to the state bucket via IAM.
+
+### 42.8 Secrets in IaC
+
+Do NOT commit `terraform.tfvars` or `secrets.tf` with real values. Keep `.tfvars.example` in git; encrypt real values with **SOPS** (age/KMS) or store them in the provider's secret manager and reference by name (`data "aws_secretsmanager_secret" ...`). This mirrors [Section 44](skills/44-secrets-management.md) (Secrets Management) for the IaC layer.
 
 ---
 

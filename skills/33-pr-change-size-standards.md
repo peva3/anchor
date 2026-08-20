@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 33. PR & Change Size Standards
 
@@ -11,7 +12,7 @@ Hard numeric boundaries prevent unreviewable changes from being submitted. These
 
 | Change Type | Max Lines | Rationale |
 |------------|-----------|-----------|
-| **All changes** | 800 lines total | Derived from code review research — beyond 800 lines, reviewer accuracy drops below 70% |
+| **All changes** | 800 lines total | Hard cap. Canonical studies suggest keeping reviews even smaller: SmartBear found ~400 LOC is the optimal review size, Google's practice is "~100 lines is reasonable, ~1000 lines is too large." Prefer smaller PRs when the change can be split naturally. |
 | **Complex logic** | 500 lines | Architectural changes, algorithm rewrites, security-sensitive code — requires deeper review |
 | **Simple/mechanical** | 800 lines | Renames, formatting, type annotation additions — still must not exceed 800 |
 | **Single file** | 500 lines | If a file exceeds 500 lines of change, split into multiple PRs |

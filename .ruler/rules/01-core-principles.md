@@ -5,6 +5,7 @@
 - No silent failures — log before swallowing exceptions
 - Test-first — tests must pass before marking work complete
 - Proven integration — verify end-to-end before declaring done
-- English only — all code, comments, and docs in English
+- Cross-service contract tests — exercise the real HTTP contracts between services
+- Trace every function call — verify every public function is called by a production path
 
-[Source: AGENTS.md Section 1, 4]
+[Source: AGENTS.md Section 1]

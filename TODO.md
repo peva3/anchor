@@ -11,7 +11,7 @@
 |---|--------|-------------|
 | 1 | ✅ | Audit current project state against AGENTS.md |
 | 2 | 🔄 | Fix the gaps found in audit |
-| 3 | ⬜ | Add CI workflow that runs a structural validation on every push (53 sections all linked, skill files present) |
+| 3 | ⬜ | Add CI workflow that runs a structural validation on every push (62 sections all linked, skill files present) |
 | 4 | ⬜ | Add pre-commit hooks (local hooks configured; consider a structural integrity check) |
 | 5 | ⬜ | Sync all 7 platform config files to mention Sections 33, 37, 50.1, 50.2 |
 | 6 | ⬜ | Add instruction-provenance tags to AGENTS.md sections per 51.5 |
@@ -38,4 +38,4 @@
 
 - Sections 16-20 (Documentation, Dependencies, Performance, Build/Deployment, External Integrations) are referenced in the AGENTS.md change log and audit but were merged into adjacent sections in the rewrite. See Section 16 for documentation, Section 17 for dependencies, Section 18 for performance, Section 19 for build, Section 20 for external integrations.
 - Build size delta: N/A (documentation-only project).
-- The scratch audit (`tests/test_agents_md_quality.py`, gitignored) is the source of truth for the section count and line count during development. Re-run it before tagging a release. Consumers validate via the structural invariant: all 53 sections link from the entry-point to a skill file.
+- The scratch audit (`tests/test_agents_md_quality.py`, gitignored) is the source of truth for the section count and line count during development. Re-run it before tagging a release. Consumers validate via the structural invariant: all 62 sections link from the entry-point to a skill file.

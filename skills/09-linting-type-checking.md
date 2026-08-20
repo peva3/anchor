@@ -2,18 +2,21 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 9. Linting & Type Checking
 
 **Before EVERY commit, run a full cleanup sweep:**
 
 ```bash
-ruff check .                  # Lint
-ruff format .                 # Format
+ruff check .                  # Lint (default ruleset; --fix to auto-fix)
+ruff format .                 # Format (defaults to 88-char line length)
 ruff check --select=E,F,W     # Explicit errors/warnings
 vulture .                     # Find dead code (uncalled functions)
-mypy .                        # Type check (if available)
+mypy .                        # Type check (or pyright/basedpyright)
 ```
+
+Configure once in `pyproject.toml` (`[tool.ruff]` line-length, target-version, select) instead of passing flags every run — deterministic, version-controlled behavior.
 
 **The sweep must prove:**
 - No unused imports, variables, or functions

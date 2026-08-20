@@ -2,14 +2,23 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 31. Production Security Patterns
 
 Hardening patterns for production deployments.
 
-### 31.1 Prompt Injection Detection
+### 31.1 Prompt Injection Defense
 
-Heuristic detection for common prompt injection patterns.
+Regex heuristics are **unreliable** — modern prompt injection evades pattern matching. Follow the OWASP GenAI guidance instead:
+
+- **Treat all model input as untrusted**, and all tool/web/MCP output as untrusted data, not instructions ([Section 36.9](skills/36-explicit-prohibitions-the-never-list.md))
+- **Instruction hierarchy:** separate privileged system instructions from user/tool content so injected text can't override rules
+- **Input guardrails:** deny/allow lists, content filtering, and output schema enforcement (structured outputs that can't be coerced)
+- **Least privilege:** give the agent/model only the tools and data the task needs, so even a successful injection has minimal blast radius (Sections 36.8, 52)
+- **Detect-and-flag:** use an LLM guardrail service (e.g. prompt-shield style detectors) for suspicious content *in parallel* — never rely on regex alone
+
+> Heuristic scanners below are retained as a cheap first line, NOT a guarantee:
 
 ```python
 import re
@@ -141,41 +150,41 @@ class AdminIPWhitelist:
 
 ### 31.5 Security CI/CD Workflow
 
-Weekly vulnerability scanning with auto-issue creation.
+Scan on EVERY PR (push protection + dependency review + gitleaks), not just weekly — weekly scans let secrets and vulns ship. The scheduled job below catches drift; the per-PR job catches new issues at the gate.
 
 ```yaml
-# .github/workflows/security.yml
+# .github/workflows/security.yml — per-PR + scheduled
 name: Security Scan
 
 on:
+  push:
+    branches: ['**']          # per-PR scanning
+  pull_request: {}
   schedule:
-    - cron: '0 8 * * 1'  # Monday 8 AM UTC
+    - cron: '0 8 * * 1'      # weekly drift check
 
 jobs:
   vulnerabilities:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: '3.12'
-      - run: pip install pip-audit safety
-      - run: pip-audit --format=json --output=pip-audit.json || true
-      - run: safety check --json --output=safety.json || true
-      - uses: actions/github-script@v7
-        if: always()
-        with:
-          script: |
-            const fs = require('fs');
-            const data = JSON.parse(fs.readFileSync('pip-audit.json', 'utf8'));
-            if (data.vulnerabilities?.length > 0) {
-              github.rest.issues.create({
-                title: 'Security Vulnerabilities Detected',
-                body: 'pip-audit found ' + data.vulnerabilities.length + ' vulnerabilities',
-                labels: ['security', 'vulnerability']
-              });
-            }
+      - name: gitleaks (secrets)
+        uses: gitleaks/gitleaks-action@v8.21.2
+      - name: pip-audit (dependencies, free/PyPA)
+        run: |
+          pip install pip-audit
+          pip-audit || true   # report; fail the gate only for blocking severities
+      # Note: `safety check` CLI 3.x requires an account/license — prefer pip-audit/osv-scanner
 ```
+
+> **Audit-log hardening:** append-only logs with tamper-evidence (hash-chaining each entry to the previous, or ship to an immutable store like S3 Object Lock/WORM), with a defined retention period — a mutable log file is not an audit trail.
+>
+> **`X-Forwarded-For` trust:** only trust client IPs from `X-Forwarded-For` when the request comes from a proxy you control; otherwise an attacker forges the header and bypasses IP allow-lists. Validate the immediate peer address, then walk the header.
 
 ---
 

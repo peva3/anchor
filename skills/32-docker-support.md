@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 32. Docker Support
 
@@ -39,8 +40,7 @@ LABEL org.opencontainers.image.version="1.0.0"
 ### 32.2 Docker Compose for Development
 
 ```yaml
-version: '3.9'
-
+# The compose `version:` key was removed from the Compose spec — omit it.
 services:
   app:
     build: .
@@ -119,7 +119,12 @@ spec:
     spec:
       containers:
         - name: app
-          image: app:latest
+          image: registry.example.com/app:sha-${GITHUB_SHA}   # never :latest — pin a digest or immutable tag
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
           ports:
             - containerPort: 8000
           envFrom:
@@ -129,13 +134,13 @@ spec:
                 name: app-secrets
           livenessProbe:
             httpGet:
-              path: /health
+              path: /healthz
               port: 8000
             initialDelaySeconds: 10
             periodSeconds: 30
           readinessProbe:
             httpGet:
-              path: /health
+              path: /readyz
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10

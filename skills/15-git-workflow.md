@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 15. Git Workflow
 
@@ -61,7 +62,7 @@ Migration 010 adds constraint with deduplication pass.
 
 **Small commits with big explanations are fine.** A 3-line change can have a 10-line commit message explaining the problem it solves.
 
-**Note on brevity:** Section 50.4's output discipline (≤3 lines) applies to task-completion reports, NOT to commit messages. Commit messages follow THIS section's format (problem → solution → context). The rules do not conflict — they govern different domains.
+**Note on brevity:** [Section 50.4](skills/50-intentional-minimalism-the-simplicity-first-architecture.md)'s output discipline (≤3 lines) applies to task-completion reports, NOT to commit messages. Commit messages follow THIS section's format (problem → solution → context). The rules do not conflict — they govern different domains.
 
 ---
 

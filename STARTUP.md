@@ -51,7 +51,7 @@ For system architecture details, see DEEPDIVE.md in the project root.
 ## Required Reading
 
 **You MUST read these files before working:**
-1. `AGENTS.md` — All project rules and conventions (53 sections, mandatory)
+1. `AGENTS.md` — All project rules and conventions (62 sections, mandatory)
 2. `DEEPDIVE.md` — System architecture and design decisions
 
 ## Critical Rules from AGENTS.md
@@ -107,7 +107,7 @@ See DEEPDIVE.md for detailed system narrative including:
 ## Required Reading
 
 **Before any task, read these files:**
-- `AGENTS.md` — All project rules and conventions (53 sections)
+- `AGENTS.md` — All project rules and conventions (62 sections)
 - `DEEPDIVE.md` — System architecture narrative
 - `docs/` — Project documentation
 
@@ -141,7 +141,7 @@ project/
 ├── docs/             # Architecture docs
 ├── research/         # Research files
 ├── DEEPDIVE.md       # System narrative
-├── AGENTS.md         # This file (53 sections)
+├── AGENTS.md         # This file (62 sections)
 └── TODO.md           # Task tracking
 ```
 
@@ -167,7 +167,7 @@ Before marking any task complete:
 
 ## Core Directives
 
-1. **Read AGENTS.md before any task** — All rules are defined there (53 sections)
+1. **Read AGENTS.md before any task** — All rules are defined there (62 sections)
 2. **Read DEEPDIVE.md** — System architecture narrative
 3. **Follow every section** — Core principles, commit protocol, testing, linting, CI/CD, security, etc.
 
@@ -226,7 +226,7 @@ Before marking complete:
 # Windsurf AI Configuration
 
 > Project-level rules for the Windsurf IDE agent.
-> See `AGENTS.md` (53 sections) for complete guidelines.
+> See `AGENTS.md` (62 sections) for complete guidelines.
 
 ## How to Use
 
@@ -252,7 +252,7 @@ project/
 ├── docs/          # Documentation
 ├── research/      # Research files
 ├── DEEPDIVE.md    # System narrative (update on architecture changes)
-├── AGENTS.md      # Project rules (53 sections)
+├── AGENTS.md      # Project rules (62 sections)
 └── TODO.md        # Task tracking
 ```
 
@@ -291,7 +291,7 @@ project/
 ```markdown
 # Continue.dev Configuration
 
-> Config for Continue.dev AI assistant. See `AGENTS.md` (53 sections) for full rules.
+> Config for Continue.dev AI assistant. See `AGENTS.md` (62 sections) for full rules.
 
 ## Workspace Rules
 
@@ -368,7 +368,7 @@ Before writing code: YAGNI → stdlib → native → existing dep → one line �
 
 ## For Any AI Agent
 
-1. **Read `AGENTS.md`** before starting any work — it contains all project rules (53 sections)
+1. **Read `AGENTS.md`** before starting any work — it contains all project rules (62 sections)
 2. **Read `DEEPDIVE.md`** for system architecture context
 3. **Follow all sections** in AGENTS.md
 
@@ -530,7 +530,7 @@ pytest
 \```
 
 ## Docs
-- [AGENTS.md](AGENTS.md) — Full project rules (53 sections)
+- [AGENTS.md](AGENTS.md) — Full project rules (62 sections)
 - [DEEPDIVE.md](DEEPDIVE.md) — System architecture narrative
 - [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guide
 - [SECURITY.md](SECURITY.md) — Security policy
@@ -549,7 +549,7 @@ Use the template from Section 5 covering system overview, architecture decisions
 
 ### 3.7 Create AGENTS.md
 
-Copy AGENTS.md (entry point) and skills/ (full rule text) from the Anchor repository (53 sections). Delete sections that don't apply to this project. Target ≤2,000 lines for project-specific use.
+Copy AGENTS.md (entry point) and skills/ (full rule text) from the Anchor repository (62 sections). Delete sections that don't apply to this project. Target ≤2,000 lines for project-specific use.
 
 ### 3.8 Create CONTRIBUTING.md
 
@@ -584,7 +584,7 @@ git commit -m "Initial project setup
 - Created .gitignore with tests/ always excluded
 - Created .env.example, docker-compose.yml, README.md
 - Created TODO.md, DEEPDIVE.md, CONTRIBUTING.md, SECURITY.md
-- Created AGENTS.md with 53 sections (standardized template)" && \
+- Created AGENTS.md with 62 sections (standardized template)" && \
 git push origin main
 ```
 
@@ -596,7 +596,7 @@ After completing all phases, your project will have:
 
 | File/Folder | Purpose |
 |-------------|---------|
-| `AGENTS.md` | Complete project rules (53 sections) |
+| `AGENTS.md` | Complete project rules (62 sections) |
 | `DEEPDIVE.md` | System architecture narrative |
 | `CLAUDE.md` | Claude Code instructions |
 | `CLAUDE.desktop.md` | Claude desktop app instructions |

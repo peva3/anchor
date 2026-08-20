@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 5. Project Structure Conventions
 
@@ -12,23 +13,23 @@ project/
 │   ├── models/            # Data models/schemas
 │   ├── services/          # Business logic
 │   └── core/              # Config, logging, exceptions
-├── tests/                  # All tests, one-off scripts, random tooling
+├── tests/                  # All tests (required, committed)
 │   ├── unit/              # Unit tests
 │   ├── integration/       # Integration tests
 │   └── scripts/           # Random scripts (gitignored)
 ├── docs/                  # Architecture docs, ADRs, runbooks
-├── research/              # Research files, whitepapers, references
+├── research/              # Research files, whitepapers, references (project-specific)
 ├── scripts/               # CLI/tools (version controlled)
 ├── docker/                # Dockerfiles, compose
 ├── DEEPDIVE.md            # System narrative — detailed explanation
 ├── .env.example           # Environment template
-├── .gitignore             # Git ignore (ALWAYS includes tests/)
+├── .gitignore             # Ignore generated artifacts (caches, tests/scripts, build output) — NOT the tests/ folder itself
 ├── README.md              # Setup and usage
 ├── AGENTS.md              # This file
 └── TODO.md                # Task tracking
 ```
 
-**Required folders for every new project:** `tests/`, `docs/`, `research/`
+**Required folders for every new project:** `tests/`, `docs/` (`.env.example` and `scripts/` when applicable). `research/` is project-specific — keep it only if the project does research. `tests/` is committed, never gitignored as a whole; ignore only generated artifacts under it (`tests/scripts/`, caches).
 
 **DEEPDIVE.md — Living System Narrative:**
 

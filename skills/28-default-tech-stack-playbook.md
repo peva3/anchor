@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 28. Default Tech Stack Playbook
 
@@ -88,13 +89,14 @@ When to use Go over Python:
 
 | Layer | Technology | Why |
 |-------|------------|-----|
-| Frontend | Next.js 15 (App Router) | SSR/SSG, React 18, API routes |
-| Styling | Tailwind CSS + shadcn/ui | Utility-first, accessible components |
+| Frontend | Next.js 15/16 (App Router) | SSR/SSG, React 19, API routes |
+| Styling | Tailwind CSS v4 + shadcn/ui | Utility-first, accessible components |
 | API | FastAPI (Python) or Route handlers | FastAPI for complex, Next.js for simple |
 | Database | PostgreSQL | ACID, JSON, vectors, pgvector |
 | Cache | Redis | Sessions, rate limiting, caching |
 | Search | Typesense or Meilisearch | Typo-tolerant, fast |
-| Auth | NextAuth.js or custom JWT | NextAuth for Next.js, JWT for others |
+| Auth | Auth.js v5 (formerly NextAuth.js) or custom JWT | Auth.js for Next.js (app-router native), JWT for others |
+| Observability | OpenTelemetry (OTLP) | Tracing + metrics + logs via one vendor-neutral pipeline ([Section 41](skills/41-observability-standards.md)) |
 | Deploy | Vercel (frontend) + Railway/Render (backend) | Easiest scaling |
 
 **Project Structure:**
@@ -339,13 +341,14 @@ Phase 3 — Production / Scale:
 - **Never split for "architecture purity."** If two services always deploy together, always scale together, and have the same availability requirements, they can share a database instance without shame.
 
 ```python
-# Phase 1 example — env config per service
+# Phase 1 example — env config per service (placeholders only, NEVER real passwords)
 # orders-service/.env
-DATABASE_URL=postgresql://orders_user:pass@postgres:5432/app?options=-c%20search_path%3Dorders
+DATABASE_URL=postgresql://orders_user:CHANGE_ME@postgres:5432/app?options=-c%20search_path%3Dorders
 #                                                            ^^^ schema-scoped
+# Real secrets live in the secret manager (Section 44), never in .env files.
 
 # billing-service/.env  
-DATABASE_URL=postgresql://billing_user:pass@postgres:5432/app?options=-c%20search_path%3Dbilling
+DATABASE_URL=postgresql://billing_user:CHANGE_ME@postgres:5432/app?options=-c%20search_path%3Dbilling
 #                                                              ^^^ different schema
 ```
 

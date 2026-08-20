@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 43. Database Backup & Recovery
 
@@ -15,7 +16,7 @@ Data loss is a resume-generating event. Every project with persistent data MUST 
 | **Weekly** | 4 weeks | Extended recovery window for delayed-discovered issues |
 | **Monthly** | 12 months | Long-term compliance and audit requirements |
 
-This is the **Grandfather-Father-Son** retention pattern.
+This is the **Grandfather-Father-Son** retention pattern. In addition to scheduled logical dumps, configure **WAL archiving** (PostgreSQL continuous archiving: `pg_basebackup` + `archive_mode=on`/`archive_command` or `archive_library`) so you can restore to **any point in time** (PITR), not just the last dump. Logical dumps alone lose everything between dumps. Also define **RPO** (how much data loss is acceptable) and **RTO** (how fast recovery must be) and size the schedule to them.
 
 ### 43.2 PostgreSQL Backup Implementation
 
@@ -153,25 +154,29 @@ curl -f http://localhost:8000/health
 
 ### 43.4 Backup Verification
 
-Automated restore test — validates backup integrity:
+Automated restore test — validates backup integrity. Never build shell strings with `shell=True` (command-injection hazard, [Section 36.1](skills/36-explicit-prohibitions-the-never-list.md)); pass argument lists:
 
 ```python
 def verify_backup(backup_path: Path, test_db_url: str) -> bool:
     """Restore backup to ephemeral test database and verify."""
     try:
         # Restore to test database
-        subprocess.run(
-            f"gunzip -c {backup_path} | psql {test_db_url}",
-            shell=True, check=True, capture_output=True, timeout=600
-        )
+        with gzip.open(backup_path, "rb") as f_in:
+            subprocess.run(
+                ["psql", test_db_url],
+                stdin=f_in, check=True, capture_output=True, timeout=600
+            )
 
         # Verify critical tables exist and have data
         result = subprocess.run(
-            f"psql {test_db_url} -c \"SELECT count(*) FROM information_schema.tables WHERE table_schema='public'\"",
-            shell=True, check=True, capture_output=True, text=True
+            [
+                "psql", test_db_url, "-tA", "-c",
+                "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'",
+            ],
+            check=True, capture_output=True, text=True
         )
 
-        table_count = int(result.stdout.strip().split('\n')[-2].strip())
+        table_count = int(result.stdout.strip())
         return table_count > 0
 
     except Exception as e:
@@ -180,8 +185,11 @@ def verify_backup(backup_path: Path, test_db_url: str) -> bool:
     finally:
         # Clean up test database
         subprocess.run(
-            f"psql {test_db_url} -c \"DROP SCHEMA public CASCADE; CREATE SCHEMA public\"",
-            shell=True, capture_output=True
+            [
+                "psql", test_db_url, "-c",
+                "DROP SCHEMA public CASCADE; CREATE SCHEMA public",
+            ],
+            capture_output=True
         )
 ```
 

@@ -32,7 +32,7 @@ assignees: []
 
 ### Structural Check
 
-<Does the bug involve a broken entry-point → skill link, or a section whose skill file is missing? The audit is a scratch tool (`tests/`, not shipped); the shipped invariant is that all 53 sections resolve from the entry-point.>
+<Does the bug involve a broken entry-point → skill link, or a section whose skill file is missing? The audit is a scratch tool (`tests/`, not shipped); the shipped invariant is that all 62 sections resolve from the entry-point.>
 
 ### Relevant Section
 

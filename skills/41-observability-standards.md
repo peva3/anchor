@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 41. Observability Standards
 
@@ -84,9 +85,17 @@ from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 
 def setup_tracing(service_name: str, otlp_endpoint: str):
     """Initialize OpenTelemetry tracing for this service."""
-    tracer_provider = TracerProvider()
+    # Configure via standard SDK env vars instead of code when possible:
+    #   OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_SERVICE_NAME,
+    #   OTEL_RESOURCE_ATTRIBUTES, OTEL_PROPAGATORS, OTEL_TRACES_SAMPLER
+    from opentelemetry.sdk.resources import Resource
+    tracer_provider = TracerProvider(
+        resource=Resource.create({"service.name": service_name})
+    )
 
-    # Export to OTLP collector (Jaeger, Grafana Tempo, etc.)
+    # Prefer TLS (no insecure=True — deprecated in the OTLP exporter).
+    # For plaintext dev endpoints pass insecure=True explicitly and add a TODO
+    # to switch to OTEL_EXPORTER_OTLP_ENDPOINT=https://... in prod.
     exporter = OTLPSpanExporter(endpoint=otlp_endpoint, insecure=True)
     tracer_provider.add_span_processor(BatchSpanProcessor(exporter))
 
@@ -179,7 +188,7 @@ async def metrics():
 
 ### 41.4 Correlation IDs
 
-Every request MUST carry a correlation ID through the entire system.
+Every request MUST carry a correlation ID through the entire system. When OpenTelemetry is in use, prefer propagating the W3C `traceparent` header (via `OTEL_PROPAGATORS=tracecontext,baggage`) so traces link across services; the custom `X-Correlation-ID` middleware below is the fallback for systems without a tracer.
 
 ```python
 from contextvars import ContextVar

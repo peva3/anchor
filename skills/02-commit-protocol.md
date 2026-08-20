@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 2. Commit Protocol
 
@@ -16,7 +17,7 @@
 - Each commit should be a stable checkpoint that passes all tests independently
 - Use `gh auth status` to verify auth before attempting pushes
 - If `gh` is logged in, push to the user's remote using their configured identity
-- **NEVER** create GitHub Actions workflows, dependabot config, or any other GitHub-side automation without explicit per-file user approval — see Section 36.4a
+- **NEVER** create GitHub Actions workflows, dependabot config, or any other GitHub-side automation without explicit per-file user approval — see [Section 36.4](skills/36-explicit-prohibitions-the-never-list.md)a
 - **NEVER** create PRs, issues, or comments without explicit user approval (see "Never Go Rogue" below)
 
 **IMPORTANT — Never Go Rogue:**
@@ -45,10 +46,14 @@
 - Never change git config `user.name` or `user.email` — use what is already set
 - Verify identity with `git config --global user.name` and `git config --global user.email` before first commit
 
-**Message format conventions:**
-- Prefix with scope when applicable: `api: add rate limiting`, `frontend: fix timeline scroll bug`
+**Message format conventions — Conventional Commits:**
+- Prefix with a type so history drives automated changelogs and SemVer bumps ([Section 39](skills/39-semantic-versioning-changelog.md)): `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`, `test:`, `perf:`, `build:`, `ci:`
+- Add optional scope in parens: `fix(api):`, `feat(frontend):`
+- `BREAKING CHANGE:` footer (or `!` after type) for breaking changes — this drives the major version bump
+- Keep the human-sounding WHY message: `fix: corrected token refresh race condition` then a body explaining WHY
 - For TODO completions: `Sprint N: <description>`
 - Include size delta for binary builds: `autoexec.bin +12KB`
+- Review `git status` and `git diff` BEFORE staging; never stage generated files or lockfile-only edits by accident
 
 ---
 

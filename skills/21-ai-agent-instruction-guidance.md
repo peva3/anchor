@@ -2,12 +2,13 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 21. AI Agent Instruction Guidance
 
 > Based on research from AgentBench (arXiv:2308.03688) and CAMEL (arXiv:2303.17760) on what makes AI agents effective.
 >
-> **Provenance** (per Section 51.5):
+> **Provenance** (per [Section 51.5](skills/51-instruction-architecture-context-economy-self-improvement.md)):
 > - **Sections 21.1, 24 (IF/IA/TLE/CLE failure modes)** — [AgentBench: A Benchmark for Evaluating LLMs as Agents](research/papers/full/agentbench-2308.03688.md) (arXiv:2308.03688, ICLR 2024)
 > - **Sections 22, 21.2 (role assignment, multi-agent cooperation)** — [CAMEL: Communicative Agents for "Mind" Exploration of LLM Society](research/papers/full/camel-2303.17760.md) (arXiv:2303.17760, NeurIPS 2023)
 

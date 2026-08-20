@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 49. Chaos Engineering
 
@@ -48,61 +49,42 @@ experiment:
     - Application reconnected within 5s of database recovery
 ```
 
-### 49.3 Failure Injection Patterns
+### 49.3 Failure Injection Tools
 
-```python
-import asyncio
-import random
-from contextlib import asynccontextmanager
-from typing import Callable, Awaitable
+Prefer battle-tested tools over hand-rolled `tc`/`iptables` snippets — those require root and don't work in containers, on macOS, or on managed CI. The in-app `FailureInjector` class is a reinvention; standard tooling covers the same ground.
 
-class FailureInjector:
-    """Inject controlled failures for chaos testing."""
+| Tool | Use For |
+|------|---------|
+| **Chaos Mesh** | Kubernetes-native fault injection (network, disk, pod kill, time) via CRDs |
+| **LitmusChaos** | Kubernetes chaos experiments with git-ops experiment definitions |
+| **AWS Fault Injection Simulator (FIS)** | AWS resources (EC2, EKS, RDS, network) with safe defaults and guardrails |
+| **Toxiproxy** | TCP-level fault proxy for app-level latency/down/blackhole — works in containers and local dev |
+| **stress / stress-ng** | CPU, memory, disk I/O resource exhaustion |
 
-    def __init__(self, enabled: bool = False):
-        self.enabled = enabled
+```bash
+# Toxiproxy: inject 500ms latency into a connection (works in CI/local)
+toxiproxy-cli create db -l localhost:12345 -u db:5432
+toxiproxy-cli toxic add db -t latency -a latency=500
 
-    @asynccontextmanager
-    async def latency(self, min_ms: int = 50, max_ms: int = 500):
-        """Inject random latency into an operation."""
-        if self.enabled:
-            delay = random.uniform(min_ms, max_ms) / 1000
-            await asyncio.sleep(delay)
-        yield
-
-    async def maybe_fail(self, failure_rate: float = 0.1, error_type: type = Exception):
-        """Fail with given probability."""
-        if self.enabled and random.random() < failure_rate:
-            raise error_type("Chaos monkey says no")
-
-    async def maybe_timeout(self, timeout_rate: float = 0.1, duration_s: float = 30):
-        """Timeout with given probability."""
-        if self.enabled and random.random() < timeout_rate:
-            await asyncio.sleep(duration_s)
-            raise TimeoutError("Chaos timeout")
-
-# Usage in production code (gated by config)
-chaos = FailureInjector(enabled=config.CHAOS_ENGINEERING_ENABLED)
-
-async def fetch_data_from_db(query: str):
-    await chaos.maybe_fail(failure_rate=0.05, error_type=ConnectionError)
-    async with chaos.latency(min_ms=10, max_ms=200):
-        return await db.execute(query)
+# Chaos Mesh: inject network partition into the api pod (staging)
+#   kubectl apply -f network-partition.yaml  # with targetSelector: api
 ```
+
+> If you keep an in-app failure injector (e.g. for unit-level chaos), gate it behind config and NEVER ship it enabled to production — a `FailureInjector(enabled=True)` in prod is itself a production incident.
 
 ### 49.4 Chaos Experiment Library
 
 | Experiment | What It Tests | How to Run |
 |-----------|---------------|------------|
-| **Kill a service** | Failover, health checks, graceful degradation | `docker compose stop <service>` |
-| **Network latency** | Timeout handling, retry logic | `tc qdisc add dev eth0 root netem delay 500ms` |
-| **Network partition** | Service isolation, split-brain prevention | `iptables -A INPUT -s <service_ip> -j DROP` |
+| **Kill a service** | Failover, health checks, graceful degradation | `docker compose stop <service>` or Chaos Mesh PodKill |
+| **Network latency** | Timeout handling, retry logic | Toxiproxy latency toxic, or Chaos Mesh NetworkChaos (not raw `tc`) |
+| **Network partition** | Service isolation, split-brain prevention | Chaos Mesh / Litmus network partition, or AWS FIS |
 | **CPU exhaustion** | Throttling, resource limits, priority scheduling | `stress --cpu 4 --timeout 60s` |
 | **Memory exhaustion** | OOM handling, graceful degradation | `stress --vm 2 --vm-bytes 1G --timeout 60s` |
-| **Disk full** | Error handling, cleanup, alerting | `dd if=/dev/zero of=/tmp/fill bs=1M count=1000` |
-| **DNS failure** | Caching, fallback IPs | `iptables -A OUTPUT -p udp --dport 53 -j DROP` |
-| **Dependency slow** | Circuit breaker, timeout configuration | Inject latency at proxy level |
-| **Clock skew** | Time-based logic, token expiry | Change system clock by ±5 minutes |
+| **Disk full** | Error handling, cleanup, alerting | Fill the volume in staging only |
+| **DNS failure** | Caching, fallback IPs | Chaos Mesh / Toxiproxy proxy, or fail the resolver in staging |
+| **Dependency slow** | Circuit breaker, timeout configuration | Inject latency at proxy level (Toxiproxy) |
+| **Clock skew** | Time-based logic, token expiry | Change system clock by ±5 minutes (staging VMs only) |
 | **Certificate expiry** | TLS handling, renewal automation | Use short-lived certs in staging |
 
 ### 49.5 Game Day Checklist
@@ -114,6 +96,7 @@ async def fetch_data_from_db(query: str):
 - [ ] Rollback plan is documented and tested
 - [ ] Communication channel is established (Slack channel, incident bridge)
 - [ ] All team members know the experiment is running
+- [ ] **PRODUCTION experiments require explicit human approval** ([Section 36.4](skills/36-explicit-prohibitions-the-never-list.md) — never spend money or risk production without explicit user authorization), a documented window, and a named on-call owner
 
 **During game day:**
 - [ ] Announce experiment start

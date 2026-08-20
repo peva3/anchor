@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 30. Health Endpoint Specification
 
@@ -78,12 +79,32 @@ async def health_check() -> HealthResponse:
 }
 ```
 
-### 30.4 Kubernetes Probe Configuration
+### 30.4 Liveness vs Readiness — Two Endpoints
+
+Do **not** wire a dependency-checking endpoint to BOTH probes. If `/health` checks the DB and a downstream DB outage hits it, the pod is killed and restarts in a loop instead of shedding traffic. Split:
+
+| Probe | Endpoint | Checks | Purpose |
+|-------|----------|--------|---------|
+| **livenessProbe** | `/healthz` | Process only (return 200 if the process is up) | Restart a deadlocked/hung process |
+| **readinessProbe** | `/readyz` | Dependencies (DB, cache, external API) | Remove the pod from Service traffic when deps are down |
+| **startupProbe** | `/startupz` | Slow-boot readiness (first startup only) | Defer liveness/readiness while the app boots > failureThreshold |
+
+```python
+@app.get("/healthz")
+async def liveness() -> dict:
+    return {"status": "ok"}  # process is alive
+
+@app.get("/readyz")
+async def readiness() -> HealthResponse:
+    ...  # full subsystem check from 30.1
+```
+
+### 30.5 Kubernetes Probe Configuration
 
 ```yaml
 livenessProbe:
   httpGet:
-    path: /health
+    path: /healthz          # process only — never deps
     port: 8000
   initialDelaySeconds: 10
   periodSeconds: 30
@@ -92,12 +113,21 @@ livenessProbe:
 
 readinessProbe:
   httpGet:
-    path: /health
+    path: /readyz           # dependency checks
     port: 8000
   initialDelaySeconds: 5
   periodSeconds: 10
   timeoutSeconds: 3
   failureThreshold: 3
+
+startupProbe:
+  httpGet:
+    path: /startupz
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 30    # allow slow boot before liveness starts
 ```
 
 ---

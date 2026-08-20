@@ -18,7 +18,7 @@
 
 <p align="center">
   <b>Anchor — the production-grade AGENTS.md template for AI coding agents.</b><br>
-  <sub>Keep your agents grounded. 53 sections of battle-tested rules distilled from 100+ real-world projects, academic research, and production failures.</sub>
+  <sub>Keep your agents grounded. 62 sections of battle-tested rules distilled from 100+ real-world projects, academic research, and production failures.</sub>
 </p>
 
 <p align="center">
@@ -136,11 +136,11 @@ cp anchor/STARTUP.md ./your-new-project/STARTUP.md
 
 ```
 anchor/
-├── AGENTS.md                  # ⭐ The main template — high-level entry point, 53 sections (full text in skills/), copy this into your project
-├── skills/                    # 📂 Full rule text — 53 skill files (NN-name.md), lazy-loaded by task
+├── AGENTS.md                  # ⭐ The main template — high-level entry point, 62 sections (full text in skills/), copy this into your project
+├── skills/                    # 📂 Full rule text — 62 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md                 # 🚀 AI agent bootstrap guide — builds a project from scratch in 4 phases
 ├── README.md                  # 📖 This file
-├── .gitignore                 # 🔒 Standard gitignore (includes tests/)
+├── .gitignore                 # 🔒 Ignore generated artifacts — tests/ itself is committed
 │
 ├── CLAUDE.md                  # 🤖 Anthropic Claude agent config (references AGENTS.md)
 ├── CLAUDE.desktop.md          # 💻 Anthropic Claude desktop app config
@@ -245,9 +245,9 @@ The template ships with config files for 8+ AI coding agent platforms. All refer
 
 ## 🧪 Quality Validation
 
-The template is validated structurally: the entry-point links to all 53 skill files, and the skills hold the full rule text. Validation is done with a scratch audit script (not shipped) that checks:
+The template is validated structurally: the entry-point links to all 62 skill files, and the skills hold the full rule text. Validation is done with a scratch audit script (not shipped) that checks:
 
-- **Section structure** — All 53 sections present, sequentially numbered; each has a skill file
+- **Section structure** — All 62 sections present, sequentially numbered; each has a skill file
 - **Contradiction detection** — No conflicting NEVER/ALWAYS rules
 - **Actionable MUST rules** — Every MUST rule links to concrete implementation
 - **Code block validity** — All 66 Python blocks parse correctly
@@ -265,7 +265,7 @@ The template is validated structurally: the entry-point links to all 53 skill fi
 |--------|-------|
 | **Sections** | 53 |
 | **Entry-point** | 470 lines / ~7,000 tokens (always loaded) |
-| **Full rule text** | 53 skill files in `skills/` (lazy-loaded by task) |
+| **Full rule text** | 62 skill files in `skills/` (lazy-loaded by task) |
 | **Python code blocks** | 66 |
 | **Research sources** | 22 (12 papers, 10 projects) |
 | **Agent platforms supported** | 8+ |
@@ -283,7 +283,7 @@ This template follows its own rules. Before contributing:
 
 1. **Read Section 50.8** — AGENTS.md governs itself. Agents editing it must follow all rules herein.
 2. **Read Section 51.2** — Propose additions when you encounter a failure mode not yet covered.
-3. **Verify the structure** — All 53 sections must stay linked from the entry-point with their skill file present. Run the scratch audit (`python3 tests/test_agents_md_quality.py`) during development.
+3. **Verify the structure** — All 62 sections must stay linked from the entry-point with their skill file present. Run the committed structural validator (`./scripts/check_structure.sh`) — it checks index links, duplicate headings, and cross-references.
 4. **Follow Section 33** — PRs must stay under 800 lines.
 5. **Follow Section 15** — Commit messages must be human-sounding, WHY-focused.
 6. **Follow Section 35** — Use the PR template with HUMAN/AGENT disclosure sections.
@@ -308,4 +308,4 @@ MIT — use it, modify it, ship it. Attribution appreciated.
 
 ---
 
-<sub>Anchor — keep your agents grounded. 53 sections. 0 filler. Built from 100+ real-world AGENTS.md files, 22 research papers, and production codebases.</sub>
+<sub>Anchor — keep your agents grounded. 62 sections. 0 filler. Built from 100+ real-world AGENTS.md files, 22 research papers, and production codebases.</sub>

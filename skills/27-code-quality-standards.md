@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 27. Code Quality Standards
 
@@ -305,16 +306,22 @@ def safe_read_file(base_dir: Path, user_path: str) -> str:
 
 #### Secure Password Handling
 
+Prefer Argon2id (OWASP first choice); bcrypt only for legacy systems.
+
 ```python
-import bcrypt
+from argon2 import PasswordHasher  # pip install argon2-cffi
 import secrets
 
+ph = PasswordHasher()
+
 def hash_password(password: str) -> str:
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password.encode(), salt).decode()
+    return ph.hash(password)  # Argon2id by default
 
 def verify_password(password: str, hashed: str) -> bool:
-    return bcrypt.checkpw(password.encode(), hashed.encode())
+    try:
+        return ph.verify(hashed, password)
+    except Exception:
+        return False
 
 def generate_token() -> str:
     return secrets.token_urlsafe(32)

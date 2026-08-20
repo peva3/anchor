@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 50. Intentional Minimalism — The Simplicity-First Architecture
 
@@ -159,7 +160,7 @@ Add when: <measurable trigger condition>
 - Do NOT explain why you used a for-loop instead of a list comprehension (the ladder already decided that)
 
 **What this does NOT apply to (explicit carve-outs):**
-- **Commit messages** — These follow Section 15's detailed WHY format (problem → solution → context). Commit messages are not "output" — they're permanent project history.
+- **Commit messages** — These follow [Section 15](skills/15-git-workflow.md)'s detailed WHY format (problem → solution → context). Commit messages are not "output" — they're permanent project history.
 - **User-requested explanations** — If the user asks "why did you do X?", answer fully.
 - **Security decisions** — Safety override. If omitting the explanation could cause someone to reverse the security measure later, explain it.
 - **Architectural decisions in DEEPDIVE.md** — These need full context for future agents.
@@ -207,7 +208,7 @@ Prevent agents from making invalid or misleading claims. These are NOT optional.
 - If the performance change is irrelevant (1μs difference), don't mention it
 
 **NEVER claim "100% test coverage" based on line coverage alone:**
-- Line coverage ≠ behavioral coverage (see Section 40.5)
+- Line coverage ≠ behavioral coverage (see [Section 40.5](skills/40-code-coverage-enforcement.md))
 - Branch coverage + mutation score are the minimum for strong claims
 
 **NEVER say "bug fix" when you changed behavior without confirming the old behavior was wrong:**

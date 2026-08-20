@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 29. Operational Patterns
 
@@ -10,6 +11,8 @@ Production-hardened patterns for reliability and resilience.
 ### 29.1 Circuit Breaker Pattern
 
 Prevents cascading failures by stopping requests to a failing service.
+
+> **Prefer battle-tested libraries** over hand-rolled implementations: Python `tenacity` / `pybreaker`, Java `Resilience4j`, Node `cockatiel`. The hand-rolled code below shows the *concept*; in production use the library (it handles async, timeouts, and cross-node coordination that single-process in-memory state can't). Also: the state below lives in one process and won't survive a restart or scale-out — use a shared store (Redis) if you need cross-node semantics.
 
 ```python
 from enum import Enum
@@ -28,12 +31,10 @@ class CircuitBreaker:
         failure_threshold: int = 5,
         success_threshold: int = 2,
         timeout: float = 60.0,
-        quota_reset_timeout: float = 3600.0
     ):
         self.failure_threshold = failure_threshold
         self.success_threshold = success_threshold
         self.timeout = timeout
-        self.quota_reset_timeout = quota_reset_timeout
 
         self.failures = 0
         self.successes = 0
@@ -116,6 +117,8 @@ class CircuitBreakerManager:
 ### 29.2 Dead Letter Queue (DLQ) Pattern
 
 Handles background task failures with retry and escalation.
+
+> **Prefer a managed DLQ** when using a broker (SQS redrive policy, RabbitMQ DLX, Kafka DLT) instead of a hand-rolled queue — the broker persists across restarts, applies backpressure, and gives you dead-letter inspection out of the box. The code below is the in-process concept; production should use the broker's DLQ plus alerting on depth.
 
 ```python
 from dataclasses import dataclass
@@ -396,6 +399,12 @@ class SemanticCache:
             "total_hits": total_hits,
         }
 ```
+
+### 29.5 Bulkhead, Idempotency & Cancellation
+
+- **Bulkhead.** Isolate failure domains with separate connection pools/threads per dependency — a saturated pool for service A must not starve service B (thread-per-dependency or semaphore-per-bulkhead; most circuit-breaker libraries ship bulkheads)
+- **Idempotency for retried work.** Every retried side-effecting operation must carry an idempotency key ([Section 20](skills/20-external-integrations.md)) so at-least-once delivery can't double-apply; store the key + result and replay on repeat
+- **Cancellation & propagation.** Thread the timeout/cancellation context (asyncio.TaskGroup, `contextlib` cancellation, `trio`/structured concurrency) into every call — a cancelled upstream must cancel downstream work instead of leaking tasks or double-releasing resources
 
 ---
 

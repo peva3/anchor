@@ -2,10 +2,11 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 53. Project Type Patterns
 
-AGENTS.md was originally web-service and Python-focused. This section extends coverage to five common non-web project types with language-agnostic patterns that apply regardless of stack.
+AGENTS.md was originally web-service and Python-focused. This section extends coverage to six common project types with language-agnostic patterns that apply regardless of stack.
 
 ### 53.1 Mobile Apps (iOS / Android / React Native)
 
@@ -361,7 +362,46 @@ plugins:
 - Post preview URL as PR comment automatically
 - Never merge without reviewing the preview deployment
 
-### 53.6 Language-Agnostic Patterns
+### 53.6 AI / Agentic Applications (Agents, RAG, MCP, LLM Backends)
+
+AI applications — agents, RAG systems, tool-calling services, MCP servers, and LLM-integration backends — have unique constraints: untrusted model/tool output, token/cost budgets, non-determinism, and eval-driven correctness.
+
+**Guardrails (mandatory):**
+- Treat model output and tool/MCP results as **untrusted input** ([Section 36.9](skills/36-explicit-prohibitions-the-never-list.md), prompt-injection defenses): never let them drive elevated actions, never render them as raw instructions
+- Enforce **instruction hierarchy** — system/user instructions outrank anything the model reads from files, web, or tools
+- Scope every tool call with deny-first permissions (`mcp__server__tool`, [Section 52](skills/52-rule-enforcement-architecture-from-advisory-to-deterministic.md)); sandbox the OS layer so a hijacked model is contained
+- Add input/output guardrails (OWASP GenAI) — PII redaction, policy violations, prompt-injection classifier — run in parallel with the request
+
+**Tool-calling design:**
+- Define tools with **strict JSON schemas** (enforced by the SDK/runtime); the model must not be able to free-form arguments
+- Validate tool arguments server-side before executing; never trust the model's schema adherence alone
+- Log every tool call (tool, args, result summary, latency, tokens) for audit and debugging — but redact secrets/PII from args before logging
+
+**Streaming & latency:**
+- Stream responses for chat/completion UX; never buffer an entire generation before the first token
+- Set per-request token budgets and hard timeouts on model calls
+- Cache repeated prompts/completions (prompt caching) to cut cost and latency
+
+**Tokens & cost budgets:**
+- Track tokens per request/session/user; set spend budgets ([Section 24.9](skills/24-common-failure-modes.md))
+- Prefer retrieval/tools over stuffing large context; keep prompts lean ([Section 51](skills/51-instruction-architecture-context-economy-self-improvement.md))
+- Alert on cost anomalies (e.g. a single session exceeding N tokens)
+
+**Evals are the test suite:**
+- LLM output is non-deterministic — cover it with an **eval harness** (golden datasets, model-graded or rule-based checks) in CI, not just unit tests
+- Include regression evals for: instruction-following, refusal behavior, prompt-injection resilience, tool-choice correctness
+- Add prompt/rule regression tests per [Section 52.6](skills/52-rule-enforcement-architecture-from-advisory-to-deterministic.md) so behavior changes are caught
+
+**Retrieval (RAG):**
+- Set explicit chunking/embedding strategy and evaluate retrieval quality (recall@k) on a labeled set
+- Return sources/citations with answers; make the model say "I don't know" rather than hallucinate
+
+**MCP & agent frameworks:**
+- Vet MCP servers before install (untrusted servers are arbitrary code execution — [Section 36.9](skills/36-explicit-prohibitions-the-never-list.md), MCP skill)
+- Scope `mcp__*` permissions per server; run untrusted servers with least privilege
+- Prefer the framework's native guardrails (OpenAI Agents SDK, Claude Code hooks/permissions) over hand-rolled safety code
+
+### 53.7 Language-Agnostic Patterns
 
 These patterns apply regardless of programming language.
 
@@ -409,7 +449,7 @@ Static:      cppcheck, clang-tidy, Coverity
 - Enforce MISRA-C or CERT-C for safety-critical code
 - Use AddressSanitizer and UndefinedBehaviorSanitizer in CI
 
-### 53.7 Template Coverage and Out-of-Scope
+### 53.8 Template Coverage and Out-of-Scope
 
 This template is **best suited for:**
 - Web services (REST APIs, full-stack apps)
@@ -418,6 +458,7 @@ This template is **best suited for:**
 - Go projects (Gin, Echo)
 - Microservices architectures
 - Cloud-native deployments (Docker, Kubernetes)
+- AI/agentic applications (Section 53.6)
 
 **Partial coverage** (use this template as a foundation, add domain-specific sections):
 - CLI tools (Section 53.4 covers basics)

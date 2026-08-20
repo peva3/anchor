@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 52. Rule Enforcement Architecture — From Advisory to Deterministic
 
@@ -43,6 +44,8 @@ The most powerful new pattern: parse your AGENTS.md prose rules and generate act
 
 **Pattern: Rule → Hook Compilation**
 
+> **Current hook decision schema:** PreToolUse hooks decide by emitting `hookSpecificOutput.permissionDecision` = `deny | allow | ask | defer` in the hook JSON output — not a top-level `decision` field. Exit codes still work: `0` = no decision (let permissions decide), `2` = block. The examples below show the intent; check the live hooks reference for the exact output shape before wiring.
+
 ```json
 // hooks/enforce-pr-size.json — compiled from AGENTS.md Section 33.1
 {
@@ -72,18 +75,18 @@ fi
 
 | AGENTS.md Rule | Hook Type | Triggers On | Blocks When |
 |---------------|-----------|-------------|-------------|
-| Section 2: Never go rogue | Permission deny | `gh pr create`, `gh issue create` | No explicit approval |
-| Section 33.1: PR size limit | PreToolUse(Bash) | `git push` | Diff exceeds 800 lines |
-| Section 36.2: No force push | PreToolUse(Bash) | `git push --force` | Always (exit code 2) |
-| Section 9: Lint before commit | PreToolUse(Bash) | `git commit` | `ruff check .` fails |
-| Section 40: Coverage floor | CI job | `pull_request` | Coverage drops below 80% |
-| Section 13: No secrets in code | Git hook | `git commit` | `detect-secrets` finds a secret |
-| Section 36.4: No paid services | PreToolUse(WebFetch) | Any API domain | Domain matches known paid service |
-| Section 44: Encrypted secrets | Git hook + CI | `git commit` + PR | Unencrypted secret detected |
+| [Section 2](skills/02-commit-protocol.md): Never go rogue | Permission deny | `gh pr create`, `gh issue create` | No explicit approval |
+| [Section 33.1](skills/33-pr-change-size-standards.md): PR size limit | PreToolUse(Bash) | `git push` | Diff exceeds 800 lines |
+| [Section 36.2](skills/36-explicit-prohibitions-the-never-list.md): No force push | PreToolUse(Bash) | `git push --force` | Always (exit code 2) |
+| [Section 9](skills/09-linting-type-checking.md): Lint before commit | PreToolUse(Bash) | `git commit` | `ruff check .` fails |
+| [Section 40](skills/40-code-coverage-enforcement.md): Coverage floor | CI job | `pull_request` | Coverage drops below 80% |
+| [Section 13](skills/13-security-best-practices.md): No secrets in code | Git hook | `git commit` | `gitleaks` finds a secret |
+| [Section 36.4](skills/36-explicit-prohibitions-the-never-list.md): No paid services | PreToolUse(WebFetch) | Any API domain | Domain matches known paid service |
+| [Section 44](skills/44-secrets-management.md): Encrypted secrets | Git hook + CI | `git commit` + PR | Unencrypted secret detected |
 
 ### 52.3 Pre-commit Hooks as Deterministic Gate
 
-Pre-commit hooks (Section 37) are the most universal hard-layer enforcement — they work with ANY agent, not just ones that support hook systems.
+Pre-commit hooks ([Section 37](skills/37-pre-commit-hook-standards.md)) are the most universal hard-layer enforcement — they work with ANY agent, not just ones that support hook systems.
 
 **Minimum hard-layer hooks every project must have:**
 
@@ -91,10 +94,10 @@ Pre-commit hooks (Section 37) are the most universal hard-layer enforcement — 
 # .pre-commit-config.yaml — compiled from AGENTS.md rules
 repos:
   # Section 13: No secrets in code
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
     hooks:
-      - id: detect-secrets
+      - id: gitleaks
         name: "BLOCK: secrets in code (AGENTS.md S13)"
 
   # Section 9: No dead code before commit
@@ -133,6 +136,8 @@ repos:
 
 For agents that support hooks, compile AGENTS.md rules into JSON hook definitions:
 
+**Deny-first precedence:** permission evaluation is `deny → ask → allow`. A `deny` rule wins over everything, including an `allow` list — you cannot add an allowlist exception that overrides a deny. Scope MCP tools with `mcp__server__tool` rules so a compromised or malicious MCP server cannot reach sensitive operations.
+
 ```json
 // .claude/settings.json — hard-layer enforcement
 {
@@ -142,7 +147,9 @@ For agents that support hooks, compile AGENTS.md rules into JSON hook definition
       "Bash(rm -rf /*)",                     // Section 36.1
       "Bash(git config user.*)",             // Section 2 (identity)
       "WebFetch(domain:openai.com/api*)",    // Free-tier only unless approved
-      "WebFetch(domain:anthropic.com/api*)"  // Free-tier only unless approved
+      "WebFetch(domain:anthropic.com/api*)", // Free-tier only unless approved
+      "mcp__github__create_issue",           // Section 36.4a — no bot PRs/issues
+      "mcp__shell__run"                      // Untrusted MCP servers get no shell
     ],
     "allow": [
       "Read(*.md)",
@@ -428,16 +435,21 @@ jobs:
 | 2 (Never spend) | Permission deny + pre-commit | Block paid runner YAML + API domain access | CRITICAL |
 | 2 (Use user identity) | Permission deny | Block `git config user.*` changes | CRITICAL |
 | 9 (Lint before commit) | PreToolUse(Bash) | `ruff check .` exit code gates commit | HIGH |
-| 13 (No secrets) | Git hook + CI | `detect-secrets` on pre-commit + CI | CRITICAL |
+| 13 (No secrets) | Git hook + CI | `gitleaks` on pre-commit + CI | CRITICAL |
 | 33.1 (PR size) | PreToolUse(Bash) + CI | `git diff --stat` gate at 800 lines | HIGH |
 | 36.2 (No force push) | Permission deny | Block `git push --force` to main | CRITICAL |
 | 36.3 (No rogue GitHub) | Permission deny | Block `gh pr/issue` unless approved | HIGH |
 | 36.4 (No paid services) | Permission deny + pre-commit | Block `runs-on.*large\|gpu` + API domains | CRITICAL |
+| 36.9 (Untrusted MCP) | Permission deny | `mcp__*` scoped per server; deny untrusted servers entirely | CRITICAL |
 | 37 (Pre-commit installed) | CI check | Assert `.pre-commit-config.yaml` exists | HIGH |
 | 38 (CI workflow) | CI check | Assert `.github/workflows/ci*.yml` exists | HIGH |
 | 40 (Coverage floor) | CI check | `--cov-fail-under=80` in CI | HIGH |
-| 44 (No committed secrets) | Git hook + CI | `detect-secrets` + `gitleaks` | CRITICAL |
+| 44 (No committed secrets) | Git hook + CI | `gitleaks` | CRITICAL |
 | 23 (Verification gates) | Stop hook (agent) | Run tests + lint, block exit on failure | MEDIUM |
+
+### 52.10 OS Sandboxing as a Third Enforcement Layer
+
+Hooks and permissions can be bypassed by a prompt-injected agent that tricks the model. The third layer is the operating system itself: run agents in a sandbox (container, `bubblewrap`, VM, or a restricted user with no write access outside the workdir), with a network egress policy. This survives prompt injection because the agent physically cannot perform the denied action — no model misbehavior can escape the OS boundary. Treat sandboxing as the last-resort guarantee under permissions.
 
 ---
 

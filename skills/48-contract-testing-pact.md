@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 48. Contract Testing (Pact)
 
@@ -28,21 +29,12 @@ pip install pact-python
 
 ```python
 # tests/contract/consumer/test_user_api_contract.py
-import atexit
 import pytest
-from pact import Consumer, Provider
+from pact import Pact
 
-pact = Consumer("WebApp").has_pact_with(
-    Provider("UserAPI"),
-    host_name="localhost",
-    port=1234,
-    pact_dir="./pacts"
-)
+pact = Pact(consumer="WebApp", provider="UserAPI", host_name="localhost", port=1234, pact_dir="./pacts")
 
-pact.start_service()
-atexit.register(pact.stop_service)
-
-def test_get_user(pact: Pact):
+def test_get_user():
     """WebApp expects GET /users/{id} to return specific fields."""
     expected_response = {
         "id": 42,
@@ -67,13 +59,26 @@ def test_get_user(pact: Pact):
 
 ### 48.4 Provider Verification (Satisfies Consumer Expectations)
 
-```bash
-# Run provider verification against running User API
-pact-verifier \
-  --provider-base-url=http://localhost:8000 \
-  --pact-url=./pacts/WebApp-UserAPI.json \
-  --provider-states-setup-url=http://localhost:8000/_pact/provider_states
+```python
+# tests/contract/provider/test_user_api_contract.py
+import pytest
+from pact import Verifier
+
+def test_verify_user_api():
+    """Verify the running User API satisfies all consumer contracts."""
+    verifier = (
+        Verifier(provider="UserAPI", provider_base_url="http://localhost:8000")
+        .add_transport("http")
+        .set_provider_state("a user with id 42 exists", setup_state)
+    )
+    verifier.verify_with_broker(
+        broker_url="https://pact-broker.example.com",
+        broker_token=os.environ["PACT_BROKER_TOKEN"],
+        publish_version=os.environ.get("GITHUB_SHA", "dev"),
+    )
 ```
+
+> pact-python v3/v4 API: use `Verifier().add_transport(...).verify_with_broker(...)` or `.verify()` (which raises on failure) — the older `pact-verifier` CLI and `Consumer`/`Provider` classes are deprecated.
 
 ```python
 # Provider state setup endpoint
@@ -106,17 +111,7 @@ contract-test:
 
     - name: Verify provider against contracts
       run: |
-        pact-verifier \
-          --provider-base-url=http://localhost:8000 \
-          --pact-dir=./pacts/ \
-          --provider-states-setup-url=http://localhost:8000/_pact/provider_states
-
-    - name: Publish contracts to Pact Broker
-      run: |
-        pact-broker publish ./pacts/ \
-          --consumer-app-version=${{ github.sha }} \
-          --broker-base-url=https://pact-broker.example.com \
-          --broker-token=${{ secrets.PACT_BROKER_TOKEN }}
+        python -m pytest tests/contract/provider/ -k "provider"
 
     - name: Check if safe to deploy (can-i-deploy)
       run: |

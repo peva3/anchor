@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 45. Flaky Test Management
 
@@ -21,7 +22,7 @@ Flaky tests (tests that pass and fail intermittently without code changes) erode
 ```ini
 # pytest.ini
 [pytest]
-# Re-run failed tests to detect flakiness
+# Re-run failed tests to detect flakiness (CI only — see 45.2b)
 addopts =
     --reruns 2
     --reruns-delay 1
@@ -40,6 +41,14 @@ pytest --reruns 3 --reruns-delay 1
 pytest --reruns 3 --rerun-flaky-report=flaky_report.json
 ```
 
+**45.2b Reruns are CI-only, and only for diagnosis:**
+- Re-running masks flakes locally — set reruns in the CI config (or via `PYTEST_ADDOPTS`), NOT in committed `pytest.ini`, so a developer's local failure is a real failure
+- A test that only passes on the retry is still flaky — log it as a flaky report and root-cause it (Section 45.3), don't just accept the rerun
+- `pytest-rerunfailures` is **incompatible** with `pytest-xdist --looponfail`, `--pdb`, and the `flaky` plugin — don't combine them
+
+**45.2c Detect order-dependence with `pytest-randomly`:**
+Install `pytest-randomly` and run CI with random ordering (`pytest-randomly` shuffles test order and the seed is printed). If a test fails under shuffle, it's order-dependent — fix the isolation, don't pin the seed to hide it. Keep the seed in the failure output so you can reproduce.
+
 ### 45.3 Quarantine Mechanism
 
 When a flaky test is discovered, quarantine it immediately — do NOT delete it:
@@ -55,11 +64,15 @@ def test_thing_that_flakes():
 ```
 
 ```ini
-# pytest.ini — exclude quarantined tests from CI
+# pytest.ini — register the marker AND exclude quarantined tests from CI
 [pytest]
 markers =
     flaky: Test is known to be flaky (see ticket for details)
+addopts =
+    -m "not flaky"        # quarantined tests are excluded by default
 ```
+
+> Without `-m "not flaky"` in CI, the marker only labels tests — they still run and still block CI. Exclude them, then make sure a scheduled/lab job runs `-m flaky` so they keep being exercised while quarantined.
 
 **Quarantine process:**
 1. **Detect** — Identify flaky test from CI failures

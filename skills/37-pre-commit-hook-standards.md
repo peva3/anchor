@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 37. Pre-Commit Hook Standards
 
@@ -28,7 +29,7 @@ repos:
   # --- UNIVERSAL HOOKS (every project) ---
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         name: Remove trailing whitespace
@@ -56,7 +57,7 @@ repos:
   # --- PYTHON HOOKS ---
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.0
+    rev: v0.11.0
     hooks:
       - id: ruff
         name: Lint Python (ruff)
@@ -65,12 +66,12 @@ repos:
         name: Format Python (ruff)
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
+    rev: v1.14.0
     hooks:
       - id: mypy
         name: Type check (mypy)
-        additional_dependencies: [types-all]
-        args: [--ignore-missing-imports]
+        # Install only the type stubs you actually use — avoid the types-all meta-package
+        args: []
 
   # --- SECURITY HOOKS ---
 
@@ -82,12 +83,11 @@ repos:
         args: [-c, pyproject.toml, --skip=B101]
         # B101: assert — used in tests, skip for production code scan
 
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
     hooks:
-      - id: detect-secrets
+      - id: gitleaks
         name: Detect secrets in code
-        args: ['--baseline', '.secrets.baseline']
 
   # --- GENERAL HOOKS ---
 
@@ -114,7 +114,7 @@ repos:
 | **ruff-format** | Format violations | Medium — consistency |
 | **mypy** | Type errors | HIGH — runtime bugs |
 | **bandit** | Security anti-patterns | HIGH — vulnerabilities |
-| **detect-secrets** | Any hardcoded secret | CRITICAL — data breach |
+| **gitleaks** | Any hardcoded secret | CRITICAL — data breach |
 
 ### 37.4 Enforcement Policy
 
@@ -136,18 +136,22 @@ repos:
 
 This catches cases where a developer skipped hooks locally.
 
-### 37.6 Detect-Secrets Baseline
+### 37.6 Keeping Hooks Current
+
+Pinned revisions rot — schedule `pre-commit autoupdate` (e.g. monthly, or on a dependabot/renovate PR for `.pre-commit-config.yaml`) and review the diff before merging. Prefer widely-maintained hooks: gitleaks (active) over detect-secrets (unmaintained), ruff over the old flake8/pyflakes setup.
+
+### 37.7 Gitleaks Baseline
 
 ```bash
 # Generate initial baseline (existing secrets are whitelisted)
-detect-secrets scan > .secrets.baseline
+gitleaks dir --config .gitleaks.toml --report-format sarif --report-path .gitleaks.sarif
 
 # Audit the baseline to ensure no real secrets were whitelisted
-detect-secrets audit .secrets.baseline
-
-# Commit the baseline so future scans catch NEW secrets only
-git add .secrets.baseline
+# Commit the config so future scans catch NEW secrets only
+git add .gitleaks.toml
 ```
+
+> Gitleaks needs no baseline file to start; any pre-existing secret it flags should be rotated rather than whitelisted.
 
 ---
 

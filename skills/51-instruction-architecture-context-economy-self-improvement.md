@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 51. Instruction Architecture — Context Economy & Self-Improvement
 
@@ -29,7 +30,8 @@ When deploying to Kubernetes:
 ```
 
 **Rules:**
-- **Core sections respond to all requests** (Section 1-2, 9, 15, 33, 36) — always loaded
+- **Core sections respond to all requests** (Sections 1-2, 36, 50, 51) — always loaded inline in the entry-point
+- **Sections 9, 15, 33** are high-frequency but task-scoped — load their skill files on commit/git/PR work (they are not inlined)
 - **Domain-specific sections load on trigger match** — keyword in user message activates them
 - **Without a trigger list, the section is always loaded**
 - **Trigger matching is case-insensitive, word-boundary-aware** — "kubernetes" matches "deploy to kubernetes" but not "kubernetes-health-check" (single word match)

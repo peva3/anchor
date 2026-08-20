@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 47. Performance Benchmark Testing
 
@@ -44,11 +45,19 @@ def test_api_endpoint_benchmark(benchmark, client):
     assert response.status_code == 200
 ```
 
-### 47.2 Time Budget Assertions
+### 47.2 Statistical Rigor — Warmup & Rounds
+
+Hard single-run assertions are flaky on shared CI runners. Do this instead:
+- **Warm up** before measuring (run the function a few times so caches/JIT settle)
+- Use `--benchmark-rounds` and `--benchmark-warmup` to gather a stable sample; compare **median** (and p95), not a single run
+- Use `--benchmark-disable` in normal test runs so devs aren't slowed by benchmarks — run them only in the dedicated CI job
+- Prefer **regression-percentage** checks against a stored baseline over absolute ms budgets
+
+### 47.3 Time Budget Assertions (regression-based)
 
 ```python
 def test_critical_path_with_time_budget(benchmark):
-    """Critical path operations have hard time budgets."""
+    """Critical path operations compared against a stored baseline."""
     budget_ms = {
         "validate_token": 5,
         "check_permission": 10,
@@ -62,13 +71,15 @@ def test_critical_path_with_time_budget(benchmark):
 
         result = benchmark(fn, test_input())
 
-        # Assert median time is within budget
+        # Assert median time is within budget (allow noise margin)
         stats = benchmark.stats
-        assert stats.stats.median < max_ms / 1000.0, \
+        assert stats.stats.median < max_ms / 1000.0 * 1.2, \
             f"{operation}: median {stats.stats.median*1000:.1f}ms exceeds budget {max_ms}ms"
 ```
 
-### 47.3 CI Integration
+Store a baseline JSON and compare in CI (`--benchmark-compare=baseline.json`), failing only on a **regression %**, not on absolute jitter.
+
+### 47.4 CI Integration
 
 ```yaml
 # Performance regression detection in CI
@@ -95,7 +106,7 @@ benchmark:
         python scripts/check_benchmark_regression.py benchmark_results.json
 
     - name: Store benchmark results
-      uses: benchmark-action/github-action-benchmark@v1
+      uses: benchmark-action/github-action-benchmark@v1.2.2  # pin a SHA per Section 38.4
       with:
         tool: pytest
         output-file-path: benchmark_results.json
@@ -105,7 +116,7 @@ benchmark:
         auto-push: false
 ```
 
-### 47.4 What to Benchmark
+### 47.5 What to Benchmark
 
 | Category | What to Measure | Target |
 |----------|----------------|--------|
@@ -117,7 +128,9 @@ benchmark:
 | **Startup time** | Application boot to first request | <5s |
 | **Memory usage** | RSS after warmup | <500MB baseline |
 
-### 47.5 NEVER Do These for Benchmarks
+Use **`pytest-memray`** for memory-benchmark/leak checks in the same job. Note this skill covers microbenchmarks; load/end-to-end capacity testing (k6, locust) is a separate discipline.
+
+### 47.6 NEVER Do These for Benchmarks
 
 - **NEVER** run benchmarks on oversubscribed CI runners — use dedicated runners or control for noise
 - **NEVER** compare benchmarks across different machines — always use same hardware
@@ -125,6 +138,7 @@ benchmark:
 - **NEVER** benchmark with unrealistic data volumes — test with production-scale data
 - **NEVER** benchmark only happy paths — measure worst-case performance too
 - **NEVER** skip benchmarking "because the change is small" — small changes cause big regressions
+- **NEVER** gate CI on an absolute ms assertion from a single run — compare to a baseline with a regression threshold instead
 
 ---
 

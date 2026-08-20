@@ -9,8 +9,8 @@ Anchor is a documentation-only template. It ships rules, not code.
 
 ```
 standardized-markdown/
-├── AGENTS.md                # ⭐ The deliverable — high-level entry point, 53 sections of agent rules
-├── skills/                  # Full rule text — 53 skill files (NN-name.md), lazy-loaded by task
+├── AGENTS.md                # ⭐ The deliverable — high-level entry point, 62 sections of agent rules
+├── skills/                  # Full rule text — 62 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md               # AI bootstrap guide — phases for greenfield projects
 ├── README.md                # Public-facing description, stats, quick start
 ├── CONTRIBUTING.md          # How to add/change sections safely
@@ -39,7 +39,7 @@ There is no runtime data flow. The data flow is **rule distribution**:
 
 1. **Author** writes a section in `AGENTS.md` addressing a specific observed failure mode
 2. **Extract** the section's full text into `skills/NN-name.md` (one skill per section)
-3. **Audit** (scratch `tests/test_agents_md_quality.py`, run during development, not shipped) verifies section numbering, skill-file completeness, code-block validity, and workflow coverage
+3. **Validate** — the shipped `scripts/check_structure.sh` enforces the invariant (all 62 index links resolve, no duplicate headings, cross-references land on real sections); a deeper scratch audit (`tests/test_agents_md_quality.py`, run during development, not shipped) covers numbering, skill-file completeness, code-block validity, and workflow coverage
 4. **Consumer** copies `AGENTS.md` + `skills/` (and platform-specific config) into their own project
 5. **AI agent** in the consumer project reads the entry point, loads the skills its task needs, and follows the rules
 
@@ -47,7 +47,7 @@ The template is therefore optimized for two audiences simultaneously: humans who
 
 ## Key Decisions
 
-### Why 53 sections, not fewer
+### Why 62 sections, not fewer
 
 Section 51.3 mandates ≤2,000 lines and ≤5,000 tokens for *project-specific* AGENTS.md files, with an explicit exception for this template repository. The template's value is breadth — a single import gives a project access to production-readiness patterns (CI/CD, observability, secrets, mutation testing, chaos engineering) that would otherwise take a team months to assemble.
 
@@ -59,13 +59,13 @@ The template reconciles breadth with constrained context windows by **splitting 
 
 Consumers trim on import: copy `AGENTS.md` + `skills/`, delete inapplicable skills, inline what remains.
 
-### Why the audit script is Python, not Make/Node
+### Why the shipped validator is a shell script, with Python scratch for development
 
-`tests/test_agents_md_quality.py` is pure standard library (re, pathlib, collections). No dependencies to install, no version matrix to maintain. The audit runs in under a second over the entry point plus 53 skill files. Adding pytest as a runtime dep would inflate the install footprint for marginal benefit. It is a **scratch development tool, not a shipped deliverable** — per Section 1, `tests/` is gitignored and does not ship with the template (see "Gotchas" below).
+Two layers keep the structure intact. The **shipped** gate is `scripts/check_structure.sh` — pure bash over `grep`/`awk`, zero dependencies, so a fresh clone can always run it. It enforces the structural invariant that makes lazy loading safe: every entry-point index link resolves to a skill file, no duplicate headings, and every "Section NN" cross-reference lands on a real section. During development a deeper Python audit (`tests/test_agents_md_quality.py`, scratch, gitignored) adds code-block validity and workflow-coverage checks. It is pure standard library (re, pathlib, collections), runs in under a second over the entry point plus 62 skill files, but it is **not shipped** — per Section 1, `tests/` is gitignored (see "Gotchas" below).
 
 ### Why the deployed platform configs are lightweight
 
-Each platform (Cursor, Windsurf, Continue, Copilot, Claude) gets a thin pointer file that says "read AGENTS.md and follow Section N." The 53 sections live in one canonical place (the skills/ library). If we duplicated the rules into each config, drift would be inevitable — any update to AGENTS.md would require manual mirroring to 7 other files. The trade-off: agents on platforms with very small context windows may not load the full rule corpus eagerly. The mitigation is the entry-point index (Section 51.4 model capability awareness): agents read the lean index and load only the skills they need.
+Each platform (Cursor, Windsurf, Continue, Copilot, Claude) gets a thin pointer file that says "read AGENTS.md and follow Section N." The 62 sections live in one canonical place (the skills/ library). If we duplicated the rules into each config, drift would be inevitable — any update to AGENTS.md would require manual mirroring to 7 other files. The trade-off: agents on platforms with very small context windows may not load the full rule corpus eagerly. The mitigation is the entry-point index (Section 51.4 model capability awareness): agents read the lean index and load only the skills they need.
 
 ### Why AGENTS.md is self-referential (Section 50.8)
 
@@ -73,7 +73,7 @@ The template cannot avoid governing itself — every section is a rule the maint
 
 ## Gotchas and Landmines
 
-1. **`tests/` is entirely gitignored** — by design (Section 1: tests are scratch). The audit script and all test suites live locally during development but are **not shipped** in the template. A fresh clone has no `tests/` directory — any config or doc that invokes `python3 tests/...` will fail and must be kept out of the repo. The guardrails ship as the entry-point + skills structure itself.
+1. **`tests/` is entirely gitignored** — by design (Section 1: tests are scratch). The scratch audit and test suites live locally during development but are **not shipped** in the template. A fresh clone has no `tests/` directory — any config or doc that invokes `python3 tests/...` will fail and must be kept out of the repo. The guardrails ship as the entry-point + skills structure itself, and structural integrity is enforced by the committed `scripts/check_structure.sh`.
 
 2. **Duplicate section 3.9 in STARTUP.md** — historically had two `### 3.9 Create SECURITY.md` headings, with the first one containing the CONTRIBUTING template by mistake. Any agent following STARTUP literally would have overwritten SECURITY.md. Fixed.
 

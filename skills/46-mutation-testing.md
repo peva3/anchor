@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 46. Mutation Testing
 
@@ -85,16 +86,16 @@ mutation-test:
 
 Not all code benefits from mutation testing. Configure mutmut to skip "arid nodes" — AST nodes where mutants are unproductive:
 
-**.mutmut-cache or pyproject.toml:**
+**pyproject.toml:**
 ```toml
 [tool.mutmut]
-paths_to_mutate = ["src"]
+source_paths = ["src"]
 backup = false
 runner = "python -m pytest"
 
 [tool.mutmut.exclude]
 # Skip these — mutants here don't produce useful signals
-functions = [
+do_not_mutate_patterns = [
     "__repr__",
     "__str__",
     "__init__",
@@ -102,13 +103,13 @@ functions = [
     "_log_*",
 ]
 
-paths = [
-    "*/tests/*",
-    "*/migrations/*",
+do_not_mutate = [
     "src/core/logging.py",
     "src/core/config.py",
 ]
 ```
+
+> In-file exclusion: append `# pragma: no mutate` to any line mutmut should leave alone. (The old `paths_to_mutate` / `[tool.mutmut.exclude] functions/paths` keys are superseded by `source_paths` / `do_not_mutate_patterns` / `do_not_mutate`.)
 
 ### 46.5 Arid Node Types to Skip
 

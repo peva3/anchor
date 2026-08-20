@@ -2,6 +2,7 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 44. Secrets Management
 
@@ -114,17 +115,15 @@ class SecretRotator:
 ```yaml
 # Add to ci.yml
 - name: Scan for secrets
+  uses: trufflesecurity/trufflehog@main
+  with:
+    path: ./
+
+# Or gitleaks (pre-commit-friendly)
+- name: Scan for secrets
   uses: gitleaks/gitleaks-action@v2
   with:
     config-path: .gitleaks.toml
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-# Or with truffleHog
-- name: Scan for secrets
-  run: |
-    pip install trufflehog3
-    trufflehog3 --format json --output trufflehog-report.json .
 ```
 
 ### 44.6 Secrets Management Rules
@@ -132,9 +131,11 @@ class SecretRotator:
 - **NEVER** commit secrets to git — enforced by pre-commit `detect-secrets` and CI scanning
 - **NEVER** share secrets via email, Slack, or any unencrypted channel
 - **NEVER** hardcode secrets in Docker images — use runtime injection
-- **NEVER** log secrets — implement PII redaction (Section 41.5)
+- **NEVER** log secrets — implement PII redaction ([Section 41.5](skills/41-observability-standards.md))
 - **ALWAYS** use a secrets manager (not `.env` files) for production
 - **ALWAYS** rotate secrets on a schedule — automate rotation
+- **ALWAYS** prefer short-lived credentials — use OIDC for CI (GitHub Actions OIDC → cloud provider, no long-lived deploy tokens) and Vault dynamic secrets
+- **ALWAYS** revoke and rotate a secret immediately on suspected exposure; scrub already-committed secrets with `git filter-repo`
 - **ALWAYS** use least privilege — each service gets only the secrets it needs
 - **ALWAYS** use ephemeral credentials when possible (Vault dynamic secrets, OIDC tokens)
 - **ALWAYS** audit secret access — who accessed, when, from where

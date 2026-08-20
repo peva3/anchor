@@ -2,12 +2,13 @@
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
 > This is a lazy-loaded skill — load it when the corresponding task applies.
+> If this skill references another section, load that section's skill file too (the referenced file is NOT included).
 
 ## 38. CI/CD Pipeline Standards
 
-**Section 36.4a is in effect:** do not create any of the GitHub Actions workflows in this section without explicit, per-workflow user approval. The templates below are reference material — present them as a recommendation when the user asks for CI, but wait for approval before writing the file.
+**[Section 36.4](skills/36-explicit-prohibitions-the-never-list.md)a is in effect:** do not create any of the GitHub Actions workflows in this section without explicit, per-workflow user approval. The templates below are reference material — present them as a recommendation when the user asks for CI, but wait for approval before writing the file.
 
-The pre-commit hook (Section 37) runs locally and needs no GitHub-side automation.
+The pre-commit hook ([Section 37](skills/37-pre-commit-hook-standards.md)) runs locally and needs no GitHub-side automation.
 
 ### 38.1 CI Pipeline — `.github/workflows/ci.yml`
 
@@ -22,10 +23,18 @@ on:
   pull_request:
     branches: [main, master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true   # cancel superseded runs to save minutes
+
+permissions:
+  contents: read               # least-privilege: nothing writable by default
+
 jobs:
   lint-and-typecheck:
     name: Lint & Type Check
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       matrix:
         python-version: ['3.11', '3.12']
@@ -34,6 +43,7 @@ jobs:
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip                # dependency caching keyed on the lockfile hash
       - name: Install dependencies
         run: pip install ruff mypy
       - name: Ruff lint
@@ -41,12 +51,13 @@ jobs:
       - name: Ruff format check
         run: ruff format --check .
       - name: Mypy type check
-        run: mypy . --ignore-missing-imports
+        run: mypy .
 
   test:
     name: Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     needs: lint-and-typecheck
+    timeout-minutes: 30
     strategy:
       matrix:
         python-version: ['3.11', '3.12']
@@ -89,7 +100,7 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
       - name: Upload coverage to Codecov
         if: success() || failure()
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b1d2a1d8e5f6b3c4d9e0a1b2c3 # v4.6.0
+        uses: codecov/codecov-action@d6f4507edf870b12d61c8d1d1f015c0ec3a1a0c9 # v5.0.0
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
@@ -170,14 +181,26 @@ on:
     types: [completed]
     branches: [main]
 
+permissions:
+  id-token: write              # needed only for OIDC; never use long-lived secrets
+  contents: read
+
 jobs:
   deploy-staging:
     name: Deploy to Staging
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: staging
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.1.0
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/deploy-staging
+          aws-region: us-east-1
+          # No access keys — GitHub OIDC mints short-lived credentials (Section 44)
 
       - name: Build and push Docker image
         run: |
@@ -193,7 +216,8 @@ jobs:
         run: |
           # Smoke test the deployed service
           sleep 10
-          curl -f http://staging.example.com/health
+          curl -f http://staging.example.com/healthz
+          curl -f http://staging.example.com/readyz
 
       - name: Notify on failure
         if: failure()
@@ -227,8 +251,32 @@ uses: actions/checkout@main
 - **Every third-party action** (community or vendor) MUST use full SHA
 - **The version tag comment** (`# v4.2.2`) is REQUIRED for human readability and audit
 - **Update SHAs** when upgrading action versions — never leave a stale SHA
+- **Mutable tags in third-party actions** (e.g. `benchmark-action/github-action-benchmark@v1`) violate this rule — pin the SHA
 
-### 38.5 PR and Issue Templates
+### 38.5 Security Scanning in CI
+
+Run secret and dependency scanning on every PR (not weekly — [Section 31](skills/31-production-security-patterns.md)):
+
+```yaml
+  scan:
+    name: Secret & Supply-Chain Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: gitleaks (secrets)
+        uses: gitleaks/gitleaks-action@v8.21.2
+      - name: pip-audit (dependencies)
+        run: pip install pip-audit && pip-audit -r requirements.txt
+      - name: CodeQL
+        uses: github/codeql-action/init@v3
+```
+
+**`workflow_run` deploy caution:** a workflow triggered by `workflow_run` receives input from another workflow's logs/artifacts, which GitHub treats as untrusted ("pwn request"). Never pass untrusted content from `workflow_run` into shell commands or deploy arguments without validating it first; prefer a `workflow_dispatch` or release trigger for production.
+
+### 38.6 PR and Issue Templates
 
 Create these files in `.github/`:
 
@@ -246,7 +294,7 @@ Create these files in `.github/`:
 
 ### Breaking Changes
 
-## AI Agent Disclosure
+## Review Assistance Notes
 ### Agent Decision Log
 ### Areas Needing Human Review
 ### Agent Self-Check
@@ -288,7 +336,7 @@ assignees: []
 - Project version:
 ```
 
-### 38.6 Branch Protection Rules
+### 38.7 Branch Protection Rules
 
 Configure these in GitHub repository settings → Branches → Branch protection rules:
 

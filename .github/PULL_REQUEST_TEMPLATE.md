@@ -18,7 +18,7 @@
 
 ### Testing
 
-- [ ] All 53 sections remain linked from the entry-point with their skill file present
+- [ ] All 62 sections remain linked from the entry-point with their skill file present
 - [ ] `pytest tests/` passes (scratch suite, not shipped)
 - [ ] Manual verification performed (describe what was tested)
 
