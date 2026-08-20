@@ -1,5 +1,6 @@
 # Per Section 1, tests/ contents are scratch and not for the repo.
 tests/
+scripts/
 __pycache__/
 *.pyc
 *.pyo
