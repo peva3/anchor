@@ -27,7 +27,8 @@ project/
 ├── docs/          # Documentation
 ├── research/      # Research files
 ├── DEEPDIVE.md    # System narrative (update on architecture changes)
-├── AGENTS.md      # Project rules (this file references it)
+├── AGENTS.md      # Project rules entry point (this file references it)
+├── skills/        # Full rule text — lazy-loaded by task
 └── TODO.md        # Task tracking
 ```
 

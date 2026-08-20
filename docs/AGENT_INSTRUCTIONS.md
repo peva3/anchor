@@ -5,7 +5,7 @@
 
 ## For Any AI Agent
 
-1. **Read `AGENTS.md`** before starting any work — it contains all project rules (51 sections)
+1. **Read `AGENTS.md`** before starting any work — it contains all project rules (53 sections, entry point; full text in `skills/`)
 2. **Read `DEEPDIVE.md`** for system architecture context
 3. **Follow all sections** in AGENTS.md
 

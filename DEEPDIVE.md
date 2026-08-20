@@ -9,7 +9,8 @@ Anchor is a documentation-only template. It ships rules, not code.
 
 ```
 standardized-markdown/
-├── AGENTS.md                # ⭐ The deliverable — 51 sections of agent rules
+├── AGENTS.md                # ⭐ The deliverable — high-level entry point, 53 sections of agent rules
+├── skills/                  # Full rule text — 53 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md               # AI bootstrap guide — phases for greenfield projects
 ├── README.md                # Public-facing description, stats, quick start
 ├── CONTRIBUTING.md          # How to add/change sections safely
@@ -40,25 +41,34 @@ standardized-markdown/
 There is no runtime data flow. The data flow is **rule distribution**:
 
 1. **Author** writes a section in `AGENTS.md` addressing a specific observed failure mode
-2. **Audit** (`tests/test_agents_md_quality.py`) verifies section numbering, code-block validity, and workflow coverage
-3. **Consumer** copies `AGENTS.md` (and platform-specific config) into their own project
-4. **AI agent** in the consumer project reads `AGENTS.md` and follows it
+2. **Extract** the section's full text into `skills/NN-name.md` (one skill per section)
+3. **Audit** (`tests/test_agents_md_quality.py`) verifies section numbering, skill-file completeness, code-block validity, and workflow coverage
+4. **Consumer** copies `AGENTS.md` + `skills/` (and platform-specific config) into their own project
+5. **AI agent** in the consumer project reads the entry point, loads the skills its task needs, and follows the rules
 
 The template is therefore optimized for two audiences simultaneously: humans who edit it (need clear authorship, no AI-shorthand) and AI agents who consume it (need explicit, actionable, contradiction-free rules).
 
 ## Key Decisions
 
-### Why 51 sections, not fewer
+### Why 53 sections, not fewer
 
-Section 51.3 mandates ≤2,000 lines and ≤5,000 tokens for *project-specific* AGENTS.md files, with an explicit exception for this template repository. We exceed those limits because the value of the template is breadth — a single import gives a project access to production-readiness patterns (CI/CD, observability, secrets, mutation testing, chaos engineering) that would otherwise take a team months to assemble. The exception clause exists in 51.3 precisely so this template can serve as the reference; consumers trim on import.
+Section 51.3 mandates ≤2,000 lines and ≤5,000 tokens for *project-specific* AGENTS.md files, with an explicit exception for this template repository. The template's value is breadth — a single import gives a project access to production-readiness patterns (CI/CD, observability, secrets, mutation testing, chaos engineering) that would otherwise take a team months to assemble.
+
+The template reconciles breadth with constrained context windows by **splitting into an entry point + lazy-loaded skills**:
+
+1. `AGENTS.md` stays lean (~470 lines, ~7K tokens) — a high-level index plus the core rules (Sections 1, 2, 36, 50.1/50.3/50.6, 51) reproduced in full so the non-negotiable guardrails always apply.
+2. `skills/NN-name.md` holds each section's full rule text, byte-for-byte identical to the former monolith. Agents load only the skills their current task needs (Section 51.1 trigger-based loading).
+3. A 32K-context model can follow all guardrails by loading the entry point plus 7-12 relevant skills (~16-19K tokens total), verified by `tests/test_constrained_context_projects.py`.
+
+Consumers trim on import: copy `AGENTS.md` + `skills/`, delete inapplicable skills, inline what remains.
 
 ### Why the audit script is Python, not Make/Node
 
-`tests/test_agents_md_quality.py` is pure standard library (re, pathlib, collections). No dependencies to install, no version matrix to maintain. The audit runs in 0.2s on a 195KB file. Adding pytest as a runtime dep would inflate the install footprint for marginal benefit — a one-liner `python3 tests/test_agents_md_quality.py` is the contract.
+`tests/test_agents_md_quality.py` is pure standard library (re, pathlib, collections). No dependencies to install, no version matrix to maintain. The audit runs in under a second over the entry point plus 53 skill files. Adding pytest as a runtime dep would inflate the install footprint for marginal benefit — a one-liner `python3 tests/test_agents_md_quality.py` is the contract.
 
 ### Why the deployed platform configs are lightweight
 
-Each platform (Cursor, Windsurf, Continue, Copilot, Claude) gets a thin pointer file that says "read AGENTS.md and follow Section N." The 51 sections live in one place. If we duplicated the rules into each config, drift would be inevitable — any update to AGENTS.md would require manual mirroring to 7 other files. The trade-off: agents on platforms with very small context windows may not load AGENTS.md eagerly. Section 51.4 (model capability awareness) is the mitigation: copy only the sections you need if you cannot fit AGENTS.md.
+Each platform (Cursor, Windsurf, Continue, Copilot, Claude) gets a thin pointer file that says "read AGENTS.md and follow Section N." The 53 sections live in one canonical place (the skills/ library). If we duplicated the rules into each config, drift would be inevitable — any update to AGENTS.md would require manual mirroring to 7 other files. The trade-off: agents on platforms with very small context windows may not load the full rule corpus eagerly. The mitigation is the entry-point index (Section 51.4 model capability awareness): agents read the lean index and load only the skills they need.
 
 ### Why AGENTS.md is self-referential (Section 50.8)
 

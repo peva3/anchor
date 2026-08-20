@@ -18,7 +18,7 @@
 
 <p align="center">
   <b>Anchor — the production-grade AGENTS.md template for AI coding agents.</b><br>
-  <sub>Keep your agents grounded. 51 sections of battle-tested rules distilled from 100+ real-world projects, academic research, and production failures.</sub>
+  <sub>Keep your agents grounded. 53 sections of battle-tested rules distilled from 100+ real-world projects, academic research, and production failures.</sub>
 </p>
 
 <p align="center">
@@ -132,7 +132,8 @@ cp anchor/STARTUP.md ./your-new-project/STARTUP.md
 
 ```
 anchor/
-├── AGENTS.md                  # ⭐ The main template — 51 sections, copy this into your project
+├── AGENTS.md                  # ⭐ The main template — high-level entry point, 53 sections (full text in skills/), copy this into your project
+├── skills/                    # 📂 Full rule text — 53 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md                 # 🚀 AI agent bootstrap guide — builds a project from scratch in 4 phases
 ├── README.md                  # 📖 This file
 ├── .gitignore                 # 🔒 Standard gitignore (includes tests/)
@@ -197,7 +198,10 @@ Full research catalog: [`research/index.md`](research/index.md)
 # Copy the core template
 cp anchor/AGENTS.md ./my-project/AGENTS.md
 
-# Trim to fit — keep only relevant sections
+# Copy the skills library (full rule text lives here)
+cp -r anchor/skills ./my-project/skills
+
+# Trim to fit — keep only relevant skills and inline them if needed
 # Target: ≤2,000 lines for project-specific use (Section 51.3)
 ```
 
@@ -247,7 +251,7 @@ python3 tests/test_agents_md_quality.py
 ```
 
 The audit checks:
-- **Section structure** — All 51 sections present, sequentially numbered
+- **Section structure** — All 53 sections present, sequentially numbered; each has a skill file
 - **Contradiction detection** — No conflicting NEVER/ALWAYS rules
 - **Actionable MUST rules** — Every MUST rule links to concrete implementation
 - **Code block validity** — All 66 Python blocks parse correctly
@@ -308,4 +312,4 @@ MIT — use it, modify it, ship it. Attribution appreciated.
 
 ---
 
-<sub>Anchor — keep your agents grounded. 51 sections. 0 filler. Built from 100+ real-world AGENTS.md files, 22 research papers, and production codebases.</sub>
+<sub>Anchor — keep your agents grounded. 53 sections. 0 filler. Built from 100+ real-world AGENTS.md files, 22 research papers, and production codebases.</sub>

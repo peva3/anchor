@@ -43,7 +43,8 @@ project/
 ├── docs/             # Architecture docs
 ├── research/         # Research files
 ├── DEEPDIVE.md       # System narrative
-├── AGENTS.md         # This file
+├── AGENTS.md         # This file (entry point)
+├── skills/           # Full rule text — lazy-loaded by task
 └── TODO.md           # Task tracking
 ```
 
