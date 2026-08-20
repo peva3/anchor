@@ -14,12 +14,3 @@ repos:
       - id: check-merge-conflict
       - id: mixed-line-ending
         args: ['--fix=lf']
-
-  - repo: local
-    hooks:
-      - id: anchor-audit
-        name: Anchor AGENTS.md audit
-        entry: python3 tests/test_agents_md_quality.py --strict
-        language: system
-        pass_filenames: false
-        always_run: true

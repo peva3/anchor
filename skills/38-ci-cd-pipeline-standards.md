@@ -7,7 +7,7 @@
 
 **Section 36.4a is in effect:** do not create any of the GitHub Actions workflows in this section without explicit, per-workflow user approval. The templates below are reference material — present them as a recommendation when the user asks for CI, but wait for approval before writing the file.
 
-The pre-commit hook (Section 37) and the audit script (`tests/test_agents_md_quality.py`) run locally and need no GitHub-side automation.
+The pre-commit hook (Section 37) runs locally and needs no GitHub-side automation.
 
 ### 38.1 CI Pipeline — `.github/workflows/ci.yml`
 

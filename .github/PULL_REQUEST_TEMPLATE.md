@@ -18,8 +18,8 @@
 
 ### Testing
 
-- [ ] `python3 tests/test_agents_md_quality.py --strict` passes
-- [ ] `pytest tests/` passes
+- [ ] All 53 sections remain linked from the entry-point with their skill file present
+- [ ] `pytest tests/` passes (scratch suite, not shipped)
 - [ ] Manual verification performed (describe what was tested)
 
 ### Breaking Changes
@@ -33,7 +33,7 @@
 <!-- HUMAN: The human reviewer MUST check this box after personal verification. -->
 <!-- AI agents MUST NOT check this box. -->
 
-- [ ] I have personally read the diff, run the audit locally, and verified the change is correct.
+- [ ] I have personally read the diff, verified the entry-point ↔ skill structure is intact, and verified the change is correct.
 
 ---
 

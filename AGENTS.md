@@ -12,9 +12,10 @@
 
 1. **Always loaded:** This file (header, core rules below, Section Index, Cheatsheet).
 2. **Lazy-loaded:** The full text of every section is in `skills/NN-name.md`. Load a skill only when your task matches its "Load when" trigger. This keeps context lean — a model with a 32K window can follow all rules without reading 6,700 lines.
-3. **Full text on demand:** The Section Index and Skills Directory below map every section to its skill file. If a task touches a topic, load that skill and follow it exactly.
-4. **Verification:** When in doubt about a rule's full wording, read the skill file — never guess.
-5. **Template usage:** Projects should copy this file, keep the core rules, then trim the skill list to what applies and inline the needed skills into their own AGENTS.md (target ≤2,000 lines, per Section 51.3).
+3. **Follow cross-references:** When a loaded skill references another section (e.g. "see Section 35"), that referenced section is NOT included — load `skills/NN-name.md` for it too before proceeding. The Section Index maps every section to its file.
+4. **Full text on demand:** The Section Index and Skills Directory below map every section to its skill file. If a task touches a topic, load that skill and follow it exactly.
+5. **Verification:** When in doubt about a rule's full wording, read the skill file — never guess.
+6. **Template usage:** Projects should copy this file, keep the core rules, then trim the skill list to what applies and inline the needed skills into their own AGENTS.md (target ≤2,000 lines, per Section 51.3).
 
 ---
 

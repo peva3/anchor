@@ -92,4 +92,3 @@ For any intentional shortcut, add a structured comment:
 | `pre-commit install` | Install git hooks | 37 |
 | `pre-commit run --all-files` | Run all hooks | 37 |
 | `pytest --cov=. --cov-fail-under=80` | Tests + coverage | 8, 40 |
-| `python3 tests/test_agents_md_quality.py --strict` | Run audit (Anchor) | 50.8 |

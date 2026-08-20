@@ -35,19 +35,23 @@
 
 ## 🚀 Quick Start
 
-```bash
+ ```bash
 # 1. Clone the template
 git clone https://github.com/peva3/anchor.git
 
 # 2. Copy AGENTS.md into your project
 cp anchor/AGENTS.md ./your-project/AGENTS.md
 
-# 3. Copy supporting agent config files
+# 3. Copy the skills library — every section's full rule text lives here.
+#    The entry-point links to these files, so without them the doc dangles.
+cp -r anchor/skills ./your-project/skills
+
+# 4. Copy supporting agent config files
 cp anchor/CLAUDE.md ./your-project/
 cp -r anchor/.cursor/rules/ ./your-project/.cursor/
 cp anchor/.github/copilot-instructions.md ./your-project/.github/
 
-# 4. Optional — bootstrap an entire new project from scratch
+# 5. Optional — bootstrap an entire new project from scratch
 cp anchor/STARTUP.md ./your-new-project/STARTUP.md
 # Follow the STARTUP.md phases — it's a step-by-step guide for AI agents
 ```
@@ -117,7 +121,7 @@ cp anchor/STARTUP.md ./your-new-project/STARTUP.md
 
 | | Typical AGENTS.md | This Template |
 |---|---|---|
-| **Sections** | 5-15 | 51 |
+| **Sections** | 5-15 | 53 (entry-point + skills) |
 | **Testing depth** | "Write tests" | Flaky management, mutation testing, contract testing, chaos engineering, coverage enforcement |
 | **Security** | "No secrets in code" | Prompt injection detection, audit logging, key encryption, IP whitelisting, 6-category NEVER list |
 | **Production** | Basic Docker | Circuit breaker, DLQ, middleware stack, health endpoints, structured logging, OpenTelemetry, SLOs |
@@ -164,9 +168,6 @@ anchor/
 │   ├── index.md               # Research catalog
 │   ├── papers/                # AgentBench, CAMEL, MetaGPT, Voyager, HuggingGPT
 │   └── whitepapers/           # Agentic AI best practices
-│
-└── tests/                     # 🧪 Quality validation tools
-    └── test_agents_md_quality.py  # Automated audit: contradictions, code validity, workflow coverage
 ```
 
 ---
@@ -244,22 +245,17 @@ The template ships with config files for 8+ AI coding agent platforms. All refer
 
 ## 🧪 Quality Validation
 
-The AGENTS.md file is self-tested. Run the audit:
+The template is validated structurally: the entry-point links to all 53 skill files, and the skills hold the full rule text. Validation is done with a scratch audit script (not shipped) that checks:
 
-```bash
-python3 tests/test_agents_md_quality.py
-```
-
-The audit checks:
 - **Section structure** — All 53 sections present, sequentially numbered; each has a skill file
 - **Contradiction detection** — No conflicting NEVER/ALWAYS rules
 - **Actionable MUST rules** — Every MUST rule links to concrete implementation
 - **Code block validity** — All 66 Python blocks parse correctly
 - **Workflow coverage** — 9 common development workflows all covered
 - **Markdown validity** — No broken references or unclosed blocks
-- **Size & density** — Section balance analysis
+- **Size & density** — Entry-point stays lean (≤2,000 lines) so constrained-context models can follow it
 
-**Status: 0 failures. 0 warnings.** See the test output inline in the tool results above.
+**Status: 0 failures. 0 warnings** in normal mode (one known WARN in strict mode: some MUST rules are advisory phrasing, not a regression).
 
 ---
 
@@ -267,9 +263,9 @@ The audit checks:
 
 | Metric | Value |
 |--------|-------|
-| **Sections** | 51 |
-| **Lines** | 5,780 |
-| **Words** | ~25,500 |
+| **Sections** | 53 |
+| **Entry-point** | 470 lines / ~7,000 tokens (always loaded) |
+| **Full rule text** | 53 skill files in `skills/` (lazy-loaded by task) |
 | **Python code blocks** | 66 |
 | **Research sources** | 22 (12 papers, 10 projects) |
 | **Agent platforms supported** | 8+ |
@@ -287,7 +283,7 @@ This template follows its own rules. Before contributing:
 
 1. **Read Section 50.8** — AGENTS.md governs itself. Agents editing it must follow all rules herein.
 2. **Read Section 51.2** — Propose additions when you encounter a failure mode not yet covered.
-3. **Run the audit** — `python3 tests/test_agents_md_quality.py` must pass.
+3. **Verify the structure** — All 53 sections must stay linked from the entry-point with their skill file present. Run the scratch audit (`python3 tests/test_agents_md_quality.py`) during development.
 4. **Follow Section 33** — PRs must stay under 800 lines.
 5. **Follow Section 15** — Commit messages must be human-sounding, WHY-focused.
 6. **Follow Section 35** — Use the PR template with HUMAN/AGENT disclosure sections.

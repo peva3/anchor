@@ -17,9 +17,6 @@ standardized-markdown/
 ├── SECURITY.md              # Vulnerability reporting and self-audit
 ├── LICENSE                  # MIT
 │
-├── tests/
-│   └── test_agents_md_quality.py  # Structural audit (parses AGENTS.md, asserts)
-│
 ├── docs/
 │   └── AGENT_INSTRUCTIONS.md      # Universal fallback for agents without native config
 │
@@ -42,7 +39,7 @@ There is no runtime data flow. The data flow is **rule distribution**:
 
 1. **Author** writes a section in `AGENTS.md` addressing a specific observed failure mode
 2. **Extract** the section's full text into `skills/NN-name.md` (one skill per section)
-3. **Audit** (`tests/test_agents_md_quality.py`) verifies section numbering, skill-file completeness, code-block validity, and workflow coverage
+3. **Audit** (scratch `tests/test_agents_md_quality.py`, run during development, not shipped) verifies section numbering, skill-file completeness, code-block validity, and workflow coverage
 4. **Consumer** copies `AGENTS.md` + `skills/` (and platform-specific config) into their own project
 5. **AI agent** in the consumer project reads the entry point, loads the skills its task needs, and follows the rules
 
@@ -58,13 +55,13 @@ The template reconciles breadth with constrained context windows by **splitting 
 
 1. `AGENTS.md` stays lean (~470 lines, ~7K tokens) — a high-level index plus the core rules (Sections 1, 2, 36, 50.1/50.3/50.6, 51) reproduced in full so the non-negotiable guardrails always apply.
 2. `skills/NN-name.md` holds each section's full rule text, byte-for-byte identical to the former monolith. Agents load only the skills their current task needs (Section 51.1 trigger-based loading).
-3. A 32K-context model can follow all guardrails by loading the entry point plus 7-12 relevant skills (~16-19K tokens total), verified by `tests/test_constrained_context_projects.py`.
+3. A 32K-context model can follow all guardrails by loading the entry point plus 7-12 relevant skills (~16-19K tokens total), verified during development by the scratch constrained-context test suite (`tests/`, not shipped).
 
 Consumers trim on import: copy `AGENTS.md` + `skills/`, delete inapplicable skills, inline what remains.
 
 ### Why the audit script is Python, not Make/Node
 
-`tests/test_agents_md_quality.py` is pure standard library (re, pathlib, collections). No dependencies to install, no version matrix to maintain. The audit runs in under a second over the entry point plus 53 skill files. Adding pytest as a runtime dep would inflate the install footprint for marginal benefit — a one-liner `python3 tests/test_agents_md_quality.py` is the contract.
+`tests/test_agents_md_quality.py` is pure standard library (re, pathlib, collections). No dependencies to install, no version matrix to maintain. The audit runs in under a second over the entry point plus 53 skill files. Adding pytest as a runtime dep would inflate the install footprint for marginal benefit. It is a **scratch development tool, not a shipped deliverable** — per Section 1, `tests/` is gitignored and does not ship with the template (see "Gotchas" below).
 
 ### Why the deployed platform configs are lightweight
 
@@ -72,11 +69,11 @@ Each platform (Cursor, Windsurf, Continue, Copilot, Claude) gets a thin pointer 
 
 ### Why AGENTS.md is self-referential (Section 50.8)
 
-The template cannot avoid governing itself — every section is a rule the maintainers must follow, and the audit script enforces it. If the template were exempt, future maintainers would slowly drift away from its own standards. Section 50.8 makes the constraint explicit: editing AGENTS.md requires following every rule in AGENTS.md.
+The template cannot avoid governing itself — every section is a rule the maintainers must follow, and the structure (entry-point ↔ skill files) enforces it. If the template were exempt, future maintainers would slowly drift away from its own standards. Section 50.8 makes the constraint explicit: editing AGENTS.md requires following every rule in AGENTS.md.
 
 ## Gotchas and Landmines
 
-1. **`tests/` in `.gitignore`** — earlier drafts of `.gitignore` ignored the entire `tests/` folder. This hid the audit script from fresh clones, defeating the purpose. The fix: only `tests/scripts/` (random tooling) and `.test-cache/` are ignored. The audit must travel with the repo.
+1. **`tests/` is entirely gitignored** — by design (Section 1: tests are scratch). The audit script and all test suites live locally during development but are **not shipped** in the template. A fresh clone has no `tests/` directory — any config or doc that invokes `python3 tests/...` will fail and must be kept out of the repo. The guardrails ship as the entry-point + skills structure itself.
 
 2. **Duplicate section 3.9 in STARTUP.md** — historically had two `### 3.9 Create SECURITY.md` headings, with the first one containing the CONTRIBUTING template by mistake. Any agent following STARTUP literally would have overwritten SECURITY.md. Fixed.
 
@@ -86,9 +83,9 @@ The template cannot avoid governing itself — every section is a rule the maint
 
 ## Interconnections
 
-- `AGENTS.md` → `tests/test_agents_md_quality.py` (audit target)
 - `AGENTS.md` → `STARTUP.md` (bootstrap uses sections 5, 6, 37, 38)
 - `AGENTS.md` → `CONTRIBUTING.md` (contribution flow uses sections 33, 34, 35, 50.8)
 - `AGENTS.md` → `docs/AGENT_INSTRUCTIONS.md` (universal fallback for unknown agents)
 - `AGENTS.md` → `research/index.md` (provenance per section 51.5)
 - `AGENTS.md` → all 7 platform config files (single source of truth)
+- `AGENTS.md` ↔ `skills/` (entry-point links to every skill; skills hold full rule text)

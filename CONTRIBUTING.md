@@ -34,7 +34,7 @@ This project follows its own rules (Section 50.8). Before contributing, read AGE
 
 ## Before Submitting
 
-1. **Run the quality audit:** `python3 tests/test_agents_md_quality.py`
+1. **Verify the structure** — all 53 sections must stay linked from the entry-point with a matching skill file. Run the scratch audit (`python3 tests/test_agents_md_quality.py`) during development.
 2. **Verify your PR stays under 800 lines** (Section 33.1)
 3. **Use the PR template** (Section 35) — include both HUMAN and AGENT sections
 4. **Self-check against the anti-patterns** (Section 34) — no laziness, uncertainty, or bloat

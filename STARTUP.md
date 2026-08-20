@@ -619,7 +619,7 @@ After completing all phases, your project will have:
 | `docs/` | Documentation directory |
 | `research/` | Research files directory |
 
-## Key AGENTS.md Sections (51 Total)
+## Key AGENTS.md Sections (53 Total)
 
 | Sections | Domain |
 |----------|--------|
