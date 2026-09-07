@@ -85,6 +85,7 @@
 | 60 | Property-Based Testing | Hypothesis, shrinking, seeds, CI integration | [skills/60-property-based-testing.md](skills/60-property-based-testing.md) |
 | 61 | Snapshot / Golden-File Testing | syrupy, matchers, never blind snapshot updates | [skills/61-snapshot-golden-file-testing.md](skills/61-snapshot-golden-file-testing.md) |
 | 62 | Retries, Backoff & Idempotency | Timeout budgets, exponential backoff+jitter, idempotency keys | [skills/62-retries-backoff-and-idempotency.md](skills/62-retries-backoff-and-idempotency.md) |
+| 63 | UI Quality & Anti-Slop Guardrails | No fabricated content, no dead controls, empty/loading/error states, WCAG AA accessibility, liveliness dials | [skills/63-ui-quality-and-anti-slop-guardrails.md](skills/63-ui-quality-and-anti-slop-guardrails.md) |
 
 ---
 
@@ -119,6 +120,7 @@
 | Write property-based tests | [skills/60-property-based-testing.md](skills/60-property-based-testing.md) |
 | Use snapshot/golden-file tests | [skills/61-snapshot-golden-file-testing.md](skills/61-snapshot-golden-file-testing.md) |
 | Retry outbound calls safely | [skills/62-retries-backoff-and-idempotency.md](skills/62-retries-backoff-and-idempotency.md), [skills/20-external-integrations.md](skills/20-external-integrations.md) |
+| Build a UI / frontend | [skills/63-ui-quality-and-anti-slop-guardrails.md](skills/63-ui-quality-and-anti-slop-guardrails.md) — no fabricated content, dead controls, or missing states |
 
 ---
 
@@ -416,7 +418,7 @@ Every non-obvious rule should be traceable to its source. This prevents cargo-cu
 
 ## Skills Directory
 
-All 62 sections have their full rule text in `skills/`. Load the file whose "Load when" matches your task.
+All 63 sections have their full rule text in `skills/`. Load the file whose "Load when" matches your task.
 
 | Skill | Section | Load when |
 |-------|---------|-----------|
@@ -482,6 +484,7 @@ All 62 sections have their full rule text in `skills/`. Load the file whose "Loa
 | [60-property-based-testing.md](skills/60-property-based-testing.md) | 60 Property-Based Testing | Property tests (Hypothesis) |
 | [61-snapshot-golden-file-testing.md](skills/61-snapshot-golden-file-testing.md) | 61 Snapshot Testing | Golden-file/snapshot tests |
 | [62-retries-backoff-and-idempotency.md](skills/62-retries-backoff-and-idempotency.md) | 62 Retries & Idempotency | Outbound calls, retries |
+| [63-ui-quality-and-anti-slop-guardrails.md](skills/63-ui-quality-and-anti-slop-guardrails.md) | 63 UI Quality & Anti-Slop | UI/frontend work |
 
 ---
 
@@ -507,3 +510,4 @@ The AGENTS.md file itself is subject to its own rules. This is not a meta observ
 - **2026-08-20** — Restructured AGENTS.md into a high-level entry point. Full rule text for the original 53 sections moved to `skills/NN-name.md` (byte-for-byte preservation), then expanded to 62 sections with 9 new agent-focused skills (54 MCP, 55 prompt-injection, 56 agent memory, 57 tool-call permissions, 58 supply-chain/SBOM, 59 incident response, 60 property-based testing, 61 snapshot testing, 62 retries/idempotency). Core rules inline in full: Sections 1, 2, and 36; selected subsections of 50 (50.1, 50.3, 50.6) and 51 (51.1, 51.3, 51.5). The remaining subsections of 50/51 (50.2, 50.4, 50.5, 50.7, 50.8, 51.2, 51.4) live only in the skill files. Entry-point file reduced from ~6,700 lines to ~450 lines to fit constrained context windows. Section Index and Quick-Navigation Cheatsheet now link to skill files.
 - **2026-07-01** — Added Section 53 (Project Type Patterns) and Section 52 (Rule Enforcement Architecture).
 - **2026-08-20** — Added Sections 54-62 (agent-focused skills; see the 2026-08-20 entry above).
+- **2026-08-20** — Added Section 63 (UI Quality & Anti-Slop Guardrails) — no fabricated content/placeholders, no dead controls, required empty/loading/error states, WCAG AA accessibility minimums, and the ENERGY/RHYTHM/MOTION dials mechanism for enforceable visual liveliness. Adapted from the universal engineering subset of the anti-slop rule library (https://github.com/miqdadbadjuber/anti-slop); mirrors Section 34 for the visual layer. This brings the library to 63 sections.
