@@ -7,25 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-08-20
+
 ### Added
-- **Sections 54-62** — nine new agent-focused skills: MCP usage & guardrails, prompt-injection defenses, agent memory & state management, tool-call permission & safety, supply-chain security & SBOM, incident response & runbooks, property-based testing, snapshot/golden-file testing, and retries/backoff/idempotency
-- **Section 53.6** — AI/agentic applications project type (agents, RAG, MCP, LLM backends)
-- **Section 63** — UI Quality & Anti-Slop Guardrails: no fabricated content/placeholders, no dead controls, required empty/loading/error states, WCAG AA accessibility minimums, and the ENERGY/RHYTHM/MOTION dials mechanism for enforceable visual liveliness (adapted from https://github.com/miqdadbadjuber/anti-slop)
-- Section 36.9 — Prompt-Injection & Untrusted Input NEVER list
+- **Section 63** — UI Quality & Anti-Slop Guardrails: no fabricated content/placeholders, no dead controls, required empty/loading/error states, WCAG AA accessibility minimums, and the ENERGY/RHYTHM/MOTION dials mechanism for enforceable visual liveliness (adapted from the universal engineering subset of https://github.com/miqdadbadjuber/anti-slop). Brings the library to 63 sections.
 
 ### Changed
-- AGENTS.md restructured from a ~6,700-line monolith into a ~500-line entry-point plus a `skills/` library (63 lazy-loaded skill files, one per section); core rules (Sections 1, 2, 36 and selected subsections of 50/51) stay inline
-- Every skill cross-reference is now a self-contained link to the referenced skill file, so a lazily-loaded skill can pull in what it points to without the always-loaded index
-- Stale tooling modernized across skills: Pact v2→v3/v4, trufflehog3/safety/detect-secrets→TruffleHog/pip-audit/gitleaks, removed obsolete compose `version:` key, current mutmut config schema, bcrypt→Argon2id, OTel env-var config, bumped pre-commit hook revisions
-- Contradictions fixed: duplicate 36.6 heading, 51.1 core-set claim, skill 05 tests/-gitignore conflict, PR-template AI-attribution clash
+- AGENTS.md entry-point (Section Index, Skills Directory, Quick-Navigation Cheatsheet) and all docs updated from 62 to 63 sections
 
 ### Fixed
-- Broken references to the deleted `scripts/check_structure.sh` in README, CONTRIBUTING, and DEEPDIVE (structural validation is now a documented manual check)
+- Broken references to the deleted `scripts/check_structure.sh` in README, CONTRIBUTING, and DEEPDIVE (structural validation is now a documented manual check: 63 index rows, every link resolves to a file in skills/)
 
 ### Removed
 - `scripts/` (structural validator) — removed from the tree, gitignored, and purged from git history
-- `Dockerfile`, `docker-compose.yml`, `requirements-dev.txt` — audit container (only existed to run the now-unshipped test)
-- `tests/` from the shipped tree (scratch, gitignored by design)
 
 ## [2.0.0] - 2026-08-20
 
