@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **A/B harness: Anchor-guided vs rule-free output** (local, `tests/ab_bench.py`). One project timeline of six tasks — feature, test, fix, ui, security, release — is run through two arms: the entry point plus the routed skills, and a generic "helpful coding assistant" with no rules. Each answer is scored against a task rubric. Drivers are pluggable: `stub` (context-echo proxy for pipeline checks), `emit` (writes exact per-arm prompts), and `files` (scores real recorded answers, e.g. from subagents). First recorded run: **Anchor 10/10 rubric items, rule-free 6/10** — the gap is process, not code: conventional commit messages, test-first ordering, explicit unknowns, and log/PII hygiene
+- **Load/unload timeline** in the same harness: per task it reports the active set at each phase, what phases add, what phases drop, and cross-task churn when the work changes type (e.g. feature → test drops API and dependency skills, joins the testing set). This is what makes "skills unload as work changes" observable rather than asserted
+
+### Fixed
+- **`fix` is now an actual trigger** — a request ending "Fix it." matched nothing and fell through to `review`; the word is registered as a weak trigger so a domain noun still wins
+- **Committed-credential requests route to `security`** — "an API key was committed" carried no trigger word and fell through to `review`
+
+### Added
 - **Reachability testing** — the benchmark now has a `--trace` mode that prints, per project, the matched trigger signals, the chosen route, and the exact add/drop at every phase boundary with token cost, plus the provenance of each guardrail (inline core, a named skill, or `UNREACHABLE`). `--matrix` prints which routes can load each section. Both are local; the harness and its report are gitignored
 - **Phase drops** — `routing.json` phases now carry `add` **and** `drop`, so skills genuinely unload at boundaries (the tech-stack playbook leaves once planning is done) instead of accumulating for the whole task. Section 64 documents the semantics
 - **`meta` task type** — work on the ruleset itself (editing skills, extending routing) now has a route, so instruction-architecture and enforcement guidance is reachable
