@@ -188,3 +188,8 @@ jobs:
 
 ---
 
+### Multi-Tenant Isolation
+
+- **Every data access is scoped by tenant, in the query — not in the caller.** A tenant ID taken from a request parameter and trusted is an authorization bypass; take it from the authenticated session and enforce it at the data layer (row-level security, schema-per-tenant, or a mandatory filter helper).
+- **Test cross-tenant access explicitly**: tenant A requesting tenant B's record must 404 or 403, not 200. This is the one authorization test that must exist.
+- **Audit records need retention and tamper evidence** — append-only storage, hash chaining or an immutable log service, and a defined retention period that matches what you claim to regulators.

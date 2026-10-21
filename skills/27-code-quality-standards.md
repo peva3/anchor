@@ -751,3 +751,10 @@ Before marking any code complete, verify:
 
 ---
 
+### Money and Time Are Not Floats
+
+- **Never use binary floating point for money.** `0.1 + 0.2` is not `0.3`. Use integer minor units (cents) or `Decimal`, and round explicitly at the boundary you choose (usually display).
+- **Store currency alongside the amount**, and never mix currencies in one arithmetic operation without an explicit conversion and its rate.
+- **Store instants in UTC and convert at the edge** — use timezone-aware types, never a naive `datetime.now()`. Scheduling and availability are local-time problems with DST edges (see [Section 25.12](skills/25-common-gotchas.md)).
+- **Tenant scope is a data-layer rule, not a caller rule** — take the tenant from the authenticated session and enforce it in the query (see [Section 31](skills/31-production-security-patterns.md)); never trust a tenant ID passed as a parameter.
+- **Test the rounding cases** — tax, proration, split payments, and refunds are where the pennies go missing. A total that disagrees with the sum of its lines is a defect, not a rounding quirk.

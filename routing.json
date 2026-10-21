@@ -111,18 +111,33 @@
         "acceptance criteria",
         "capability",
         "allow users to",
-        "form"
+        "form",
+        "reservation",
+        "reservations",
+        "booking",
+        "bookings",
+        "availability",
+        "appointment",
+        "appointments",
+        "invoice",
+        "invoices",
+        "pdf generation",
+        "document generation",
+        "notification preferences",
+        "notification settings",
+        "preferences page",
+        "notifications"
       ],
       "always": [
         35
       ],
       "skills": [
+        27,
         12,
         17,
         24,
         62,
-        63,
-        5
+        63
       ]
     },
     {
@@ -166,7 +181,8 @@
         27,
         33,
         17,
-        18
+        18,
+        5
       ]
     },
     {
@@ -272,7 +288,10 @@
         "sphinx",
         "mkdocs",
         "runbook",
-        "runbooks"
+        "runbooks",
+        "accessibility statement",
+        "conformance statement",
+        "privacy policy"
       ],
       "always": [
         16
@@ -411,7 +430,15 @@
         "aria",
         "typography",
         "modal",
-        "navbar"
+        "navbar",
+        "fitness",
+        "workout",
+        "workouts",
+        "habit",
+        "tracker",
+        "admin dashboard",
+        "internal dashboard",
+        "onboarding flow"
       ],
       "always": [
         63
@@ -468,7 +495,17 @@
         "csv import",
         "materialized view",
         "partitioning",
-        "data quality"
+        "data quality",
+        "forecast",
+        "forecasting",
+        "demand",
+        "inventory",
+        "relevance",
+        "ranking",
+        "anonymize",
+        "anonymization",
+        "pseudonymize",
+        "retention"
       ],
       "always": [
         53
@@ -567,7 +604,25 @@
         "slack",
         "gcs",
         "blob storage",
-        "presigned url"
+        "presigned url",
+        "calendar",
+        "calendar sync",
+        "two-way sync",
+        "bidirectional sync",
+        "zendesk",
+        "helpdesk",
+        "ticketing",
+        "scrape",
+        "scraper",
+        "scraping",
+        "crawl",
+        "crawler",
+        "gateway",
+        "api gateway",
+        "live notifications",
+        "live updates",
+        "server-sent events",
+        "sse"
       ],
       "always": [
         20
@@ -619,7 +674,6 @@
         "lambda",
         "serverless",
         "load balancer",
-        "ingress",
         "nginx",
         "cdn",
         "vpc",
@@ -628,7 +682,10 @@
         "prometheus",
         "grafana",
         "datadog",
-        "uptime"
+        "uptime",
+        "ingress",
+        "reverse proxy",
+        "tls termination"
       ],
       "always": [
         32
@@ -696,7 +753,15 @@
         "privacy",
         "compliance",
         "threat model",
-        "pentest"
+        "pentest",
+        "audit trail",
+        "audit log",
+        "audit logs",
+        "tenant isolation",
+        "multi-tenant",
+        "multitenant",
+        "jwt validation",
+        "token validation"
       ],
       "always": [
         36
@@ -741,7 +806,17 @@
         "system prompt",
         "context window",
         "guardrails",
-        "evals"
+        "evals",
+        "transcription",
+        "transcribe",
+        "transcript",
+        "recommendation",
+        "recommender",
+        "recommendations",
+        "personalization",
+        "summarization",
+        "audio",
+        "speech"
       ],
       "always": [
         53

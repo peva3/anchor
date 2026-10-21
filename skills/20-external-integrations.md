@@ -19,3 +19,8 @@ For each external API/service integrated:
 
 ---
 
+### Reconciliation for Bidirectional Sync
+
+- **Two-way sync needs an explicit conflict resolution rule, not just retries.** Define the source of truth per field, keep a per-record version or `updated_at` from both sides, and reconcile deterministically when both changed. "Last write wins" is a decision — write it down.
+- **Make every write idempotent with a stable external ID**, so a replay updates rather than duplicates.
+- **Never point a crawler or bulk client at a third party without checking `robots.txt`, its terms, and a rate limit you actually enforce.** Back off on 429/503, set a descriptive user agent, and cache what you fetched.

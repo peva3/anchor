@@ -87,3 +87,5 @@ Before a UI change is marked complete, run this checklist (mirrors [Section 34.8
 
 - Anti Slop — Rules for AI Coding Agents: https://github.com/miqdadbadjuber/anti-slop
 - WCAG 2 contrast (minimum): https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html
+
+**Empty state is a state, not an accident.** When a query or list returns nothing, say so in plain language, keep the layout, and offer the next action (clear the filter, broaden the term). A blank panel reads as a broken page.

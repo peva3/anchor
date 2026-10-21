@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Round 6 benchmark: 20 fresh domains (122 scenarios total)** — returns portal, restaurant reservations, fitness tracking, inventory forecasting, helpdesk sync, two-way calendar sync, invoice PDFs, nightly scraping, recommendations, call transcription, multi-tenant billing, admin dashboards, search relevance, notification preferences, audit trails, data anonymization, API gateway, push campaigns, localization QA, accessibility statements
+- **Substance rules the round exposed**: money is never a float (integer minor units or `Decimal`, explicit rounding, test the rounding cases); store instants in UTC and convert at the edge, with DST-aware scheduling; two-way sync needs an explicit **conflict resolution** rule rather than retries alone; crawlers must honour `robots.txt`, terms, and a real rate limit; **multi-tenant scoping is a data-layer rule** taken from the session, with a cross-tenant access test; audit records need retention and tamper evidence; an empty state is a state, not a blank panel
+
+### Fixed
+- **Vocabulary, round two** — reservations/bookings/availability, invoices and PDF generation, notification preferences → `feature`; fitness/workout/tracker, admin and internal dashboards, onboarding → `ui`; forecast/demand/inventory, relevance/ranking, anonymization, data quality → `data`; transcription, recommendations, personalization, audio → `ai`; calendar sync, helpdesk, scrapers, gateways → `integration`; audit trail, tenant isolation, JWT validation → `security`; ingress/reverse proxy/nginx → `infra`; accessibility statement → `docs`
+- **Over-broad triggers pruned again**: `settings page` and `profile page` were stealing WordPress plugin work from `feature`; `summarize` sent a confidential-document request to `ai`; singular `notification` pulled mobile push work out of `ui`
+- **`feature` now loads code quality instead of project structure** (money, time, tenant rules), and `refactor` picked up project structure so section 5 stays reachable
+
+### Added
 - **Vocabulary harvest across all 19 task types** — the routing map grew from 277 to 533 triggers in one pass instead of discovering words one scenario at a time, covering the phrasing people actually use for debugging, integration, data, security, AI, infrastructure, CLI and device work
 - **Section 64.9 (keep the vocabulary honest)** — one owner per trigger, phrases over abstract nouns, weak verbs never outrank a domain noun, a fallback is a reported gap, and generic words that fit every domain own none of them
 - **Vocabulary suite and map hygiene checks** — trigger ownership, minimum vocabulary per type, and normalized form are now validated, so a future edit cannot quietly create two owners for one word

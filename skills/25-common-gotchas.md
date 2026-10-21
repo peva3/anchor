@@ -69,3 +69,9 @@ Lessons learned from multiple projects — things that regularly bite developers
 
 ---
 
+### 25.12 Time and Timezones
+
+- Store instants in UTC; convert to a local timezone only at the presentation edge. Mixing naive and aware datetimes raises errors at runtime, or silently shifts by hours.
+- Use timezone-aware types (`datetime.now(timezone.utc)`, `ZoneInfo`), never `datetime.now()` without a zone.
+- Scheduling and availability are **local-time problems** with DST edges: a "9am appointment" can be 23 or 25 hours apart across a DST boundary. Store the zone with the intent, and test the transition dates.
+- Never compare timestamps from different sources without normalising their zone and precision.
