@@ -10,7 +10,7 @@
 | # | Status | Description |
 |---|--------|-------------|
 | 1 | ✅ | Audit current project state against AGENTS.md |
-| 2 | 🔄 | Bring in proven concepts from the work version (routing map, checkpoints, branch policy, hard stops, new sections 64-66) |
+| 2 | 🔄 | Ship the routing map, checkpoints, branch policy, hard stops, and sections 64-66 |
 | 3 | ⬜ | Decide whether to ship a local routing/benchmark checker (Phase 4 proposal — approval required) |
 | 4 | ⬜ | Populate or remove empty `research/papers/full/` directory |
 | 5 | ⬜ | Keep `routing.json` and the Section Index in sync when skills change |
