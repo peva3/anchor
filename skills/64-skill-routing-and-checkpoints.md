@@ -69,6 +69,17 @@ If two routes are plausible and you cannot tell which the user means:
 2. Say which one you picked and why, in the checkpoint line.
 3. Do not silently load both "just in case" — that defeats the budget.
 
+**If nothing matches at all, that is a fallback, not a default.** A fallback means the map
+has no vocabulary for this kind of work. Do not quietly treat it as `review` and carry on:
+
+1. **Say it out loud** in the checkpoint: `ROUTE: fallback — no task type matched`.
+2. **Ask the user which area this belongs to** if the answer changes which rules load
+   (auth vs UI vs data are different guardrails). One short question beats loading the wrong set.
+3. **If you cannot ask, take the safer route and name the assumption** — more verification,
+   stricter security, smaller change — and say it was a fallback.
+4. **Record the missing phrase** as a vocabulary gap ([Section 64.9](skills/64-skill-routing-and-checkpoints.md)) so the next run recognises it.
+   A fallback that is never reported is a gap nobody can fix.
+
 ### 64.7 The Routing Map Is Data, Not Logic
 
 `routing.json` at the repo root is a plain table: task type → trigger phrases → skills, plus the core set. It has no scoring, no weights, and no code. Both humans and agents read the same file, and the same request always resolves the same way. When you add a skill, add its route in the same change — a skill with no route is a skill nobody loads.

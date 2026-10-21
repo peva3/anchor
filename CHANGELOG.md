@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.3.0] - 2026-10-21
 
 ### Added
 - **Round 6 benchmark: 20 fresh domains (122 scenarios total)** — returns portal, restaurant reservations, fitness tracking, inventory forecasting, helpdesk sync, two-way calendar sync, invoice PDFs, nightly scraping, recommendations, call transcription, multi-tenant billing, admin dashboards, search relevance, notification preferences, audit trails, data anonymization, API gateway, push campaigns, localization QA, accessibility statements
@@ -76,6 +76,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Skill 13** gained least-privilege, output-encoding, no-dynamic-code, and SSRF guidance; **skill 54** gained least-privilege credentials for database-exposing MCP servers
 - `tests/routing-benchmark.json` regenerated against the updated map and extended to the `embedded` type
 
+### Fixed
+- **Core and skill copies could drift apart** — sections 1, 2, 36, 50.6, 51.3 and 64 exist both inline and as skills, and nothing compared them. The structure check now fails when the entry point states a rule its skill lacks (70% word-overlap tolerance for rewording), and it immediately found real drift: 36.10 was missing from the skill entirely, 36.2 lost its branch-policy rules, 36.4a lost three approval rules, and 51.3 still carried a pre-rebrand exception paragraph that claimed a different project name
+- **A fallback was silent** — an unmatched request quietly became `review`. Section 64.6 now requires reporting the fallback, asking which area the work belongs to, and recording the phrase as a vocabulary gap
+- **Two harvested triggers were stealing work** — `endpoint`/`endpoints` from `feature` and bare `query`/`queries` from `data`; both pruned, with the specific phrases (`slow query`, `query tuning`, `index tuning`) kept
+
+### Changed
+- **Active-skill budget raised 7 → 8** and the **commit phase now drops the domain corpus**: a commit is a write-up, not a build. Commit-time context fell from ~27.6K tokens (86% of a 32K window) to ~14.0K (44%), which pays for the extra slot (each skill costs ~955 tokens)
+- The A/B evaluator checks artifacts rather than words: python blocks must parse, code-producing task types must include runnable test code, outputs may not contain credentials, and commits must use a conventional prefix; it also supports n>=3 samples per task
 ## [2.2.0] - 2026-08-21
 
 ### Added

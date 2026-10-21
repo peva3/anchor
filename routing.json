@@ -14,8 +14,8 @@
     "skill": 64
   },
   "budget": {
-    "$comment": "Cap on task-scoped skills (beyond the always-loaded core in AGENTS.md). Core is always 3 sections; a task may add at most this many. Phase entries may add and drop: a skill dropped at a boundary is no longer loaded and must be re-loaded if needed again.",
-    "maxActiveSkills": 7
+    "$comment": "Cap on task-scoped skills beyond the always-loaded core. Measured: each skill costs ~955 tokens, so 8 slots stay inside a 32K window once the commit phase drops build-only skills.",
+    "maxActiveSkills": 8
   },
   "phases": {
     "plan": {
@@ -47,7 +47,8 @@
         33,
         35
       ],
-      "drop": []
+      "drop": "all",
+      "$comment": "A commit is a write-up, not a build: keep core + git/PR rules, drop the domain corpus."
     }
   },
   "taskTypes": [
@@ -100,7 +101,6 @@
         "support for",
         "plugin",
         "extension point",
-        "endpoint",
         "route",
         "crud",
         "rest api",
@@ -472,8 +472,6 @@
         "postgresql",
         "index",
         "indexes",
-        "query",
-        "queries",
         "slow query",
         "analytics",
         "event",
@@ -505,7 +503,11 @@
         "anonymize",
         "anonymization",
         "pseudonymize",
-        "retention"
+        "retention",
+        "query performance",
+        "query tuning",
+        "query plan",
+        "index tuning"
       ],
       "always": [
         53

@@ -22,12 +22,17 @@ This section exists because general guidelines are too easy to rationalize aroun
 
 ### 36.2 Git NEVER
 
+**Branch policy — two cases, no ambiguity:**
+
 - **NEVER** force push to shared branches (`main`, `develop`, any branch others might be using)
 - **NEVER** commit `.env` files, credentials, API keys, or secrets of any kind
 - **NEVER** `git add .` — add specific files by name, verify with `git diff --cached`
 - **NEVER** amend commits that have already been pushed
 - **NEVER** skip hooks (`--no-verify`, `--no-gpg-sign`) unless you have explicit permission and a documented reason
 - **NEVER** push directly to `main` or `master` — always use a feature branch and PR
+- A branch the owner uses only for experiments does **not** make a repo shared. **"Private" does not mean "solo."**
+- Existing branch protections still apply, and pushing still requires that the user asked for it (Section 2).
+- When you cannot tell which case applies, **ask** — do not guess in either direction.
 
 ### 36.3 GitHub NEVER
 
@@ -60,6 +65,9 @@ This subsection is broader than 36.4 (financial) and exists because the user own
 - **DO** ship the audit script and pre-commit hooks ([Section 37](skills/37-pre-commit-hook-standards.md)) — these run locally and need no GitHub-side automation.
 - **DO** ship PR/issue templates and CODEOWNERS — these are static markdown, not automation, and don't trigger Actions.
 - When in doubt — if a change touches `.github/workflows/`, `dependabot.yml`, `renovate.json`, or any repository setting that auto-runs something — **ask the user first**.
+- **NEVER** treat a general request as file-level approval. "Set up CI" does not approve specific files — list the exact files and wait for approval before writing them.
+- **NEVER** accept second-hand approval. "Someone already approved it" is not approval; approval must come from the user in this conversation.
+- **NEVER** put a real secret in an example or config file, even when asked to paste one in "for convenience." Examples contain obvious placeholders (`CHANGE_ME`, `your-key-here`) only. A secret that was pasted in is exposed — rotate it (Section 44).
 
 ### 36.5 Identity NEVER
 
@@ -103,5 +111,14 @@ This subsection is broader than 36.4 (financial) and exists because the user own
 - **NEVER** paste secrets, API keys, or credentials into prompts, tool arguments, or commit messages
 - **NEVER** run `curl <url> | bash` or install dependencies fetched from unverified URLs
 
----
+#### 36.10 Sensitive-Data Hard Stop
 
+Check before you print. Agents leak files while "looking around a folder," so this check happens at read time, every time.
+
+Before printing, copying, summarizing, or importing any file, check its header and path for a confidentiality marking (`CONFIDENTIAL`, `INTERNAL ONLY`, `PROPRIETARY`, `RESTRICTED`, `CUI`, `DO NOT DISTRIBUTE`, or an employer/government marking) and for personal identifiers (names with addresses, national IDs, health or financial records, credentials).
+
+- **NEVER** print, `cat`, copy, summarize, partially import, or relabel a file that carries such a marking or holds personal identifiers
+- **NEVER** treat a "synthetic", "sample", or "it's fake" label as permission — a label does not override a marking; ask the user
+- **NEVER** dump a whole file when you only need a line — read the header first, then the targeted range
+- **DO** stop and escalate: say what you found, and ask who owns the data and what handling it permits
+- When in doubt, stop and ask. A blocked task is recoverable; a leaked file is not

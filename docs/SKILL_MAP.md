@@ -20,45 +20,46 @@ skills/ (66 files, lazy-loaded)
 - [2 Commit Protocol](../skills/02-commit-protocol.md)
 - [36 Explicit Prohibitions — The "NEVER" List](../skills/36-explicit-prohibitions-the-never-list.md)
 
-Routing itself is [64 Skill Routing & Checkpoints](../skills/64-skill-routing-and-checkpoints.md). Active budget: **7** task skills beyond the inline core.
+Routing itself is [64 Skill Routing & Checkpoints](../skills/64-skill-routing-and-checkpoints.md). Budget: **8 task skills** beyond the core.
 
-## Loading at phase boundaries
+## Phase boundaries
 
 | Phase | Adds | Drops |
 |---|---|---|
 | plan | 50, 28 | — |
 | build | — | 28 |
 | verify | 8, 9, 23, 37, 40 | — |
-| commit | 15, 33, 35 | — |
+| commit | 15, 33, 35 | all domain skills |
+
+> The commit phase keeps only the core plus the git/PR rules: a commit is a write-up, not a build. That is what holds commit-time context near 44% of a 32K window instead of 86%.
 
 ## Task types
 
-| Task type | Triggers | Loads |
-|---|---|---|
-| **fix** | bug, broken, failing test, error, regression | 34, 10, 24, 25, 27, 14, 3 |
-| **feature** | add, build, implement, new endpoint, feature | 35, 12, 17, 24, 62, 63, 5 |
-| **refactor** | refactor, rename, extract, split, clean up | 50, 1, 23, 27, 33, 17, 18 |
-| **test** | test, tests, coverage, flaky, property-based | 45, 46, 47, 8, 60, 61, 49 |
-| **review** | pull request, pr, audit, code quality check, code review | 33, 34, 36, 27, 31, 35, 50 |
-| **docs** | docs, readme, changelog, adr, documentation | 16, 4, 6, 39 |
-| **release** | release, version, tag, publish, bump | 39, 16, 19, 38, 58, 24, 59 |
-| **incident** | incident, outage, down, sev, rollback | 59, 24, 29, 30, 41, 43 |
-| **ui** | ui, frontend, page, component, css | 63, 4, 33, 34, 35, 13, 53 |
-| **data** | etl, pipeline, schema, migration, backfill | 53, 29, 40, 43, 11, 60, 47 |
-| **embedded** | firmware, embedded, microcontroller, mqtt, iot | 53, 7, 20, 30, 41, 62 |
-| **integration** | s3, upload, uploads, presigned, file upload | 20, 12, 13, 24, 41, 48, 62 |
-| **infra** | docker, kubernetes, terraform, deploy, container | 32, 30, 38, 41, 42, 47, 7 |
-| **security** | security, vulnerability, secret, auth, prompt injection | 36, 13, 31, 44, 55, 58, 27 |
-| **ai** | agent, llm, rag, mcp, prompt | 53, 54, 55, 56, 57, 24, 21 |
-| **deck** | deck, slides, presentation, talk, keynote | 66, 50, 63 |
-| **hackathon** | hackathon, demo, spike, time-boxed, prototype | 65, 6, 36, 63 |
-| **cli** | cli, command line, command-line, man page, shell tool | 53, 8, 16, 27, 33, 62 |
-| **meta** | agents.md, skill file, skill files, routing map, rule set | 51, 22, 24, 26, 50, 52 |
+| Task type | Loads |
+|---|---|
+| **fix** | 34, 10, 24, 25, 27, 14, 3 |
+| **feature** | 35, 27, 12, 17, 24, 62, 63 |
+| **refactor** | 50, 1, 23, 27, 33, 17, 18, 5 |
+| **test** | 45, 46, 47, 8, 60, 61, 49 |
+| **review** | 33, 34, 36, 27, 31, 35, 50 |
+| **docs** | 16, 4, 6, 39 |
+| **release** | 39, 16, 19, 38, 58, 24, 59 |
+| **incident** | 59, 24, 29, 30, 41, 43 |
+| **ui** | 63, 4, 33, 34, 35, 13, 53 |
+| **data** | 53, 29, 40, 43, 11, 60, 47 |
+| **embedded** | 53, 7, 20, 30, 41, 62 |
+| **integration** | 20, 12, 13, 24, 41, 48, 62 |
+| **infra** | 32, 30, 38, 41, 42, 47, 7 |
+| **security** | 36, 13, 31, 44, 55, 58, 27 |
+| **ai** | 53, 54, 55, 56, 57, 24, 21 |
+| **deck** | 66, 50, 63 |
+| **hackathon** | 65, 6, 36, 63 |
+| **cli** | 53, 8, 16, 27, 33, 62 |
+| **meta** | 51, 22, 24, 26, 50, 52 |
 
 ## Notes
 
-- Every one of the 66 sections is reachable from at least one task type; the structure check fails if that stops being true.
-- A phase may add skills at a boundary and drop ones that no longer apply (plan → build → verify → commit).
-- Cross-references inside a skill are real links — load the referenced file rather than guessing its contents.
-- The map is data, not logic: the same request always resolves to the same skills.
-- Verify locally with `python3 scripts/check_structure.py`.
+- A task type picks the skills; phases add at boundaries and drop what no longer applies.
+- Cross-references inside a skill are real links — load the referenced file rather than guessing.
+- One owner per trigger phrase, whole-word matching, and a fallback is a reported gap (Section 64.9).
+- Check locally: `python3 scripts/check_structure.py` (links, reachability, vocabulary hygiene, core↔skill drift).

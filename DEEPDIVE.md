@@ -8,7 +8,7 @@
 Anchor is a documentation-only template. It ships rules, not code.
 
 ```
-standardized-markdown/
+anchor/
 ├── AGENTS.md                # ⭐ The deliverable — high-level entry point, 66 sections of agent rules
 ├── skills/                  # Full rule text — 66 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md               # AI bootstrap guide — phases for greenfield projects

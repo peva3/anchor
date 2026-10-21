@@ -96,8 +96,7 @@ Every instruction loaded into context costs tokens. Large AGENTS.md files can co
 - **Context headroom minimum: 70%** — at least 70% of context window must be available for the task itself
 - **Periodic context snapshot** — if context exceeds 50%, summarize key decisions to external storage before continuing
 
-**Exception — this template (standardized-markdown):**
-This repository is a universal template library, not a project-specific instruction file. It intentionally exceeds these limits. Individual projects should copy only relevant sections and keep the adapted AGENTS.md within the size budget. The full template serves as a reference — project AGENTS.md files should be lean subsets.
+**Exception — this template (Anchor):** This repository is a universal template library, not a project-specific instruction file. It intentionally exceeds these limits in aggregate, but the entry point is kept as small as the bright lines allow (~410 lines, ~6,000 tokens, measured — not estimated). Sections 1, 2, and 36 stay inline on purpose: a hard stop that only applies when a skill happens to be loaded is not a hard stop. Everything else lives in `skills/`. Individual projects should copy only relevant sections and keep the adapted AGENTS.md within the size budget.
 
 **Size monitoring pattern:**
 ```bash
@@ -113,6 +112,8 @@ print(f'~{int(len(words) / 0.75):,} tokens ({len(words):,} words)')
 2. Remove redundant examples — one good example per pattern
 3. Remove patterns covered by standard style guides (PEP 8, Google style)
 4. Remove project-specific defaults and put them in the project's own AGENTS.md
+
+**Exception — this template (Anchor):**
 
 ### 51.4 Model Capability Awareness
 
