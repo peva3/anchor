@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Section 66 — Presentation Decks**: one idea per slide, readable type, speaker notes, accessible contrast, honest labeling of illustrative numbers, and an optional deck-as-code approach with design tokens, a grid, a type scale, and a render-and-inspect loop
 - **Section 36.10 — Sensitive-Data Hard Stop** (always loaded): check headers and paths for confidentiality markings and personal identifiers before printing, copying, summarizing, or importing; a "synthetic" label never overrides a marking; stop and ask who owns the data
 - **`PROJECT.md`** documented as the per-project identity file (gitignored here — every consumer writes their own)
+- **`docs/SKILL_MAP.md`** — a generated, human-readable overview of the routing map, the always-loaded core, the phase additions, and every task type
+- **Guarded pre-commit hooks** — link resolution plus JSON validity, and a full structural check (sections, index, routing map). Both hooks skip cleanly when `scripts/` is absent, so a fresh clone never fails on tooling it does not have
 
 ### Changed
 - `AGENTS.md` slimmed from 513 to ~407 lines (~7,913 → ~6,057 tokens): the Section Index and Skills Directory merged into one routing-and-glossary index, the Quick-Navigation Cheatsheet removed as a duplicate routing source, optional subsections reduced to pointers, and the section 51.3 budget exception restated with measured numbers

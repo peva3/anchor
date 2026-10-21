@@ -137,6 +137,7 @@ cp anchor/STARTUP.md ./your-new-project/STARTUP.md
 ```
 anchor/
 ├── AGENTS.md                  # ⭐ The main template — high-level entry point, 66 sections (full text in skills/), copy this into your project
+├── routing.json               # 🧭 Task type → skills to load (deterministic map, Section 64)
 ├── skills/                    # 📂 Full rule text — 66 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md                 # 🚀 AI agent bootstrap guide — builds a project from scratch in 4 phases
 ├── README.md                  # 📖 This file
@@ -162,6 +163,7 @@ anchor/
 │   └── config.json
 │
 ├── docs/                      # 📚 Supporting documentation
+│   └── SKILL_MAP.md           # 🗺️ Visual overview of the routing map and skill set
 │   └── AGENT_INSTRUCTIONS.md  # Universal fallback agent instructions
 │
 ├── research/                  # 🔬 Academic research backing all sections

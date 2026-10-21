@@ -14,3 +14,21 @@ repos:
       - id: check-merge-conflict
       - id: mixed-line-ending
         args: ['--fix=lf']
+
+  # Local structural gates. Guarded: a fresh clone has no scripts/ (gitignored),
+  # so the hooks skip instead of failing every commit.
+  - repo: local
+    hooks:
+      - id: anchor-links-and-json
+        name: Anchor — links resolve and JSON parses
+        entry: >-
+          bash -c 'if [ -f scripts/check_links.py ]; then exec python3 scripts/check_links.py "$@"; else echo "skip (scripts/ not present)"; fi' --
+        language: system
+        files: \.(md|mdx|json)$
+      - id: anchor-structure
+        name: Anchor — sections, index, routing map
+        entry: >-
+          bash -c 'if [ -f scripts/check_structure.py ]; then exec python3 scripts/check_structure.py; else echo "skip (scripts/ not present)"; fi' --
+        language: system
+        pass_filenames: false
+        files: ^(AGENTS\.md|routing\.json|skills/.*\.md)$

@@ -10,7 +10,7 @@
 
 ## How to Use This File
 
-1. **Always loaded:** This file (header, core rules below, index, cheatsheet).
+1. **Always loaded:** This file (header, core rules below, and the index).
 2. **Route first:** Before the first edit, pick the task type in `routing.json` and load the skills it lists (core set + matches). Keep at most 7 active. See [Section 64](skills/64-skill-routing-and-checkpoints.md).
 3. **Lazy-loaded:** The full text of every section is in `skills/NN-name.md`. Load a skill only when your task matches its "Load when" trigger. This keeps context lean — a model with a 32K window can follow all rules without reading 6,700 lines.
 4. **Re-check at boundaries:** At plan → build → verify → commit, and whenever the task changes direction, drop what no longer applies and emit one line: `ROUTE: active=[..] dropped=[..] added=[..] why="..."`.

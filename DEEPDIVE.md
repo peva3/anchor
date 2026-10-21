@@ -61,7 +61,7 @@ Consumers trim on import: copy `AGENTS.md` + `skills/`, delete inapplicable skil
 
 ### Why validation is manual here (and automated in scratch)
 
-Nothing structural ships as a script — `scripts/` is gitignored (see "Gotchas"). The **structural invariant** is checked manually: every entry-point index link resolves to a skill file, no duplicate headings exist, every "Section NN" cross-reference lands on a real section, and every skill number referenced by `routing.json` exists. every entry-point index link resolves to a skill file, no duplicate headings exist, and every "Section NN" cross-reference lands on a real section. During development a deeper Python audit (`tests/test_agents_md_quality.py`, scratch, gitignored) automates those checks plus code-block validity and workflow coverage. It is pure standard library (re, pathlib, collections), runs in under a second over the entry point plus 66 skill files, but it is **not shipped** — per Section 1, `tests/` is gitignored (see "Gotchas" below).
+Nothing structural ships as a script — `scripts/` is gitignored (see "Gotchas"). The **structural invariant** is checked manually: every entry-point index link resolves to a skill file, no duplicate headings exist, every "Section NN" cross-reference lands on a real section, and every skill number referenced by `routing.json` exists. During development a deeper Python audit (`tests/test_agents_md_quality.py`, scratch, gitignored) automates those checks plus code-block validity and workflow coverage. It is pure standard library (re, pathlib, collections), runs in under a second over the entry point plus 66 skill files, but it is **not shipped** — per Section 1, `tests/` is gitignored (see "Gotchas" below).
 
 ### Why the deployed platform configs are lightweight
 
@@ -92,3 +92,4 @@ The template cannot avoid governing itself — every section is a rule the maint
 - `AGENTS.md` → `routing.json` (the deterministic task-type → skill map; Section 64 protocol)
 - `AGENTS.md` → `PROJECT.md` (per-project identity; gitignored, each consumer writes its own)
 - `tests/routing-benchmark.json` → `routing.json` (local, gitignored benchmark of routing quality)
+- `docs/SKILL_MAP.md` → `routing.json` (generated human-readable view of the map; the JSON wins on conflict)
