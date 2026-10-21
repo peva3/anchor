@@ -1,4 +1,6 @@
-# Per Section 1, tests/ contents are scratch and not for the repo.
+# Per-project files: each project (including this one) keeps its own local PROJECT.md.
+PROJECT.md
+# Local-only scratch: tests, scratch scripts, benchmarks. Never shipped.
 tests/
 scripts/
 __pycache__/
@@ -16,3 +18,5 @@ coverage-html/
 .DS_Store
 *.swp
 *.swo
+pytest.ini
+.opencode/

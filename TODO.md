@@ -10,13 +10,10 @@
 | # | Status | Description |
 |---|--------|-------------|
 | 1 | ✅ | Audit current project state against AGENTS.md |
-| 2 | 🔄 | Fix the gaps found in audit |
-| 3 | ⬜ | Add CI workflow that runs a structural validation on every push (63 sections all linked, skill files present) |
-| 4 | ⬜ | Add pre-commit hooks (local hooks configured; consider a structural integrity check) |
-| 5 | ⬜ | Sync all 7 platform config files to mention Sections 33, 37, 50.1, 50.2 |
-| 6 | ⬜ | Add instruction-provenance tags to AGENTS.md sections per 51.5 |
-| 7 | ⬜ | Decide and execute first tagged release (v1.0.0) |
-| 8 | ⬜ | Populate or remove empty `research/papers/full/` directory |
+| 2 | 🔄 | Bring in proven concepts from the work version (routing map, checkpoints, branch policy, hard stops, new sections 64-66) |
+| 3 | ⬜ | Decide whether to ship a local routing/benchmark checker (Phase 4 proposal — approval required) |
+| 4 | ⬜ | Populate or remove empty `research/papers/full/` directory |
+| 5 | ⬜ | Keep `routing.json` and the Section Index in sync when skills change |
 
 ## Completed Sprints
 
@@ -36,6 +33,8 @@
 
 ## Notes
 
-- Sections 16-20 (Documentation, Dependencies, Performance, Build/Deployment, External Integrations) are referenced in the AGENTS.md change log and audit but were merged into adjacent sections in the rewrite. See Section 16 for documentation, Section 17 for dependencies, Section 18 for performance, Section 19 for build, Section 20 for external integrations.
+- Sections 16-20 exist as their own skills: 16 Documentation, 17 Dependencies, 18 Performance, 19 Build/Deployment, 20 External Integrations.
+- History lives in `CHANGELOG.md` only. `AGENTS.md` deliberately carries no change log (Section 51).
+- Local-only tooling is gitignored: `tests/` (scratch suites + `tests/routing-benchmark.json`), `scripts/`, and `PROJECT.md`.
 - Build size delta: N/A (documentation-only project).
-- The scratch audit (`tests/test_agents_md_quality.py`, gitignored) is the source of truth for the section count and line count during development. Re-run it before tagging a release. Consumers validate via the structural invariant: all 63 sections link from the entry-point to a skill file.
+- Consumers validate via the structural invariant: every section in the Section Index links to an existing file in `skills/`, and `routing.json` references only sections that exist.

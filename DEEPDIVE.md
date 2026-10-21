@@ -9,8 +9,8 @@ Anchor is a documentation-only template. It ships rules, not code.
 
 ```
 standardized-markdown/
-├── AGENTS.md                # ⭐ The deliverable — high-level entry point, 63 sections of agent rules
-├── skills/                  # Full rule text — 63 skill files (NN-name.md), lazy-loaded by task
+├── AGENTS.md                # ⭐ The deliverable — high-level entry point, 66 sections of agent rules
+├── skills/                  # Full rule text — 66 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md               # AI bootstrap guide — phases for greenfield projects
 ├── README.md                # Public-facing description, stats, quick start
 ├── CONTRIBUTING.md          # How to add/change sections safely
@@ -39,7 +39,7 @@ There is no runtime data flow. The data flow is **rule distribution**:
 
 1. **Author** writes a section in `AGENTS.md` addressing a specific observed failure mode
 2. **Extract** the section's full text into `skills/NN-name.md` (one skill per section)
-3. **Validate** — verify the Section Index has 63 rows and every link resolves to a file in skills/ (no duplicate headings, no cross-references to sections that don't exist); a deeper scratch audit (`tests/test_agents_md_quality.py`, run during development, not shipped) covers numbering, skill-file completeness, code-block validity, and workflow coverage
+3. **Validate** — verify the Section Index has 66 rows and every link resolves to a file in skills/ (no duplicate headings, no cross-references to sections that don't exist); a deeper scratch audit (`tests/test_agents_md_quality.py`, run during development, not shipped) covers numbering, skill-file completeness, code-block validity, and workflow coverage
 4. **Consumer** copies `AGENTS.md` + `skills/` (and platform-specific config) into their own project
 5. **AI agent** in the consumer project reads the entry point, loads the skills its task needs, and follows the rules
 
@@ -47,25 +47,25 @@ The template is therefore optimized for two audiences simultaneously: humans who
 
 ## Key Decisions
 
-### Why 63 sections, not fewer
+### Why 66 sections, not fewer
 
 Section 51.3 mandates ≤2,000 lines and ≤5,000 tokens for *project-specific* AGENTS.md files, with an explicit exception for this template repository. The template's value is breadth — a single import gives a project access to production-readiness patterns (CI/CD, observability, secrets, mutation testing, chaos engineering) that would otherwise take a team months to assemble.
 
 The template reconciles breadth with constrained context windows by **splitting into an entry point + lazy-loaded skills**:
 
-1. `AGENTS.md` stays lean (~470 lines, ~7K tokens) — a high-level index plus the core rules (Sections 1, 2, 36, 50.1/50.3/50.6, 51) reproduced in full so the non-negotiable guardrails always apply.
+1. `AGENTS.md` stays lean (~407 lines, ~6,000 tokens, measured) — a single Section Index (routing + glossary in one) plus the core rules (Sections 1, 2, 36, 50.1/50.6, 51.3) reproduced in full, because a hard stop that only applies when a skill happens to be loaded is not a hard stop.
 2. `skills/NN-name.md` holds each section's full rule text, byte-for-byte identical to the former monolith. Agents load only the skills their current task needs (Section 51.1 trigger-based loading).
 3. A 32K-context model can follow all guardrails by loading the entry point plus 7-12 relevant skills (~16-19K tokens total), verified during development by the scratch constrained-context test suite (`tests/`, not shipped).
 
 Consumers trim on import: copy `AGENTS.md` + `skills/`, delete inapplicable skills, inline what remains.
 
-### Why the shipped validator is a shell script, with Python scratch for development
+### Why validation is manual here (and automated in scratch)
 
-Two layers keep the structure intact. The **structural invariant** is manual but simple to check: every entry-point index link resolves to a skill file, no duplicate headings exist, and every "Section NN" cross-reference lands on a real section. During development a deeper Python audit (`tests/test_agents_md_quality.py`, scratch, gitignored) automates those checks plus code-block validity and workflow coverage. It is pure standard library (re, pathlib, collections), runs in under a second over the entry point plus 63 skill files, but it is **not shipped** — per Section 1, `tests/` is gitignored (see "Gotchas" below).
+Nothing structural ships as a script — `scripts/` is gitignored (see "Gotchas"). The **structural invariant** is checked manually: every entry-point index link resolves to a skill file, no duplicate headings exist, every "Section NN" cross-reference lands on a real section, and every skill number referenced by `routing.json` exists. every entry-point index link resolves to a skill file, no duplicate headings exist, and every "Section NN" cross-reference lands on a real section. During development a deeper Python audit (`tests/test_agents_md_quality.py`, scratch, gitignored) automates those checks plus code-block validity and workflow coverage. It is pure standard library (re, pathlib, collections), runs in under a second over the entry point plus 66 skill files, but it is **not shipped** — per Section 1, `tests/` is gitignored (see "Gotchas" below).
 
 ### Why the deployed platform configs are lightweight
 
-Each platform (Cursor, Windsurf, Continue, Copilot, Claude) gets a thin pointer file that says "read AGENTS.md and follow Section N." The 63 sections live in one canonical place (the skills/ library). If we duplicated the rules into each config, drift would be inevitable — any update to AGENTS.md would require manual mirroring to 7 other files. The trade-off: agents on platforms with very small context windows may not load the full rule corpus eagerly. The mitigation is the entry-point index (Section 51.4 model capability awareness): agents read the lean index and load only the skills they need.
+Each platform (Cursor, Windsurf, Continue, Copilot, Claude) gets a thin pointer file that says "read AGENTS.md and follow Section N." The 66 sections live in one canonical place (the skills/ library). If we duplicated the rules into each config, drift would be inevitable — any update to AGENTS.md would require manual mirroring to 7 other files. The trade-off: agents on platforms with very small context windows may not load the full rule corpus eagerly. The mitigation is the entry-point index (Section 51.4 model capability awareness): agents read the lean index and load only the skills they need.
 
 ### Why AGENTS.md is self-referential (Section 50.8)
 
@@ -73,13 +73,13 @@ The template cannot avoid governing itself — every section is a rule the maint
 
 ## Gotchas and Landmines
 
-1. **`tests/` is entirely gitignored** — by design (Section 1: tests are scratch). The scratch audit and test suites live locally during development but are **not shipped** in the template. A fresh clone has no `tests/` directory — any config or doc that invokes `python3 tests/...` will fail and must be kept out of the repo. The guardrails ship as the entry-point + skills structure itself; contributors verify structural integrity manually (Section Index has 63 rows, every link resolves).
+1. **`tests/` is entirely gitignored** — by design (Section 1: tests are scratch). The scratch audit and test suites live locally during development but are **not shipped** in the template. A fresh clone has no `tests/` directory — any config or doc that invokes `python3 tests/...` will fail and must be kept out of the repo. The guardrails ship as the entry-point + skills structure itself; contributors verify structural integrity manually (Section Index has 66 rows, every link resolves).
 
 2. **Duplicate section 3.9 in STARTUP.md** — historically had two `### 3.9 Create SECURITY.md` headings, with the first one containing the CONTRIBUTING template by mistake. Any agent following STARTUP literally would have overwritten SECURITY.md. Fixed.
 
 3. **`research/papers/full/`** is an empty directory artifact. Either populate or remove. Kept empty for now pending full paper imports; see TODO.md.
 
-4. **The `snip` shell wrapper** (per the agent's own runtime) prepends to every command. Direct use of `cd`, `export`, `source` will fail. Use `bash -c 'cd ... && ...'` or pass `workdir` to the tool instead. This is not in AGENTS.md because it's a runtime quirk of the agent host, not a project rule.
+4. **Historical note (no longer applicable):** an earlier agent host wrapped every command in a `snip` shim that broke `cd`/`export`/`source`. That host is gone; current harnesses run shell commands directly and support a `workdir` parameter. The gotcha is recorded only so future maintainers recognize old references to it.
 
 ## Interconnections
 
@@ -89,3 +89,6 @@ The template cannot avoid governing itself — every section is a rule the maint
 - `AGENTS.md` → `research/index.md` (provenance per section 51.5)
 - `AGENTS.md` → all 7 platform config files (single source of truth)
 - `AGENTS.md` ↔ `skills/` (entry-point links to every skill; skills hold full rule text)
+- `AGENTS.md` → `routing.json` (the deterministic task-type → skill map; Section 64 protocol)
+- `AGENTS.md` → `PROJECT.md` (per-project identity; gitignored, each consumer writes its own)
+- `tests/routing-benchmark.json` → `routing.json` (local, gitignored benchmark of routing quality)

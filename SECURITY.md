@@ -24,21 +24,23 @@ The AGENTS.md template covers extensive security guidance for projects that adop
 |---------|----------------|
 | Section 13 | Security best practices — input validation, parameterized queries, rate limiting, secrets |
 | Section 27.3 | Security constraints — SQL injection, eval/exec, path traversal, password hashing |
-| Section 31.1 | Prompt injection detection — heuristic pre-filter, regex patterns, threat levels |
+| Section 31.1 | Prompt injection defenses — instruction hierarchy, untrusted model/tool output, OWASP GenAI guardrails |
 | Section 31.2 | Admin audit logging — IP, user agent, action tracking |
 | Section 31.3 | API key encryption — Fernet-based at-rest encryption |
 | Section 31.4 | Admin IP whitelist — network-level access control |
-| Section 31.5 | Security CI/CD workflow — pip-audit, safety, auto-issue creation |
-| Section 36 | Explicit NEVER list — 6 categories including code/git/GitHub/security prohibitions |
-| Section 37 | Pre-commit hooks — detect-secrets, bandit, private key detection |
-| Section 44 | Secrets management — tiered strategy, rotation, scanning |
+| Section 31.5 | Security CI/CD — gitleaks + pip-audit on every PR, plus scheduled scans |
+| Section 36 | Explicit NEVER list — 9 categories including code, git, GitHub, security, and untrusted-input prohibitions |
+| Section 37 | Pre-commit hooks — gitleaks, bandit, private key detection |
+| Section 44 | Secrets management — tiered strategy, rotation, OIDC, scanning |
+| Section 54 | MCP usage and guardrails — server vetting, tool-output trust, SSRF blocks |
+| Section 55 | Prompt-injection defenses for agents — trust boundaries, guardrails |
+| Section 58 | Supply-chain security — SBOM, provenance, signed artifacts, digest pinning |
 
 ## Known Security Gaps
 
 We do not currently cover:
 
 - Hardware security module (HSM) integration
-- Binary/supply-chain signing and verification
 - FIPS compliance requirements
 - Zero-trust architecture patterns
 

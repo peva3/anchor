@@ -34,7 +34,7 @@ This project follows its own rules (Section 50.8). Before contributing, read AGE
 
 ## Before Submitting
 
-1. **Verify the structure** — all 63 sections must stay linked from the entry-point with a matching skill file. Validate by checking the Section Index has 63 rows and each link resolves to a file in skills/.
+1. **Verify the structure** — all 66 sections must stay linked from the entry-point with a matching skill file. Validate by checking the Section Index has 66 rows and each link resolves to a file in skills/.
 2. **Verify your PR stays under 800 lines** (Section 33.1)
 3. **Use the PR template** (Section 35) — include both HUMAN and AGENT sections
 4. **Self-check against the anti-patterns** (Section 34) — no laziness, uncertainty, or bloat
@@ -50,7 +50,7 @@ Before adding a new section, verify ALL of these:
 - [ ] Research or citations back the claim
 - [ ] The section includes concrete implementation guidance (not just principles)
 - [ ] Cross-references to related sections are included
-- [ ] The Change Log is updated (bottom of AGENTS.md)
+- [ ] `CHANGELOG.md` is updated (history lives only there — `AGENTS.md` carries no change log)
 
 ## Style Guide for AGENTS.md
 
