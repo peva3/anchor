@@ -44,6 +44,8 @@ cp anchor/AGENTS.md ./your-project/AGENTS.md
 
 # 3. Copy the skills library — every section's full rule text lives here.
 #    The entry-point links to these files, so without them the doc dangles.
+cp anchor/routing.json ./your-project/routing.json
+
 cp -r anchor/skills ./your-project/skills
 
 # 4. Copy supporting agent config files
@@ -202,6 +204,8 @@ Full research catalog: [`research/index.md`](research/index.md)
 cp anchor/AGENTS.md ./my-project/AGENTS.md
 
 # Copy the skills library (full rule text lives here)
+cp anchor/routing.json ./my-project/routing.json
+
 cp -r anchor/skills ./my-project/skills
 
 # Trim to fit — keep only relevant skills and inline them if needed

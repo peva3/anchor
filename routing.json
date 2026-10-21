@@ -1,5 +1,5 @@
 {
-  "$comment": "Declarative skill routing map. Data only: no scoring, no weights, no code. Same request maps to the same skills every time. Task types are the allowed values; skills are section numbers whose file lives in skills/NN-slug.md. See Section 64.",
+  "$comment": "Declarative skill routing map. Read together with AGENTS.md: AGENTS.md states the guardrails, this file decides which of them a task loads. Copy it alongside AGENTS.md — routing must never be improvised. Data only: no scoring, no weights, no code. Same request maps to the same skills every time. Task types are the allowed values; skills are section numbers whose file lives in skills/NN-slug.md. See Section 64.",
   "version": 1,
   "core": {
     "$comment": "Always loaded. Inlined in AGENTS.md so they apply even in a constrained context window.",
