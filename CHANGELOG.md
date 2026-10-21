@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Benchmark round five (100 new scenarios → 102 total)** — project scopes drawn from what people actually point coding agents at: object-storage uploads, transactional email, background queues, WebSockets, error tracking, product analytics, slow-query and index work, full-text search, OAuth and RBAC, dark mode, sortable data tables, GitHub Actions authoring, npm publishing, monorepos, and one-command local dev environments
+- **`integration` task type** — connecting to anything outside the process boundary (S3, SES, queues, webhooks, WebSockets) now loads Section 20 as its base skill. Previously Section 20 was reachable only from `embedded`, so timeouts, backoff, idempotency keys, webhook signatures and SSRF guidance were unavailable for the most common integration work
+- **End-to-end testing guidance in Section 8** — real browser drivers (Playwright/Cypress), flow-level selectors, keeping the E2E suite small, seeded data, and failure artifacts. Browser E2E had no coverage anywhere
+
+### Fixed
+- **Trigger coverage for common asks** — email, queues, uploads, WebSockets, explain-this-codebase, dead-code removal, error tracking, analytics events, query/index tuning, full-text search, OAuth, dark mode, data tables, GitHub Actions and monorepos all previously fell through to a generic route or the wrong one
+- **Whitespace in requests broke phrase triggers** — "how  does" (double space) silently rerouted to a different task type; matching now normalises whitespace, which the 408-variant stability check caught
+- Contract testing moved to `integration` (it is an interface concern) so `test` can carry the testing-requirements skill
+
+### Added
 - **A/B harness: Anchor-guided vs rule-free output** (local, `tests/ab_bench.py`). One project timeline of six tasks — feature, test, fix, ui, security, release — is run through two arms: the entry point plus the routed skills, and a generic "helpful coding assistant" with no rules. Each answer is scored against a task rubric. Drivers are pluggable: `stub` (context-echo proxy for pipeline checks), `emit` (writes exact per-arm prompts), and `files` (scores real recorded answers, e.g. from subagents). First recorded run: **Anchor 10/10 rubric items, rule-free 6/10** — the gap is process, not code: conventional commit messages, test-first ordering, explicit unknowns, and log/PII hygiene
 - **Load/unload timeline** in the same harness: per task it reports the active set at each phase, what phases add, what phases drop, and cross-task churn when the work changes type (e.g. feature → test drops API and dependency skills, joins the testing set). This is what makes "skills unload as work changes" observable rather than asserted
 

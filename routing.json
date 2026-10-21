@@ -116,7 +116,9 @@
         "upgrade",
         "migrate to",
         "dependency bump",
-        "major version bump"
+        "major version bump",
+        "dead code",
+        "unused code"
       ],
       "always": [
         50
@@ -153,7 +155,7 @@
         45,
         46,
         47,
-        48,
+        8,
         60,
         61,
         49
@@ -290,7 +292,14 @@
         "localization",
         "translation",
         "locale",
-        "rtl"
+        "rtl",
+        "dark mode",
+        "data table",
+        "sortable",
+        "sorting",
+        "filter",
+        "filtering",
+        "toggle"
       ],
       "always": [
         63
@@ -321,7 +330,18 @@
         "database",
         "postgres",
         "mysql",
-        "postgresql"
+        "postgresql",
+        "index",
+        "indexes",
+        "query",
+        "queries",
+        "slow query",
+        "analytics",
+        "event",
+        "events",
+        "full text search",
+        "full-text search",
+        "search index"
       ],
       "always": [
         53
@@ -359,6 +379,48 @@
       ]
     },
     {
+      "$comment": "External integrations (Section 20): object storage, email, queues, webhooks, websockets.",
+      "type": "integration",
+      "triggers": [
+        "s3",
+        "upload",
+        "uploads",
+        "presigned",
+        "file upload",
+        "email",
+        "transactional email",
+        "ses",
+        "sendgrid",
+        "queue",
+        "background job",
+        "worker",
+        "celery",
+        "sqs",
+        "kafka",
+        "rabbitmq",
+        "webhook",
+        "webhooks",
+        "websocket",
+        "websockets",
+        "realtime",
+        "third-party api",
+        "integration",
+        "integrations",
+        "stripe"
+      ],
+      "always": [
+        20
+      ],
+      "skills": [
+        12,
+        13,
+        24,
+        41,
+        48,
+        62
+      ]
+    },
+    {
       "type": "infra",
       "triggers": [
         "docker",
@@ -375,7 +437,15 @@
         "metrics",
         "dashboard",
         "tracing",
-        "slo"
+        "slo",
+        "sentry",
+        "error tracking",
+        "github actions",
+        "workflow",
+        "github workflow",
+        "monorepo",
+        "workspace",
+        "workspaces"
       ],
       "always": [
         32
@@ -416,7 +486,11 @@
         "leaked",
         "key was committed",
         "committed credential",
-        "exposed key"
+        "exposed key",
+        "oauth",
+        "sign in with google",
+        "google sign in",
+        "oauth2"
       ],
       "always": [
         36
@@ -529,7 +603,12 @@
         "instruction architecture",
         "guardrail",
         "convention",
-        "wiki"
+        "wiki",
+        "explain",
+        "walk me through",
+        "how does",
+        "understand",
+        "unfamiliar"
       ],
       "always": [
         51
