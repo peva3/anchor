@@ -70,6 +70,7 @@ Migration 010 adds constraint with deduplication pass.
 - **Descriptive messages.** First line <72 chars, optional body for detail.
 - **Never force push** to shared branches
 - **Branch naming:** `feature/name`, `fix/name`, `sprint-n`
+- **Solo vs shared (Section 36.2):** in a shared/team repo, always branch and use the review process — no exceptions, including emergencies. In a solo repo where only `main` matters, direct commits and pushes to `main` are fine and usually preferred as a versioned backup. An experiments-only branch does not make a repo shared, and a private repo is not necessarily a solo one. Branch protections still apply, and pushing still happens only when the user asks.
 
 ---
 

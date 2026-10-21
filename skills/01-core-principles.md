@@ -13,7 +13,7 @@
 - **Proven integration.** After building any component, verify it works end-to-end. Do not mark a task complete without verification. *(How: [Section 23](skills/23-verification-gates.md) — verification gates)*
 - **Cross-service contract tests.** When building features spanning multiple services, write integration tests that exercise the actual HTTP contracts between them. *(How: [Section 48](skills/48-contract-testing-pact.md) — contract testing)*
 - **Trace every function call.** Before marking a module complete, verify every public function is called by a production path. *(How: [Section 9](skills/09-linting-type-checking.md) — vulture identifies uncalled functions)*
-- **Navigate efficiently.** This document is long by design (universal template). Jump to [Section Index](#section-index) or [Quick-Navigation Cheatsheet](#quick-navigation-cheatsheet) instead of reading sequentially. For project-specific use, trim to ≤2,000 lines. *(How: [Section 51.3](skills/51-instruction-architecture-context-economy-self-improvement.md))*
+- **Navigate efficiently.** This document is long by design (universal template). Jump to the Section Index (`AGENTS.md`) instead of reading sequentially. For project-specific use, trim to ≤2,000 lines. *(How: [Section 51.3](skills/51-instruction-architecture-context-economy-self-improvement.md))*
 
 ---
 

@@ -25,7 +25,8 @@ project/
 ├── .env.example           # Environment template
 ├── .gitignore             # Ignore generated artifacts (caches, tests/scripts, build output) — NOT the tests/ folder itself
 ├── README.md              # Setup and usage
-├── AGENTS.md              # This file
+├── AGENTS.md              # Agent rules (this file)
+├── PROJECT.md             # Per-project identity/scope — gitignored, each project writes its own
 └── TODO.md                # Task tracking
 ```
 

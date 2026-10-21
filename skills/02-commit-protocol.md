@@ -9,7 +9,7 @@
 **After completing and verifying any task:**
 1. `git add <changed files>`
 2. `git commit -m "Descriptive commit message"` — describe WHAT changed and WHY
-3. `git push origin <branch>`
+3. `git push origin <branch>` — on a solo repo that only uses `main`, push `main` directly ([Section 36.2](skills/36-explicit-prohibitions-the-never-list.md)); in a shared repo, use a feature branch and the review process
 
 **GitHub automation (if `gh` command is available):**
 - If the user has explicitly approved a commit and push, you may run them after validation

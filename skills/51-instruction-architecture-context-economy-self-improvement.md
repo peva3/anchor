@@ -164,7 +164,7 @@ Every non-obvious rule should be traceable to its source. This prevents cargo-cu
 **Rules for provenance:**
 - **Cite the standard** (OWASP, SemVer, Google testing blog, PEP)
 - **Link to source material** when available (arXiv paper, blog post, research article)
-- **Include the date** when a rule was added (in Change Log)
+- **Include the date** when a rule was added (recorded in `CHANGELOG.md`, not in the rule file)
 - **Mark rules derived from project-specific experience** — these may not apply universally
 - **Periodically audit** — if a rule's source has been superseded or disproven, update or remove it
 

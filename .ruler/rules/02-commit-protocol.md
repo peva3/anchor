@@ -3,7 +3,7 @@
 ## After Completing Any Task
 1. `git add <files>` — add specific files, never `git add .` (Section 36.2)
 2. `git commit -m "...` — human-sounding, WHY-focused message
-3. `git push origin <branch>`
+3. `git push origin <branch>` — solo repo that only uses `main`: push `main` directly; shared repo: feature branch + review process, no exceptions (Section 36.2)
 
 ## Never Go Rogue
 - NEVER create PRs, issues, or comments without explicit user approval

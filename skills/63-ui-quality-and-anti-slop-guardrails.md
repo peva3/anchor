@@ -52,6 +52,7 @@ Accessibility is functional engineering, not polish:
 - **Color contrast** ≥ 4.5:1 for normal text, ≥ 3:1 for large text (WCAG AA)
 - **Keyboard operable** — every interactive element reachable and usable via Tab/Enter/Space; no mouse-only interactions
 - **Visible focus indicators** — never remove outlines with `outline: none` without a replacement focus style
+- **Respect `prefers-reduced-motion`** — wrap non-essential animation/transition in a reduced-motion media query; never make motion the only signal
 - **Semantic HTML / roles** — use real buttons/links/landmarks rather than divs with handlers where possible
 - **Form labels** — every field has an associated label; errors are programmatically associated with their field
 - Do not rely on color alone to convey state (e.g. also show an icon or text for success/error)
@@ -76,6 +77,7 @@ Before a UI change is marked complete, run this checklist (mirrors [Section 34.8
 - [ ] No dead controls — every interactive element clicked through and works
 - [ ] Empty / loading / error states present on all data-driven views
 - [ ] WCAG AA contrast + keyboard navigation + visible focus verified
+- [ ] `prefers-reduced-motion` respected for any animation
 - [ ] ENERGY / RHYTHM / MOTION dials set deliberately and met
 - [ ] Renders correctly at the project's supported viewport sizes
 

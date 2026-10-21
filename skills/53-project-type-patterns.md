@@ -392,6 +392,12 @@ AI applications — agents, RAG systems, tool-calling services, MCP servers, and
 - Include regression evals for: instruction-following, refusal behavior, prompt-injection resilience, tool-choice correctness
 - Add prompt/rule regression tests per [Section 52.6](skills/52-rule-enforcement-architecture-from-advisory-to-deterministic.md) so behavior changes are caught
 
+**Evidence-first answers:**
+- Every factual answer cites its source and shows provenance (document id, URL, chunk, or row) — an uncited answer is a guess
+- When retrieval or evidence is missing or weak, the answer is **"unknown"** — never fill the gap with plausible text
+- Build the eval set **before** claiming an improvement; report the metric, the dataset, and the model/provider/version that produced it ([Section 50.6](skills/50-intentional-minimalism-the-simplicity-first-architecture.md)) — "better answers" without a before/after delta is not a claim
+- Log prompts and outputs for debugging with sensitive data redacted ([Section 14](skills/14-logging-standards.md), [Section 36.10](skills/36-explicit-prohibitions-the-never-list.md))
+
 **Retrieval (RAG):**
 - Set explicit chunking/embedding strategy and evaluate retrieval quality (recall@k) on a labeled set
 - Return sources/citations with answers; make the model say "I don't know" rather than hallucinate
