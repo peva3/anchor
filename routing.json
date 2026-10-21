@@ -61,7 +61,21 @@
         "regression",
         "crash",
         "does not work",
-        "fix"
+        "fix",
+        "troubleshoot",
+        "debug",
+        "debugging",
+        "not working",
+        "throws",
+        "exception",
+        "traceback",
+        "stack trace",
+        "wrong output",
+        "misbehaving",
+        "hangs",
+        "deadlock",
+        "memory leak",
+        "intermittent failure"
       ],
       "always": [
         34
@@ -85,7 +99,19 @@
         "feature",
         "support for",
         "plugin",
-        "extension point"
+        "extension point",
+        "endpoint",
+        "route",
+        "crud",
+        "rest api",
+        "graphql",
+        "api endpoint",
+        "feature request",
+        "user story",
+        "acceptance criteria",
+        "capability",
+        "allow users to",
+        "form"
       ],
       "always": [
         35
@@ -118,7 +144,18 @@
         "dependency bump",
         "major version bump",
         "dead code",
-        "unused code"
+        "unused code",
+        "restructure",
+        "rework",
+        "modernize",
+        "deduplicate",
+        "consolidate",
+        "decouple",
+        "cleanup",
+        "tech debt",
+        "remove unused",
+        "tidy",
+        "restructure module"
       ],
       "always": [
         50
@@ -141,14 +178,32 @@
         "flaky",
         "property-based",
         "snapshot",
-        "mutation",
         "benchmark",
         "test suite",
         "regression suite",
         "chaos",
         "game day",
         "fault injection",
-        "game day exercise"
+        "game day exercise",
+        "unit test",
+        "integration test",
+        "end-to-end",
+        "e2e",
+        "test coverage",
+        "tdd",
+        "pytest",
+        "jest",
+        "vitest",
+        "playwright",
+        "cypress",
+        "test plan",
+        "test case",
+        "mocking",
+        "stub",
+        "fixture",
+        "assertions",
+        "mutation testing",
+        "mutmut"
       ],
       "always": [],
       "skills": [
@@ -174,7 +229,14 @@
         "review the",
         "please review",
         "peer review",
-        "review a pull request"
+        "review a pull request",
+        "pr review",
+        "review a pr",
+        "look over",
+        "sanity check",
+        "second pair of eyes",
+        "feedback on",
+        "critique"
       ],
       "always": [
         33,
@@ -197,7 +259,20 @@
         "adr",
         "documentation",
         "comments",
-        "deeplink"
+        "deeplink",
+        "docstring",
+        "docstrings",
+        "api docs",
+        "user guide",
+        "tutorial",
+        "onboarding docs",
+        "release notes",
+        "guide",
+        "jsdoc",
+        "sphinx",
+        "mkdocs",
+        "runbook",
+        "runbooks"
       ],
       "always": [
         16
@@ -225,7 +300,19 @@
         "feature flags",
         "rollout",
         "gradual rollout",
-        "revert the last release"
+        "revert the last release",
+        "versioning",
+        "semver",
+        "prerelease",
+        "hotfix release",
+        "changelog entry",
+        "publish package",
+        "tag a release",
+        "bump version",
+        "github release",
+        "npm publish",
+        "pypi",
+        "artifact"
       ],
       "always": [
         39
@@ -253,7 +340,20 @@
         "bill",
         "spend",
         "cost spike",
-        "cloud bill"
+        "cloud bill",
+        "postmortem",
+        "sev1",
+        "sev2",
+        "pager",
+        "alert firing",
+        "degraded",
+        "5xx spike",
+        "service is down",
+        "prod is down",
+        "escalate",
+        "error rate",
+        "error budget",
+        "5xx errors"
       ],
       "always": [
         59
@@ -299,7 +399,19 @@
         "sorting",
         "filter",
         "filtering",
-        "toggle"
+        "toggle",
+        "interface",
+        "view",
+        "styling",
+        "styles",
+        "responsive",
+        "theme",
+        "empty state",
+        "loading state",
+        "aria",
+        "typography",
+        "modal",
+        "navbar"
       ],
       "always": [
         63
@@ -341,7 +453,22 @@
         "events",
         "full text search",
         "full-text search",
-        "search index"
+        "search index",
+        "sql",
+        "table",
+        "ingestion",
+        "ingest",
+        "transform",
+        "dbt",
+        "airflow",
+        "snowflake",
+        "bigquery",
+        "redshift",
+        "parquet",
+        "csv import",
+        "materialized view",
+        "partitioning",
+        "data quality"
       ],
       "always": [
         53
@@ -365,7 +492,26 @@
         "mqtt",
         "iot",
         "ota",
-        "rtos"
+        "rtos",
+        "arduino",
+        "esp32",
+        "stm32",
+        "raspberry pi",
+        "gpio",
+        "uart",
+        "spi",
+        "i2c",
+        "sensor",
+        "actuator",
+        "low power",
+        "watchdog",
+        "bootloader",
+        "cross-compile",
+        "toolchain",
+        "hal",
+        "power draw",
+        "power consumption",
+        "battery life"
       ],
       "always": [
         53
@@ -406,7 +552,22 @@
         "third-party api",
         "integration",
         "integrations",
-        "stripe"
+        "stripe",
+        "api client",
+        "sdk",
+        "message queue",
+        "event bus",
+        "pubsub",
+        "scheduled job",
+        "cron",
+        "http client",
+        "rate limit",
+        "third party",
+        "twilio",
+        "slack",
+        "gcs",
+        "blob storage",
+        "presigned url"
       ],
       "always": [
         20
@@ -445,7 +606,29 @@
         "github workflow",
         "monorepo",
         "workspace",
-        "workspaces"
+        "workspaces",
+        "ci",
+        "cd",
+        "gitlab ci",
+        "jenkins",
+        "ansible",
+        "cloudformation",
+        "pulumi",
+        "ecs",
+        "eks",
+        "lambda",
+        "serverless",
+        "load balancer",
+        "ingress",
+        "nginx",
+        "cdn",
+        "vpc",
+        "iam",
+        "autoscaling",
+        "prometheus",
+        "grafana",
+        "datadog",
+        "uptime"
       ],
       "always": [
         32
@@ -490,7 +673,30 @@
         "oauth",
         "sign in with google",
         "google sign in",
-        "oauth2"
+        "oauth2",
+        "authentication",
+        "authorization",
+        "rbac",
+        "jwt",
+        "encryption",
+        "xss",
+        "csrf",
+        "ssrf",
+        "sqli",
+        "injection",
+        "hashing",
+        "password",
+        "2fa",
+        "mfa",
+        "certificate",
+        "tls",
+        "dependency audit",
+        "gdpr",
+        "pii",
+        "privacy",
+        "compliance",
+        "threat model",
+        "pentest"
       ],
       "always": [
         36
@@ -516,7 +722,26 @@
         "assistant",
         "embedding",
         "mcp server",
-        "subagent"
+        "subagent",
+        "fine-tune",
+        "finetuning",
+        "transformer",
+        "openai",
+        "anthropic",
+        "chatgpt",
+        "claude",
+        "gemini",
+        "token budget",
+        "tool calling",
+        "function calling",
+        "vector database",
+        "embeddings",
+        "semantic search",
+        "hallucination",
+        "system prompt",
+        "context window",
+        "guardrails",
+        "evals"
       ],
       "always": [
         53
@@ -538,7 +763,14 @@
         "presentation",
         "talk",
         "keynote",
-        "pitch"
+        "pitch",
+        "slide deck",
+        "presentation deck",
+        "workshop",
+        "training slides",
+        "pitch deck",
+        "lightning talk",
+        "conference talk"
       ],
       "always": [
         66
@@ -556,7 +788,14 @@
         "spike",
         "time-boxed",
         "prototype",
-        "proof of concept"
+        "proof of concept",
+        "48 hours",
+        "weekend project",
+        "mvp",
+        "rapid prototype",
+        "throwaway",
+        "timebox",
+        "demo day"
       ],
       "always": [
         65
@@ -577,7 +816,21 @@
         "man page",
         "shell tool",
         "tui",
-        "terminal tool"
+        "terminal tool",
+        "subcommand",
+        "argparse",
+        "click",
+        "typer",
+        "shell script",
+        "bash script",
+        "powershell",
+        "installer",
+        "packaging",
+        "exit code",
+        "stdin",
+        "stdout",
+        "flag",
+        "terminal"
       ],
       "always": [
         53
@@ -608,7 +861,16 @@
         "walk me through",
         "how does",
         "understand",
-        "unfamiliar"
+        "unfamiliar",
+        "anchor",
+        "rule",
+        "rules",
+        "instruction set",
+        "guidance",
+        "self-audit",
+        "routing",
+        "router",
+        "skills"
       ],
       "always": [
         51

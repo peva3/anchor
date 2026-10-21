@@ -89,3 +89,14 @@ Before finishing a task, check the route, not just the code:
 - Routing map (shipped): `routing.json`
 - Routing benchmark (local scratch): `tests/routing-benchmark.json`
 - Section Index in `AGENTS.md` — every section, its trigger, and its file
+
+### 64.9 Keep the Vocabulary Honest
+
+The map fails in one specific way: the words you use do not appear in any trigger, so the task falls back to a default route. Fix the vocabulary, not the skill sets.
+
+- **One owner per trigger.** If two task types claim the same word, routing depends on list order — that is luck, not design. Pick the type whose rules actually apply.
+- **Prefer the phrase people type.** `presigned url`, `backup plan`, `error rate` beat abstract nouns. Whole-word matching means a truncated stem (`deprecat`) never fires.
+- **Weak verbs never outrank a noun.** `fix`, `add`, `build`, `implement` are signals of intent, not of subject; list them under `weakTriggers`.
+- **A fallback is a reported gap.** If a request matches nothing, note the phrase and add it — do not widen a type's `skills` to compensate.
+- **Prune words that are too generic.** `button`, `command`, `retry`, `rewrite` each pulled unrelated work into the wrong type; a word that appears in every domain owns none of them.
+- **Re-measure in bulk.** A phrase suite (short requests with expected types) finds in one run what project scenarios find one at a time.

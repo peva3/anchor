@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Vocabulary harvest across all 19 task types** — the routing map grew from 277 to 533 triggers in one pass instead of discovering words one scenario at a time, covering the phrasing people actually use for debugging, integration, data, security, AI, infrastructure, CLI and device work
+- **Section 64.9 (keep the vocabulary honest)** — one owner per trigger, phrases over abstract nouns, weak verbs never outrank a domain noun, a fallback is a reported gap, and generic words that fit every domain own none of them
+- **Vocabulary suite and map hygiene checks** — trigger ownership, minimum vocabulary per type, and normalized form are now validated, so a future edit cannot quietly create two owners for one word
+
+### Changed
+- **Bulk vocabulary measurement** — a 97-phrase suite scored **43/97 before the harvest and 97/97 after** (35 fallbacks eliminated), while the 102-scenario project benchmark stayed green
+
+### Fixed
+- **Four over-broad triggers pruned** — `button`, `command`, `retry` and `rewrite` were pulling unrelated work into the wrong type; `mutation` alone meant GraphQL in one context and mutation testing in another, so it became `mutation testing`
+
+### Added
 - **Benchmark round five (100 new scenarios → 102 total)** — project scopes drawn from what people actually point coding agents at: object-storage uploads, transactional email, background queues, WebSockets, error tracking, product analytics, slow-query and index work, full-text search, OAuth and RBAC, dark mode, sortable data tables, GitHub Actions authoring, npm publishing, monorepos, and one-command local dev environments
 - **`integration` task type** — connecting to anything outside the process boundary (S3, SES, queues, webhooks, WebSockets) now loads Section 20 as its base skill. Previously Section 20 was reachable only from `embedded`, so timeouts, backoff, idempotency keys, webhook signatures and SSRF guidance were unavailable for the most common integration work
 - **End-to-end testing guidance in Section 8** — real browser drivers (Playwright/Cypress), flow-level selectors, keeping the E2E suite small, seeded data, and failure artifacts. Browser E2E had no coverage anywhere
