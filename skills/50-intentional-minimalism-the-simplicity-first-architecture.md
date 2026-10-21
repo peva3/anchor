@@ -216,6 +216,12 @@ Prevent agents from making invalid or misleading claims. These are NOT optional.
 - Let the changelog categorize it
 - "Bug fix" implies a confirmed defect; "behavior change" is the honest description when uncertain
 
+**NEVER make superlative claims without evidence** — "faster," "saves X hours," "hardens security," "reduces errors" all require a measurement or a confirmation from the user. No measurement, no claim.
+
+**ALWAYS name what produced a result** — when a model, provider, tool, or benchmark generated something you are reporting, name it (model name and version). An unattributed result cannot be reproduced or audited.
+
+**ALWAYS say "unknown" when the evidence is missing** — an honest gap beats a confident guess. This applies to answers about the codebase, the user's intent, and any expert-adjacent question.
+
 ### 50.7 Tests Are Not Bloat
 
 The minimalism ladder exempts tests. A test is not bloat — it's the discipline that makes minimalism safe to practice.

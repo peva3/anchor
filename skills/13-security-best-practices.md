@@ -12,6 +12,10 @@
 - **Redact secrets.** API keys masked in logs automatically
 - **Rate limiting.** Implement on public endpoints
 - **No secrets in code.** All secrets via env vars or mounted secrets
+- **Least privilege.** Request the narrowest scopes, permissions, and host access the feature actually needs — extra permissions widen the blast radius and, for browser extensions, trigger store review
+- **Output encoding.** Encode on output for the target context (HTML, attribute, URL, JS) — never build markup by concatenation
+- **No dynamic code from strings.** Avoid `eval`/`new Function`/inline scripts; set a Content-Security-Policy and keep it strict
+- **Validate outbound URLs.** Treat user-supplied URLs as untrusted (SSRF): allowlist schemes and hosts, and block private/loopback/metadata address ranges
 
 ---
 

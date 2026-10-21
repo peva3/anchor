@@ -14,9 +14,9 @@ Before the first edit, name the task type and load what matches.
 
 1. **Read `routing.json` — always, every task.** It is the single source of routing truth and pairs with `AGENTS.md`: `AGENTS.md` states the guardrails, `routing.json` says which of them a given task loads. Never route from memory or from an impression of what seems relevant.
 2. **Classify the task** — one of the task types in `routing.json` (fix, feature, refactor, test, review, docs, release, incident, ui, data, infra, security, deck, hackathon).
-3. **Load the core set** — Sections 1, 2, and 36 are already inline; add any skill `routing.json` lists under that task type's `always` list.
+3. **Load the core set** — Sections 1, 2, and 36 are already inline and do not count against the budget; add any skill `routing.json` lists under that task type's `always` list.
 4. **Load the matched skills** — the union of `always` and `skills` for the chosen task type.
-5. **Cap it** — keep at most **7** active skills. If a task needs more, it is multiple tasks; split it.
+5. **Cap it** — keep at most **7** task-scoped skills on top of the always-loaded core (Sections 1, 2, 36). If a task needs more, it is multiple tasks; split it.
 
 **If `routing.json` is missing or unreadable, stop.** It ships beside `AGENTS.md`; restore it before working. Improvising a route from the Section Index alone is a guardrail failure, not a reasonable fallback — the index tells you what exists, only the map tells you what applies.
 

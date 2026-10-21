@@ -1,5 +1,5 @@
 {
-  "$comment": "Declarative skill routing map. Read together with AGENTS.md: AGENTS.md states the guardrails, this file decides which of them a task loads. Copy it alongside AGENTS.md — routing must never be improvised. Data only: no scoring, no weights, no code. Same request maps to the same skills every time. Task types are the allowed values; skills are section numbers whose file lives in skills/NN-slug.md. See Section 64.",
+  "$comment": "Declarative skill routing map. Read together with AGENTS.md: AGENTS.md states the guardrails, this file decides which of them a task loads. Copy it alongside AGENTS.md — routing must never be improvised. Data only: no scoring, no weights, no code. Triggers match whole words; weakTriggers are generic verbs that never outrank a domain noun. Same request maps to the same skills every time. See Section 64.",
   "version": 1,
   "core": {
     "$comment": "Always loaded. Inlined in AGENTS.md so they apply even in a constrained context window.",
@@ -14,6 +14,7 @@
     "skill": 64
   },
   "budget": {
+    "$comment": "Cap on task-scoped skills (beyond the always-loaded core in AGENTS.md). Core is always 3 sections; a task may add at most this many.",
     "maxActiveSkills": 7
   },
   "phases": {
@@ -64,18 +65,20 @@
         "implement",
         "new endpoint",
         "feature",
-        "support for"
+        "support for",
+        "plugin",
+        "extension point"
       ],
       "always": [
         35
       ],
       "skills": [
         5,
-        8,
         12,
-        16,
         27,
-        40
+        40,
+        62,
+        63
       ]
     },
     {
@@ -87,7 +90,11 @@
         "split",
         "clean up",
         "simplify",
-        "technical debt"
+        "technical debt",
+        "migrate",
+        "migration of",
+        "behavior-preserving",
+        "without changing behavior"
       ],
       "always": [
         50
@@ -110,7 +117,9 @@
         "property-based",
         "snapshot",
         "mutation",
-        "benchmark"
+        "benchmark",
+        "test suite",
+        "regression suite"
       ],
       "always": [],
       "skills": [
@@ -217,7 +226,10 @@
         "layout",
         "accessibility",
         "design",
-        "landing"
+        "landing",
+        "extension",
+        "browser extension",
+        "popup"
       ],
       "always": [
         63
@@ -226,7 +238,8 @@
         4,
         33,
         34,
-        35
+        35,
+        13
       ]
     },
     {
@@ -238,7 +251,11 @@
         "migration",
         "backfill",
         "warehouse",
-        "dataset"
+        "dataset",
+        "spreadsheet",
+        "financial model",
+        "scenario",
+        "training pipeline"
       ],
       "always": [
         53
@@ -246,8 +263,33 @@
       "skills": [
         29,
         40,
-        42,
-        43
+        43,
+        11,
+        60,
+        47
+      ]
+    },
+    {
+      "$comment": "Embedded/firmware projects (Section 53.2): device constraints, OTA, connectivity.",
+      "type": "embedded",
+      "triggers": [
+        "firmware",
+        "embedded",
+        "microcontroller",
+        "mqtt",
+        "iot",
+        "ota",
+        "rtos"
+      ],
+      "always": [
+        53
+      ],
+      "skills": [
+        7,
+        20,
+        30,
+        41,
+        62
       ]
     },
     {
@@ -259,18 +301,21 @@
         "deploy",
         "container",
         "helm",
-        "infrastructure"
+        "infrastructure",
+        "game server",
+        "netcode",
+        "tick loop"
       ],
       "always": [
         32
       ],
       "skills": [
         7,
-        19,
         30,
         38,
         41,
-        42
+        42,
+        47
       ]
     },
     {
@@ -292,9 +337,9 @@
         13,
         31,
         44,
-        54,
         55,
-        58
+        58,
+        27
       ]
     },
     {
@@ -307,7 +352,9 @@
         "prompt",
         "eval",
         "assistant",
-        "embedding"
+        "embedding",
+        "mcp server",
+        "subagent"
       ],
       "always": [
         53
@@ -318,7 +365,7 @@
         55,
         56,
         57,
-        58
+        24
       ]
     },
     {
@@ -358,5 +405,13 @@
         63
       ]
     }
+  ],
+  "weakTriggers": [
+    "add",
+    "build",
+    "implement",
+    "support for",
+    "new endpoint",
+    "feature"
   ]
 }

@@ -15,6 +15,7 @@ MCP (Model Context Protocol) servers give agents tools — files, shells, web, c
 - Prefer well-known official servers (GitHub, Postgres, Sentry, Playwright first-party) over obscure third-party ones.
 - Prefer `stdio` servers from audited sources; treat network-transported (HTTP/SSE) servers as remote services with the full untrusted-input posture of [Section 20](skills/20-external-integrations.md).
 - After install, audit the server's tool list: does it need `write` on your filesystem? A database client? Cloud credentials? Uninstall servers whose surface is wider than the task needs.
+- **Apply least privilege to the credentials, not just the tools.** A server that only answers questions should get a read-only account and a read-only connection; never hand a query server write access to production. Prefer a replica, a scoped view, or a restricted role over the primary database.
 
 ### 54.2 Scoping MCP Tool Permissions (`mcp__*`)
 

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Routing edge-case benchmark** (local, `tests/bench_projects.py`): 24 project scenarios across six batches — unusual shapes (browser extension, MQTT gateway, game server, spreadsheet model), high-risk domains (clinic scheduling, payments ledger, auth service, training pipeline), legacy work (monolith split, COBOL adapter, WordPress plugin, jQuery→React), agent/LLM work (RAG assistant, MCP database server, orchestrator, prompt-regression suite), delivery pressure (hackathon, conference deck, outage hotfix, release day), and adversarial input (vague request, 3000-line refactor, pasted secret, confidential file). Each scenario checks routing, guardrail reachability, unloading of unrelated skills, phase boundaries, determinism, and stability under 96 surface-noise variants; average routed context is ~26% of loading every skill
+- **`embedded` task type** in `routing.json` — firmware, microcontrollers, MQTT/IoT and OTA get device constraints, OTA practice, connectivity retries, health endpoints, and observability instead of being spread across `infra`
+
+### Fixed
+- **Generic verbs no longer outrank domain nouns.** "Implement an auth service" routed to `feature` because "implement" is longer than "auth"; `weakTriggers` in `routing.json` now marks add/build/implement/feature/support-for as weak so a domain noun wins
+- **Trigger matching is whole-word.** Substring matching sent "build" to the `ui` type (b**ui**ld); triggers now match on word boundaries
+- **The active-skill budget counts task skills only** — the always-loaded core and the routing skill itself no longer consume the 7-slot budget, which previously made several task types look over-budget
+- **Coverage gaps found by the benchmark**: `ui` now loads security for permission-scoped surfaces, `data` loads config validation and property testing, `infra` swaps build docs for benchmark methodology, `feature` swaps testing (supplied at verify) for UI quality, `security` swaps the niche MCP skill for password hashing, `ai` swaps SBOM for agent failure modes
+- **Skill drift**: Section 50 was missing the three honesty rules that only existed inline in the entry point (no superlatives without evidence, name the model, say "unknown")
+- **Skill 13** gained least-privilege, output-encoding, no-dynamic-code, and SSRF guidance; **skill 54** gained least-privilege credentials for database-exposing MCP servers
+- `tests/routing-benchmark.json` regenerated against the updated map and extended to the `embedded` type
+
 ## [2.2.0] - 2026-08-21
 
 ### Added
