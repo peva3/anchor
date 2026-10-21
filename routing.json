@@ -14,24 +14,41 @@
     "skill": 64
   },
   "budget": {
-    "$comment": "Cap on task-scoped skills (beyond the always-loaded core in AGENTS.md). Core is always 3 sections; a task may add at most this many.",
+    "$comment": "Cap on task-scoped skills (beyond the always-loaded core in AGENTS.md). Core is always 3 sections; a task may add at most this many. Phase entries may add and drop: a skill dropped at a boundary is no longer loaded and must be re-loaded if needed again.",
     "maxActiveSkills": 7
   },
   "phases": {
-    "plan": [
-      50
-    ],
-    "build": [],
-    "verify": [
-      8,
-      23,
-      40
-    ],
-    "commit": [
-      15,
-      33,
-      35
-    ]
+    "plan": {
+      "add": [
+        50,
+        28
+      ],
+      "drop": []
+    },
+    "build": {
+      "add": [],
+      "drop": [
+        28
+      ]
+    },
+    "verify": {
+      "add": [
+        8,
+        9,
+        23,
+        37,
+        40
+      ],
+      "drop": []
+    },
+    "commit": {
+      "add": [
+        15,
+        33,
+        35
+      ],
+      "drop": []
+    }
   },
   "taskTypes": [
     {
@@ -53,8 +70,8 @@
         24,
         25,
         27,
-        40,
-        14
+        14,
+        3
       ]
     },
     {
@@ -76,9 +93,9 @@
         12,
         17,
         24,
-        27,
         62,
-        63
+        63,
+        5
       ]
     },
     {
@@ -108,8 +125,8 @@
         23,
         27,
         33,
-        40,
-        17
+        17,
+        18
       ]
     },
     {
@@ -425,12 +442,12 @@
         53
       ],
       "skills": [
-        31,
         54,
         55,
         56,
         57,
-        24
+        24,
+        21
       ]
     },
     {
@@ -491,6 +508,32 @@
         27,
         33,
         62
+      ]
+    },
+    {
+      "$comment": "Work on the ruleset itself: editing skills, routing, or guardrails (this repo in miniature).",
+      "type": "meta",
+      "triggers": [
+        "agents.md",
+        "skill file",
+        "skill files",
+        "routing map",
+        "rule set",
+        "ruleset",
+        "instruction architecture",
+        "guardrail",
+        "convention",
+        "wiki"
+      ],
+      "always": [
+        51
+      ],
+      "skills": [
+        22,
+        24,
+        26,
+        50,
+        52
       ]
     }
   ],

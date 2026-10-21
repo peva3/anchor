@@ -24,6 +24,8 @@ Routing is deterministic: the same request maps to the same skills. Do not inven
 
 ### 64.2 Re-check at Phase Boundaries
 
+`routing.json` gives each phase an `add` and a `drop` list. Additions bring in what the boundary needs (testing and gates at verify, PR and commit rules at commit); drops remove what the boundary no longer needs — a planning-only skill such as the tech-stack playbook has no business occupying context while you are writing code. A dropped skill is genuinely unloaded: if a later step needs it again, load it again.
+
 Re-evaluate the active set at every boundary:
 
 | Boundary | Re-check question |

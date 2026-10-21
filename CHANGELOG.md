@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Reachability testing** — the benchmark now has a `--trace` mode that prints, per project, the matched trigger signals, the chosen route, and the exact add/drop at every phase boundary with token cost, plus the provenance of each guardrail (inline core, a named skill, or `UNREACHABLE`). `--matrix` prints which routes can load each section. Both are local; the harness and its report are gitignored
+- **Phase drops** — `routing.json` phases now carry `add` **and** `drop`, so skills genuinely unload at boundaries (the tech-stack playbook leaves once planning is done) instead of accumulating for the whole task. Section 64 documents the semantics
+- **`meta` task type** — work on the ruleset itself (editing skills, extending routing) now has a route, so instruction-architecture and enforcement guidance is reachable
+- **Reachability is an enforced invariant** — `scripts/check_structure.py` fails if any section cannot be loaded by any route
+
+### Fixed
+- **Dead guidance eliminated.** The matrix found 11 of 66 sections that no route could ever load — shell rules, linting, pre-commit hooks, performance, project structure, agent instruction guidance, multi-agent patterns, getting help, tech-stack defaults, instruction architecture, and rule enforcement. Lint, type checking, and pre-commit moved into the verify phase; tech-stack choice into plan; the rest were re-homed or given the `meta` type. All 66 are now reachable
+
+### Added
 - **Expanded the routing benchmark to 80 scenarios across 19 batches** — the extra rounds cover bug triage, review work, ambiguity (`add SSO` vs `add login audit`), malformed input (typos, another language, injected instructions, missing files), scope pressure (`build everything`, `skip the tests`), and the operations long tail (cron jobs, webhooks, feature flags, engine migration, cluster upgrades). Batch 19 is a regression probe aimed at the triggers widened by earlier rounds and required no fixes, which is the convergence signal
 - **`cli` task type** in `routing.json` — command-line tools get argument/exit-code, packaging, and man-page guidance instead of borrowing `feature`
 - **Section 24.11 (diagnose before patching)** — the ruleset never previously said to find a root cause or to revert before forward-fixing a post-deploy regression
