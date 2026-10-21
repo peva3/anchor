@@ -27,3 +27,10 @@
 
 ---
 
+### Image Size and Build Hygiene
+
+- **Use a multi-stage build**: compile or install in a builder stage, copy only the artifacts into a slim runtime stage. A single-stage image ships compilers, caches, and source it does not need.
+- **Pin the base image and prefer slim/distroless variants** (`python:3.12-slim`, `gcr.io/distroless/...`) rather than `latest`.
+- **Add a `.dockerignore`** covering `.git`, virtualenvs, caches, test data, and secrets — otherwise they land in the build context and can end up in a layer.
+- **Measure before claiming a size win**: record the image size before and after (`docker images`) and report both, per [Section 50.6](skills/50-intentional-minimalism-the-simplicity-first-architecture.md).
+- **Keep layers cacheable**: copy dependency manifests and install before copying source, so code changes do not invalidate the dependency layer.

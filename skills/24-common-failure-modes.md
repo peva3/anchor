@@ -125,3 +125,8 @@ Based on AgentBench (arXiv:2308.03688) findings on LLM agent failures.
 
 ---
 
+### 24.11 Diagnose Before Patching
+
+- **Find the root cause before changing code.** A patch that makes a symptom disappear without naming the cause is a guess, and guesses regress. State the cause, then the fix.
+- **For a regression after a deploy, revert first and diagnose second.** Restoring service beats understanding the bug — a revert is a known-good state, while a forward fix under pressure is an experiment on production. Revert, confirm recovery, then investigate with the pressure off ([Section 59](skills/59-incident-response-and-runbooks.md)).
+- **Reproduce it, or say you could not.** A fix you cannot demonstrate failing before and passing after is unverified ([Section 23](skills/23-verification-gates.md)).

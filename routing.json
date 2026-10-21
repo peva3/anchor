@@ -54,7 +54,7 @@
         25,
         27,
         40,
-        45
+        14
       ]
     },
     {
@@ -73,10 +73,10 @@
         35
       ],
       "skills": [
-        5,
         12,
+        17,
+        24,
         27,
-        40,
         62,
         63
       ]
@@ -94,7 +94,11 @@
         "migrate",
         "migration of",
         "behavior-preserving",
-        "without changing behavior"
+        "without changing behavior",
+        "upgrade",
+        "migrate to",
+        "dependency bump",
+        "major version bump"
       ],
       "always": [
         50
@@ -104,7 +108,8 @@
         23,
         27,
         33,
-        40
+        40,
+        17
       ]
     },
     {
@@ -119,27 +124,37 @@
         "mutation",
         "benchmark",
         "test suite",
-        "regression suite"
+        "regression suite",
+        "chaos",
+        "game day",
+        "fault injection",
+        "game day exercise"
       ],
       "always": [],
       "skills": [
-        27,
         45,
         46,
         47,
         48,
         60,
-        61
+        61,
+        49
       ]
     },
     {
       "type": "review",
       "triggers": [
-        "review",
         "pull request",
         "pr",
         "audit",
-        "code quality check"
+        "code quality check",
+        "code review",
+        "review this",
+        "review my",
+        "review the",
+        "please review",
+        "peer review",
+        "review a pull request"
       ],
       "always": [
         33,
@@ -181,7 +196,16 @@
         "tag",
         "publish",
         "bump",
-        "cut a release"
+        "cut a release",
+        "breaking change",
+        "deprecation",
+        "deprecate",
+        "deprecated",
+        "feature flag",
+        "feature flags",
+        "rollout",
+        "gradual rollout",
+        "revert the last release"
       ],
       "always": [
         39
@@ -190,7 +214,9 @@
         16,
         19,
         38,
-        58
+        58,
+        24,
+        59
       ]
     },
     {
@@ -202,7 +228,12 @@
         "sev",
         "rollback",
         "production is broken",
-        "on-call"
+        "on-call",
+        "cost",
+        "bill",
+        "spend",
+        "cost spike",
+        "cloud bill"
       ],
       "always": [
         59
@@ -229,7 +260,19 @@
         "landing",
         "extension",
         "browser extension",
-        "popup"
+        "popup",
+        "mobile",
+        "ios",
+        "android",
+        "react native",
+        "app store",
+        "mobile app",
+        "internationalization",
+        "i18n",
+        "localization",
+        "translation",
+        "locale",
+        "rtl"
       ],
       "always": [
         63
@@ -239,7 +282,8 @@
         33,
         34,
         35,
-        13
+        13,
+        53
       ]
     },
     {
@@ -255,7 +299,11 @@
         "spreadsheet",
         "financial model",
         "scenario",
-        "training pipeline"
+        "training pipeline",
+        "database",
+        "postgres",
+        "mysql",
+        "postgresql"
       ],
       "always": [
         53
@@ -304,18 +352,23 @@
         "infrastructure",
         "game server",
         "netcode",
-        "tick loop"
+        "tick loop",
+        "observability",
+        "metrics",
+        "dashboard",
+        "tracing",
+        "slo"
       ],
       "always": [
         32
       ],
       "skills": [
-        7,
         30,
         38,
         41,
         42,
-        47
+        47,
+        7
       ]
     },
     {
@@ -328,7 +381,19 @@
         "prompt injection",
         "supply chain",
         "cve",
-        "permissions"
+        "permissions",
+        "credential",
+        "credentials",
+        "leak",
+        "scrub",
+        "rotate",
+        "rotated",
+        "rotation",
+        "revoke",
+        "sso",
+        "login",
+        "privileged",
+        "single sign-on"
       ],
       "always": [
         36
@@ -403,6 +468,29 @@
         6,
         36,
         63
+      ]
+    },
+    {
+      "$comment": "Command-line tools (Section 53.4): arguments, exit codes, streams, packaging, man pages.",
+      "type": "cli",
+      "triggers": [
+        "cli",
+        "command line",
+        "command-line",
+        "man page",
+        "shell tool",
+        "tui",
+        "terminal tool"
+      ],
+      "always": [
+        53
+      ],
+      "skills": [
+        8,
+        16,
+        27,
+        33,
+        62
       ]
     }
   ],

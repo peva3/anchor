@@ -8,10 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Expanded the routing benchmark to 80 scenarios across 19 batches** — the extra rounds cover bug triage, review work, ambiguity (`add SSO` vs `add login audit`), malformed input (typos, another language, injected instructions, missing files), scope pressure (`build everything`, `skip the tests`), and the operations long tail (cron jobs, webhooks, feature flags, engine migration, cluster upgrades). Batch 19 is a regression probe aimed at the triggers widened by earlier rounds and required no fixes, which is the convergence signal
+- **`cli` task type** in `routing.json` — command-line tools get argument/exit-code, packaging, and man-page guidance instead of borrowing `feature`
+- **Section 24.11 (diagnose before patching)** — the ruleset never previously said to find a root cause or to revert before forward-fixing a post-deploy regression
+- **Section 7 image hygiene** — multi-stage builds, slim/base pinning, `.dockerignore`, cacheable layers, and measuring size before claiming a win
+- **English-only is now in the entry point** — it is a global policy, and leaving it only in a lazily-loaded skill made it unreachable whenever that skill was not routed
 - **Routing edge-case benchmark** (local, `tests/bench_projects.py`): 24 project scenarios across six batches — unusual shapes (browser extension, MQTT gateway, game server, spreadsheet model), high-risk domains (clinic scheduling, payments ledger, auth service, training pipeline), legacy work (monolith split, COBOL adapter, WordPress plugin, jQuery→React), agent/LLM work (RAG assistant, MCP database server, orchestrator, prompt-regression suite), delivery pressure (hackathon, conference deck, outage hotfix, release day), and adversarial input (vague request, 3000-line refactor, pasted secret, confidential file). Each scenario checks routing, guardrail reachability, unloading of unrelated skills, phase boundaries, determinism, and stability under 96 surface-noise variants; average routed context is ~26% of loading every skill
 - **`embedded` task type** in `routing.json` — firmware, microcontrollers, MQTT/IoT and OTA get device constraints, OTA practice, connectivity retries, health endpoints, and observability instead of being spread across `infra`
 
 ### Fixed
+- **"without review" no longer routes to `review`** — bare `review` matched negations; the trigger now requires a deliberate review phrase
+- **`feature` was blind to hallucinated packages** — it now loads dependency management and failure modes (coverage arrives at the verify phase)
+- **Chaos experiments route to `test`, Dockerfile work stays in `infra`** — the two needs were competing for the same budget slots
+- **Release work loads incident basics** for rollback and revert-after-bad-release
 - **Generic verbs no longer outrank domain nouns.** "Implement an auth service" routed to `feature` because "implement" is longer than "auth"; `weakTriggers` in `routing.json` now marks add/build/implement/feature/support-for as weak so a domain noun wins
 - **Trigger matching is whole-word.** Substring matching sent "build" to the `ui` type (b**ui**ld); triggers now match on word boundaries
 - **The active-skill budget counts task skills only** — the always-loaded core and the routing skill itself no longer consume the 7-slot budget, which previously made several task types look over-budget

@@ -16,7 +16,8 @@
 4. **Re-check at boundaries:** At plan → build → verify → commit, and whenever the task changes direction, drop what no longer applies and emit one line: `ROUTE: active=[..] dropped=[..] added=[..] why="..."`.
 5. **Follow cross-references:** When a loaded skill references another section, that section is NOT included — load `skills/NN-name.md` for it too before proceeding. Every reference is a real link.
 6. **Verification:** When in doubt about a rule's full wording, read the skill file — never guess.
-7. **Template usage:** Projects should copy this file, keep the core rules, then trim the skill list to what applies and inline the needed skills into their own AGENTS.md (target ≤2,000 lines, per Section 51.3). Project-specific facts belong in a `PROJECT.md` you create per project — not in this file.
+7. **Write in English:** all code, comments, docs, commit messages, and PR text in English regardless of the language you were addressed in — a request in another language is still answered in English ([Section 4](skills/04-code-style.md)). If the user writes in another language, say so once and continue in English.
+8. **Template usage:** Projects should copy this file, keep the core rules, then trim the skill list to what applies and inline the needed skills into their own AGENTS.md (target ≤2,000 lines, per Section 51.3). Project-specific facts belong in a `PROJECT.md` you create per project — not in this file.
 
 ---
 
