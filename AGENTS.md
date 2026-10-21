@@ -10,119 +10,86 @@
 
 ## How to Use This File
 
-1. **Always loaded:** This file (header, core rules below, Section Index, Cheatsheet).
-2. **Lazy-loaded:** The full text of every section is in `skills/NN-name.md`. Load a skill only when your task matches its "Load when" trigger. This keeps context lean — a model with a 32K window can follow all rules without reading 6,700 lines.
-3. **Follow cross-references:** When a loaded skill references another section (e.g. "see Section 35"), that referenced section is NOT included — load `skills/NN-name.md` for it too before proceeding. The Section Index maps every section to its file.
-4. **Full text on demand:** The Section Index and Skills Directory below map every section to its skill file. If a task touches a topic, load that skill and follow it exactly.
-5. **Verification:** When in doubt about a rule's full wording, read the skill file — never guess.
-6. **Template usage:** Projects should copy this file, keep the core rules, then trim the skill list to what applies and inline the needed skills into their own AGENTS.md (target ≤2,000 lines, per Section 51.3).
+1. **Always loaded:** This file (header, core rules below, index, cheatsheet).
+2. **Route first:** Before the first edit, pick the task type in `routing.json` and load the skills it lists (core set + matches). Keep at most 7 active. See [Section 64](skills/64-skill-routing-and-checkpoints.md).
+3. **Lazy-loaded:** The full text of every section is in `skills/NN-name.md`. Load a skill only when your task matches its "Load when" trigger. This keeps context lean — a model with a 32K window can follow all rules without reading 6,700 lines.
+4. **Re-check at boundaries:** At plan → build → verify → commit, and whenever the task changes direction, drop what no longer applies and emit one line: `ROUTE: active=[..] dropped=[..] added=[..] why="..."`.
+5. **Follow cross-references:** When a loaded skill references another section, that section is NOT included — load `skills/NN-name.md` for it too before proceeding. Every reference is a real link.
+6. **Verification:** When in doubt about a rule's full wording, read the skill file — never guess.
+7. **Template usage:** Projects should copy this file, keep the core rules, then trim the skill list to what applies and inline the needed skills into their own AGENTS.md (target ≤2,000 lines, per Section 51.3). Project-specific facts belong in a `PROJECT.md` you create per project — not in this file.
 
 ---
 
-## Section Index (Glossary)
+## Section Index — Every Section, Its Trigger, and Its File
 
-| # | Section | Summary | Full Text |
-|---|---------|---------|-----------|
-| 1 | Core Principles | 8 non-negotiable principles: no dead code, no stubs, no silent failures, test-first, proven integration | [skills/01-core-principles.md](skills/01-core-principles.md) |
-| 2 | Commit Protocol | Commit/push workflow, Never Go Rogue, Never Spend Money, user identity | [skills/02-commit-protocol.md](skills/02-commit-protocol.md) |
-| 3 | Shell Execution Rules | Shell command discipline: quoting, cwd, no pipelines | [skills/03-shell-execution-rules.md](skills/03-shell-execution-rules.md) |
-| 4 | Code Style | Python/TypeScript style, English-only, import order | [skills/04-code-style.md](skills/04-code-style.md) |
-| 5 | Project Structure Conventions | Standard folder layout (src, tests, docs, research) | [skills/05-project-structure-conventions.md](skills/05-project-structure-conventions.md) |
-| 6 | TODO.md — Task Tracking Standard | Task tracking legend, current sprint, completed sprints | [skills/06-todo-md-task-tracking-standard.md](skills/06-todo-md-task-tracking-standard.md) |
-| 7 | Docker / Deployment | Containerized app, build/deploy commands | [skills/07-docker-deployment.md](skills/07-docker-deployment.md) |
-| 8 | Testing Requirements | Test commands, run full suite before completion | [skills/08-testing-requirements.md](skills/08-testing-requirements.md) |
-| 9 | Linting & Type Checking | ruff/mypy/vulture sweep, pre-commit | [skills/09-linting-type-checking.md](skills/09-linting-type-checking.md) |
-| 10 | Error Handling Patterns | No silent failures, specific exceptions, log before swallowing | [skills/10-error-handling-patterns.md](skills/10-error-handling-patterns.md) |
-| 11 | Configuration Management | Settings, env vars, config handling | [skills/11-configuration-management.md](skills/11-configuration-management.md) |
-| 12 | API Design | REST conventions, public/admin split | [skills/12-api-design.md](skills/12-api-design.md) |
-| 13 | Security Best Practices | Injection, auth, secrets, parameterized queries | [skills/13-security-best-practices.md](skills/13-security-best-practices.md) |
-| 14 | Logging Standards | Structured logging, levels, PII | [skills/14-logging-standards.md](skills/14-logging-standards.md) |
-| 15 | Git Workflow | Branching, commit messages, merge strategy, WHY format | [skills/15-git-workflow.md](skills/15-git-workflow.md) |
-| 16 | Documentation Requirements | README, DEEPDIVE.md, docs discipline | [skills/16-documentation-requirements.md](skills/16-documentation-requirements.md) |
-| 17 | Dependency Management | Add only when needed, check existing deps first | [skills/17-dependency-management.md](skills/17-dependency-management.md) |
-| 18 | Performance Considerations | Optimize only with measurements | [skills/18-performance-considerations.md](skills/18-performance-considerations.md) |
-| 19 | Build & Deployment | Build steps, CI, deploy | [skills/19-build-deployment.md](skills/19-build-deployment.md) |
-| 20 | External Integrations | Third-party APIs, resilience, timeouts | [skills/20-external-integrations.md](skills/20-external-integrations.md) |
-| 21 | AI Agent Instruction Guidance | 7 patterns: critical findings, role boundaries, error recovery | [skills/21-ai-agent-instruction-guidance.md](skills/21-ai-agent-instruction-guidance.md) |
-| 22 | Multi-Agent Cooperation Patterns | Role templates, sequential handoff, hierarchy, termination | [skills/22-multi-agent-cooperation-patterns.md](skills/22-multi-agent-cooperation-patterns.md) |
-| 23 | Verification Gates | Format/action/context/termination validation | [skills/23-verification-gates.md](skills/23-verification-gates.md) |
-| 24 | Common Failure Modes | Invalid format, hallucination, task/context limit | [skills/24-common-failure-modes.md](skills/24-common-failure-modes.md) |
-| 25 | Common Gotchas | Python version, shell, env vars, git mistakes | [skills/25-common-gotchas.md](skills/25-common-gotchas.md) |
-| 26 | Getting Help | Self-service first, framework resources, escalation | [skills/26-getting-help.md](skills/26-getting-help.md) |
-| 27 | Code Quality Standards | Python idioms, anti-patterns, security, performance, docs, testing | [skills/27-code-quality-standards.md](skills/27-code-quality-standards.md) |
-| 28 | Default Tech Stack Playbook | Per-project-type stack choices and anti-recommendations | [skills/28-default-tech-stack-playbook.md](skills/28-default-tech-stack-playbook.md) |
-| 29 | Operational Patterns | Circuit breaker, DLQ, middleware, semantic cache | [skills/29-operational-patterns.md](skills/29-operational-patterns.md) |
-| 30 | Health Endpoint Specification | /health design, probe configuration | [skills/30-health-endpoint-specification.md](skills/30-health-endpoint-specification.md) |
-| 31 | Production Security Patterns | Prompt injection, audit logging, IP whitelist | [skills/31-production-security-patterns.md](skills/31-production-security-patterns.md) |
-| 32 | Docker Support | Dockerfile best practices, compose, K8s deployment | [skills/32-docker-support.md](skills/32-docker-support.md) |
-| 33 | PR & Change Size Standards | 800-line limit, single feature rule | [skills/33-pr-change-size-standards.md](skills/33-pr-change-size-standards.md) |
-| 34 | AI Code Quality — Anti-Pattern Detection | Spot LLM laziness, confusion, bloat | [skills/34-ai-code-quality-anti-pattern-detection.md](skills/34-ai-code-quality-anti-pattern-detection.md) |
-| 35 | PR Description Format & Template | Template with agent disclosure + self-check | [skills/35-pr-description-format-template.md](skills/35-pr-description-format-template.md) |
-| 36 | Explicit Prohibitions — The "NEVER" List | Bright lines: code, git, GitHub, financial, identity, testing | [skills/36-explicit-prohibitions-the-never-list.md](skills/36-explicit-prohibitions-the-never-list.md) |
-| 37 | Pre-Commit Hook Standards | pre-commit framework setup, enforcement | [skills/37-pre-commit-hook-standards.md](skills/37-pre-commit-hook-standards.md) |
-| 38 | CI/CD Pipeline Standards | CI, release, deploy pipelines, SHA pinning | [skills/38-ci-cd-pipeline-standards.md](skills/38-ci-cd-pipeline-standards.md) |
-| 39 | Semantic Versioning & Changelog | SemVer rules, Keep a Changelog format | [skills/39-semantic-versioning-changelog.md](skills/39-semantic-versioning-changelog.md) |
-| 40 | Code Coverage Enforcement | Thresholds, branch coverage, exclusion | [skills/40-code-coverage-enforcement.md](skills/40-code-coverage-enforcement.md) |
-| 41 | Observability Standards | Structured logging, tracing, metrics, SLOs | [skills/41-observability-standards.md](skills/41-observability-standards.md) |
-| 42 | Infrastructure as Code | Terraform/OpenTofu structure, state, environments | [skills/42-infrastructure-as-code.md](skills/42-infrastructure-as-code.md) |
-| 43 | Database Backup & Recovery | Schedules, restore procedures, verification | [skills/43-database-backup-recovery.md](skills/43-database-backup-recovery.md) |
-| 44 | Secrets Management | Tiered strategy, SOPS+Age, rotation | [skills/44-secrets-management.md](skills/44-secrets-management.md) |
-| 45 | Flaky Test Management | Quarantine, four sources, remediation | [skills/45-flaky-test-management.md](skills/45-flaky-test-management.md) |
-| 46 | Mutation Testing | mutmut setup, mutation score interpretation | [skills/46-mutation-testing.md](skills/46-mutation-testing.md) |
-| 47 | Performance Benchmark Testing | pytest-benchmark, time budgets | [skills/47-performance-benchmark-testing.md](skills/47-performance-benchmark-testing.md) |
-| 48 | Contract Testing (Pact) | Consumer-driven contracts, CI integration | [skills/48-contract-testing-pact.md](skills/48-contract-testing-pact.md) |
-| 49 | Chaos Engineering | Netflix principles, experiment design | [skills/49-chaos-engineering.md](skills/49-chaos-engineering.md) |
-| 50 | Intentional Minimalism | Decision ladder, tradeoff comments, honesty boundaries | [skills/50-intentional-minimalism-the-simplicity-first-architecture.md](skills/50-intentional-minimalism-the-simplicity-first-architecture.md) |
-| 51 | Instruction Architecture | Lazy loading, context budgets, provenance | [skills/51-instruction-architecture-context-economy-self-improvement.md](skills/51-instruction-architecture-context-economy-self-improvement.md) |
-| 52 | Rule Enforcement Architecture | Prose→hooks, evidence-first, CI gates | [skills/52-rule-enforcement-architecture-from-advisory-to-deterministic.md](skills/52-rule-enforcement-architecture-from-advisory-to-deterministic.md) |
-| 53 | Project Type Patterns | Mobile, embedded, data pipelines, CLI, static sites, AI/agentic apps | [skills/53-project-type-patterns.md](skills/53-project-type-patterns.md) |
-| 54 | MCP Usage & Guardrails | Vetting MCP servers, mcp__* permission scoping, tool output as untrusted | [skills/54-mcp-usage-and-guardrails.md](skills/54-mcp-usage-and-guardrails.md) |
-| 55 | Prompt-Injection Defenses for Agents | Trust boundary, instruction hierarchy, input/output guardrails | [skills/55-prompt-injection-defenses-for-agents.md](skills/55-prompt-injection-defenses-for-agents.md) |
-| 56 | Agent Memory & State Management | What survives compaction, MEMORY.md discipline, subagent isolation | [skills/56-agent-memory-and-state-management.md](skills/56-agent-memory-and-state-management.md) |
-| 57 | Tool-Call Permission & Safety Rules | Deny-first precedence, PreToolUse hooks, sandboxing | [skills/57-tool-call-permission-and-safety-rules.md](skills/57-tool-call-permission-and-safety-rules.md) |
-| 58 | Supply-Chain Security & SBOM | Dependency verification, scanning, SBOM, signing, SLSA provenance | [skills/58-supply-chain-security-and-sbom.md](skills/58-supply-chain-security-and-sbom.md) |
-| 59 | Incident Response & Runbooks | Severity taxonomy, runbook-first rollback, blameless postmortems | [skills/59-incident-response-and-runbooks.md](skills/59-incident-response-and-runbooks.md) |
-| 60 | Property-Based Testing | Hypothesis, shrinking, seeds, CI integration | [skills/60-property-based-testing.md](skills/60-property-based-testing.md) |
-| 61 | Snapshot / Golden-File Testing | syrupy, matchers, never blind snapshot updates | [skills/61-snapshot-golden-file-testing.md](skills/61-snapshot-golden-file-testing.md) |
-| 62 | Retries, Backoff & Idempotency | Timeout budgets, exponential backoff+jitter, idempotency keys | [skills/62-retries-backoff-and-idempotency.md](skills/62-retries-backoff-and-idempotency.md) |
-| 63 | UI Quality & Anti-Slop Guardrails | No fabricated content, no dead controls, empty/loading/error states, WCAG AA accessibility, liveliness dials | [skills/63-ui-quality-and-anti-slop-guardrails.md](skills/63-ui-quality-and-anti-slop-guardrails.md) |
+Glossary and routing table in one. Load a file when its trigger matches your task; Sections 1, 2, and 36 are already inline below. The machine-readable map is `routing.json`.
 
----
-
-## Quick-Navigation Cheatsheet
-
-**Agent — how to find what you need without reading the entire document:**
-
-| I need to... | Load |
-|-------------|------|
-| Commit code | [skills/02-commit-protocol.md](skills/02-commit-protocol.md), [skills/15-git-workflow.md](skills/15-git-workflow.md) |
-| Create a PR | [skills/33-pr-change-size-standards.md](skills/33-pr-change-size-standards.md), [skills/35-pr-description-format-template.md](skills/35-pr-description-format-template.md), [skills/34-ai-code-quality-anti-pattern-detection.md](skills/34-ai-code-quality-anti-pattern-detection.md) |
-| Review a PR | [skills/33-pr-change-size-standards.md](skills/33-pr-change-size-standards.md), [skills/50-intentional-minimalism-the-simplicity-first-architecture.md](skills/50-intentional-minimalism-the-simplicity-first-architecture.md), [skills/36-explicit-prohibitions-the-never-list.md](skills/36-explicit-prohibitions-the-never-list.md) |
-| Write tests | [skills/08-testing-requirements.md](skills/08-testing-requirements.md), [skills/40-code-coverage-enforcement.md](skills/40-code-coverage-enforcement.md), [skills/45-flaky-test-management.md](skills/45-flaky-test-management.md) |
-| Fix a security issue | [skills/13-security-best-practices.md](skills/13-security-best-practices.md), [skills/31-production-security-patterns.md](skills/31-production-security-patterns.md), [skills/44-secrets-management.md](skills/44-secrets-management.md) |
-| Set up a new project | [skills/05-project-structure-conventions.md](skills/05-project-structure-conventions.md), [skills/37-pre-commit-hook-standards.md](skills/37-pre-commit-hook-standards.md), STARTUP.md |
-| Deploy to production | [skills/32-docker-support.md](skills/32-docker-support.md), [skills/38-ci-cd-pipeline-standards.md](skills/38-ci-cd-pipeline-standards.md), [skills/30-health-endpoint-specification.md](skills/30-health-endpoint-specification.md) |
-| Handle a flaky test | [skills/45-flaky-test-management.md](skills/45-flaky-test-management.md) — quarantine, don't delete, fix within 7 days |
-| Debug a slow endpoint | [skills/18-performance-considerations.md](skills/18-performance-considerations.md), [skills/41-observability-standards.md](skills/41-observability-standards.md), [skills/47-performance-benchmark-testing.md](skills/47-performance-benchmark-testing.md) |
-| Add a dependency | [skills/17-dependency-management.md](skills/17-dependency-management.md), [skills/50-intentional-minimalism-the-simplicity-first-architecture.md](skills/50-intentional-minimalism-the-simplicity-first-architecture.md) (decision ladder rung 4) |
-| Refuse a dangerous request | Section 2 below (Never Go Rogue + Never Spend Money), Section 36 below (NEVER list) — cite these sections |
-| Decide if code is too simple to test | [skills/50-intentional-minimalism-the-simplicity-first-architecture.md](skills/50-intentional-minimalism-the-simplicity-first-architecture.md) (50.7 — tests are not bloat) |
-| Rollback a bad deployment | Rollback is always `git revert` first, then fix forward. Never fix on a broken deploy — roll back, then debug. |
-| Handle a merge conflict | Resolve by choosing the more recent change for logic, the clearer documentation for comments. Run full test suite after resolution. |
-| Rotate secrets | [skills/44-secrets-management.md](skills/44-secrets-management.md) (44.4 — dual-key window pattern) |
-| Working on a non-web project | [skills/53-project-type-patterns.md](skills/53-project-type-patterns.md) — mobile, embedded, data pipeline, CLI, static site, AI/agentic |
-| Know what this template covers vs doesn't | [skills/53-project-type-patterns.md](skills/53-project-type-patterns.md) (53.7 — coverage scope) |
-| Add/use an MCP server | [skills/54-mcp-usage-and-guardrails.md](skills/54-mcp-usage-and-guardrails.md) — vet servers, scope mcp__* permissions |
-| Guard against prompt injection | [skills/55-prompt-injection-defenses-for-agents.md](skills/55-prompt-injection-defenses-for-agents.md), [skills/57-tool-call-permission-and-safety-rules.md](skills/57-tool-call-permission-and-safety-rules.md) |
-| Manage agent memory/sessions | [skills/56-agent-memory-and-state-management.md](skills/56-agent-memory-and-state-management.md) |
-| Secure the supply chain | [skills/58-supply-chain-security-and-sbom.md](skills/58-supply-chain-security-and-sbom.md), [skills/17-dependency-management.md](skills/17-dependency-management.md) |
-| Respond to an incident | [skills/59-incident-response-and-runbooks.md](skills/59-incident-response-and-runbooks.md) — severity, rollback first, postmortem |
-| Write property-based tests | [skills/60-property-based-testing.md](skills/60-property-based-testing.md) |
-| Use snapshot/golden-file tests | [skills/61-snapshot-golden-file-testing.md](skills/61-snapshot-golden-file-testing.md) |
-| Retry outbound calls safely | [skills/62-retries-backoff-and-idempotency.md](skills/62-retries-backoff-and-idempotency.md), [skills/20-external-integrations.md](skills/20-external-integrations.md) |
-| Build a UI / frontend | [skills/63-ui-quality-and-anti-slop-guardrails.md](skills/63-ui-quality-and-anti-slop-guardrails.md) — no fabricated content, dead controls, or missing states |
-
----
+- **1 Core Principles** — Always — every task — [open](skills/01-core-principles.md)
+- **2 Commit Protocol** — Always — every commit/push — [open](skills/02-commit-protocol.md)
+- **3 Shell Execution Rules** — Running shell commands — [open](skills/03-shell-execution-rules.md)
+- **4 Code Style** — Writing or editing code — [open](skills/04-code-style.md)
+- **5 Project Structure Conventions** — Scaffolding a project — [open](skills/05-project-structure-conventions.md)
+- **6 TODO.md — Task Tracking Standard** — Starting/finishing tasks — [open](skills/06-todo-md-task-tracking-standard.md)
+- **7 Docker / Deployment** — Container work — [open](skills/07-docker-deployment.md)
+- **8 Testing Requirements** — Writing/running tests — [open](skills/08-testing-requirements.md)
+- **9 Linting & Type Checking** — Before commit — [open](skills/09-linting-type-checking.md)
+- **10 Error Handling Patterns** — Writing error paths — [open](skills/10-error-handling-patterns.md)
+- **11 Configuration Management** — Config/env work — [open](skills/11-configuration-management.md)
+- **12 API Design** — Designing endpoints — [open](skills/12-api-design.md)
+- **13 Security Best Practices** — Any security-sensitive code — [open](skills/13-security-best-practices.md)
+- **14 Logging Standards** — Adding logging — [open](skills/14-logging-standards.md)
+- **15 Git Workflow** — Any git operation — [open](skills/15-git-workflow.md)
+- **16 Documentation Requirements** — Writing docs — [open](skills/16-documentation-requirements.md)
+- **17 Dependency Management** — Adding a dependency — [open](skills/17-dependency-management.md)
+- **18 Performance Considerations** — Performance work — [open](skills/18-performance-considerations.md)
+- **19 Build & Deployment** — Building/deploying — [open](skills/19-build-deployment.md)
+- **20 External Integrations** — Third-party APIs — [open](skills/20-external-integrations.md)
+- **21 AI Agent Instruction Guidance** — Writing agent prompts — [open](skills/21-ai-agent-instruction-guidance.md)
+- **22 Multi-Agent Cooperation Patterns** — Multi-agent systems — [open](skills/22-multi-agent-cooperation-patterns.md)
+- **23 Verification Gates** — Verifying completion — [open](skills/23-verification-gates.md)
+- **24 Common Failure Modes** — Diagnosing agent failures — [open](skills/24-common-failure-modes.md)
+- **25 Common Gotchas** — Debugging common issues — [open](skills/25-common-gotchas.md)
+- **26 Getting Help** — Asking for help — [open](skills/26-getting-help.md)
+- **27 Code Quality Standards** — Writing quality code — [open](skills/27-code-quality-standards.md)
+- **28 Default Tech Stack Playbook** — Choosing stack — [open](skills/28-default-tech-stack-playbook.md)
+- **29 Operational Patterns** — Resilience patterns — [open](skills/29-operational-patterns.md)
+- **30 Health Endpoint Specification** — Health checks — [open](skills/30-health-endpoint-specification.md)
+- **31 Production Security Patterns** — Prod security — [open](skills/31-production-security-patterns.md)
+- **32 Docker Support** — Docker/K8s deep dive — [open](skills/32-docker-support.md)
+- **33 PR & Change Size Standards** — Creating PRs — [open](skills/33-pr-change-size-standards.md)
+- **34 AI Code Quality — Anti-Pattern Detection** — Reviewing AI code — [open](skills/34-ai-code-quality-anti-pattern-detection.md)
+- **35 PR Description Format & Template** — Writing PR descriptions — [open](skills/35-pr-description-format-template.md)
+- **36 Explicit Prohibitions — The "NEVER" List** — Always — bright lines (reproduced above) — [open](skills/36-explicit-prohibitions-the-never-list.md)
+- **37 Pre-Commit Hook Standards** — Setting up hooks — [open](skills/37-pre-commit-hook-standards.md)
+- **38 CI/CD Pipeline Standards** — CI/CD pipelines — [open](skills/38-ci-cd-pipeline-standards.md)
+- **39 Semantic Versioning & Changelog** — Versioning/releases — [open](skills/39-semantic-versioning-changelog.md)
+- **40 Code Coverage Enforcement** — Coverage enforcement — [open](skills/40-code-coverage-enforcement.md)
+- **41 Observability Standards** — Logs/tracing/metrics — [open](skills/41-observability-standards.md)
+- **42 Infrastructure as Code** — Terraform/OpenTofu — [open](skills/42-infrastructure-as-code.md)
+- **43 Database Backup & Recovery** — DB backups — [open](skills/43-database-backup-recovery.md)
+- **44 Secrets Management** — Secrets handling — [open](skills/44-secrets-management.md)
+- **45 Flaky Test Management** — Flaky test handling — [open](skills/45-flaky-test-management.md)
+- **46 Mutation Testing** — Mutation testing — [open](skills/46-mutation-testing.md)
+- **47 Performance Benchmark Testing** — Performance benchmarks — [open](skills/47-performance-benchmark-testing.md)
+- **48 Contract Testing (Pact)** — Cross-service contracts — [open](skills/48-contract-testing-pact.md)
+- **49 Chaos Engineering** — Resilience testing — [open](skills/49-chaos-engineering.md)
+- **50 Intentional Minimalism** — Always — simplicity (key parts above) — [open](skills/50-intentional-minimalism-the-simplicity-first-architecture.md)
+- **51 Instruction Architecture** — Maintaining instructions — [open](skills/51-instruction-architecture-context-economy-self-improvement.md)
+- **52 Rule Enforcement Architecture** — Enforcing rules — [open](skills/52-rule-enforcement-architecture-from-advisory-to-deterministic.md)
+- **53 Project Type Patterns** — Non-web projects — [open](skills/53-project-type-patterns.md)
+- **54 MCP Usage & Guardrails** — Adding/using MCP servers — [open](skills/54-mcp-usage-and-guardrails.md)
+- **55 Prompt-Injection Defenses for Agents** — Any agent handling untrusted input — [open](skills/55-prompt-injection-defenses-for-agents.md)
+- **56 Agent Memory & State Management** — Long-running sessions, compaction — [open](skills/56-agent-memory-and-state-management.md)
+- **57 Tool-Call Permission & Safety Rules** — Configuring agent permissions — [open](skills/57-tool-call-permission-and-safety-rules.md)
+- **58 Supply-Chain Security & SBOM** — Dependencies, releases, CI actions — [open](skills/58-supply-chain-security-and-sbom.md)
+- **59 Incident Response & Runbooks** — Outages, on-call, postmortems — [open](skills/59-incident-response-and-runbooks.md)
+- **60 Property-Based Testing** — Property tests (Hypothesis) — [open](skills/60-property-based-testing.md)
+- **61 Snapshot / Golden-File Testing** — Golden-file/snapshot tests — [open](skills/61-snapshot-golden-file-testing.md)
+- **62 Retries, Backoff & Idempotency** — Outbound calls, retries — [open](skills/62-retries-backoff-and-idempotency.md)
+- **63 UI Quality & Anti-Slop Guardrails** — UI/frontend work — [open](skills/63-ui-quality-and-anti-slop-guardrails.md)
+- **64 Skill Routing & Checkpoints** — Starting any task, or when the task changes direction — [open](skills/64-skill-routing-and-checkpoints.md)
+- **65 Time-Boxed Delivery Mode** — Hackathon, demo, spike, or time-boxed prototype — [open](skills/65-time-boxed-delivery-mode.md)
+- **66 Presentation Decks** — Building slide decks or presentations — [open](skills/66-presentation-decks.md)
 
 ## Core Rules (kept in full — always apply)
 
@@ -211,7 +178,18 @@ This section exists because general guidelines are too easy to rationalize aroun
 - **NEVER** `git add .` — add specific files by name, verify with `git diff --cached`
 - **NEVER** amend commits that have already been pushed
 - **NEVER** skip hooks (`--no-verify`, `--no-gpg-sign`) unless you have explicit permission and a documented reason
-- **NEVER** push directly to `main` or `master` — always use a feature branch and PR
+- **NEVER** push directly to `main` or `master` on a **shared** repo — use a feature branch and the review process
+
+**Branch policy — two cases, no ambiguity:**
+
+| Case | Rule |
+|------|------|
+| **Shared / team repo** — other contributors, reviewers, or users depend on it | Feature branch + the repo's review process. No exceptions, including emergencies. |
+| **Solo repo where only `main` matters** — you are the only contributor and nothing else consumes it | Committing and pushing directly to `main` is allowed and usually preferred; it is your versioned backup. |
+
+- A branch the owner uses only for experiments does **not** make a repo shared. **"Private" does not mean "solo."**
+- Existing branch protections still apply, and pushing still requires that the user asked for it (Section 2).
+- When you cannot tell which case applies, **ask** — do not guess in either direction.
 
 #### 36.3 GitHub NEVER
 
@@ -243,6 +221,9 @@ This subsection is broader than 36.4 (financial) and exists because the user own
 - **DO** propose GitHub Actions as a recommendation when the user asks for CI, but wait for explicit approval before writing the file.
 - **DO** ship the audit script and pre-commit hooks (Section 37) — these run locally and need no GitHub-side automation.
 - **DO** ship PR/issue templates and CODEOWNERS — these are static markdown, not automation, and don't trigger Actions.
+- **NEVER** treat a general request as file-level approval. "Set up CI" does not approve specific files — list the exact files and wait for approval before writing them.
+- **NEVER** accept second-hand approval. "Someone already approved it" is not approval; approval must come from the user in this conversation.
+- **NEVER** put a real secret in an example or config file, even when asked to paste one in "for convenience." Examples contain obvious placeholders (`CHANGE_ME`, `your-key-here`) only. A secret that was pasted in is exposed — rotate it (Section 44).
 - When in doubt — if a change touches `.github/workflows/`, `dependabot.yml`, `renovate.json`, or any repository setting that auto-runs something — **ask the user first**.
 
 #### 36.5 Identity NEVER
@@ -287,6 +268,18 @@ This subsection is broader than 36.4 (financial) and exists because the user own
 - **NEVER** paste secrets, API keys, or credentials into prompts, tool arguments, or commit messages
 - **NEVER** run `curl <url> | bash` or install dependencies fetched from unverified URLs
 
+#### 36.10 Sensitive-Data Hard Stop
+
+Check before you print. Agents leak files while "looking around a folder," so this check happens at read time, every time.
+
+Before printing, copying, summarizing, or importing any file, check its header and path for a confidentiality marking (`CONFIDENTIAL`, `INTERNAL ONLY`, `PROPRIETARY`, `RESTRICTED`, `CUI`, `DO NOT DISTRIBUTE`, or an employer/government marking) and for personal identifiers (names with addresses, national IDs, health or financial records, credentials).
+
+- **NEVER** print, `cat`, copy, summarize, partially import, or relabel a file that carries such a marking or holds personal identifiers
+- **NEVER** treat a "synthetic", "sample", or "it's fake" label as permission — a label does not override a marking; ask the user
+- **NEVER** dump a whole file when you only need a line — read the header first, then the targeted range
+- **DO** stop and escalate: say what you found, and ask who owns the data and what handling it permits
+- When in doubt, stop and ask. A blocked task is recoverable; a leaked file is not
+
 ### 50. Intentional Minimalism — The Simplicity-First Architecture
 
 This section is not about "writing less code." It's about a structured decision protocol that treats complexity as cost and maps simplicity onto concrete actions. Before reaching for a library, a pattern, or even a function, run the ladder.
@@ -330,18 +323,9 @@ Rung 6: Minimum Code That Works
 
 **The ladder is a reflex, not a research project.** Each rung takes seconds to evaluate. If you're spending minutes debating whether stdlib covers the need, drop to the next rung and move on.
 
-#### 50.3 Safety Carve-Outs — What to NEVER Be Lazy About
+#### 50.3 Safety Carve-Outs
 
-The pursuit of simplicity has hard boundaries. These domains are exempt from the ladder — always invest full rigor:
-
-| Domain | Why It's Exempt | Minimum Standard |
-|--------|-----------------|------------------|
-| **Input validation at trust boundaries** | The outside world is hostile. Unvalidated input is the #1 attack vector. | Validate type, range, and format for every external input. Use Pydantic or equivalent. |
-| **Error handling that prevents data loss** | Silent data loss is unrecoverable. Users will not forgive you. | Every write operation must handle failure. Transactions or idempotency keys. |
-| **Security** | Security shortcuts compound. One "temporary" bypass becomes permanent. | Parameterized queries, no eval/exec, encrypted secrets, auth on every endpoint. |
-| **Accessibility** | Excluding users is not an optimization. It's a defect. | Semantic HTML, keyboard navigation, screen reader labels, color contrast. |
-| **Hardware calibration** | The platform is never the spec ideal. A clock drifts. A sensor reads off. A regulator sags under load. Real hardware needs real calibration. | Measure, don't assume. Validate against physical ground truth. Document calibration drift over time. |
-| **Anything explicitly requested** | If the user explicitly asks for something, build it as specified. The ladder optimizes everything ELSE. | Build what was asked for. Name simplifications in a tradeoff comment. Let the user decide. |
+Laziness is never allowed to skip validation, error handling, security, or tests. The full carve-out list is in [Section 50](skills/50-intentional-minimalism-the-simplicity-first-architecture.md) (50.3).
 
 #### 50.6 Honesty Boundaries — What Agents MUST NOT Claim
 
@@ -366,21 +350,17 @@ Prevent agents from making invalid or misleading claims. These are NOT optional.
 - Let the changelog categorize it
 - "Bug fix" implies a confirmed defect; "behavior change" is the honest description when uncertain
 
+**NEVER make superlative claims without evidence** — "faster," "saves X hours," "hardens security," "reduces errors" all require a measurement or a confirmation from the user. No measurement, no claim.
+
+**ALWAYS name what produced a result** — when a model, provider, tool, or benchmark generated something you are reporting, name it (model name and version). An unattributed result cannot be reproduced or audited.
+
+**ALWAYS say "unknown" when the evidence is missing** — an honest gap beats a confident guess. This applies to answers about the codebase, the user's intent, and any expert-adjacent question.
+
 ### 51. Instruction Architecture — Context Economy & Self-Improvement
 
 #### 51.1 Trigger-Based Instruction Loading
 
-Large AGENTS.md files must not flood every context window. Structure specialized knowledge so it only enters context when relevant.
-
-**Rules:**
-- **Core sections respond to all requests** (Sections 1-2, 36, 50, 51) — always loaded inline in this file
-- **Sections 9, 15, 33** are high-frequency but task-scoped — load their skill files on commit/git/PR work (they are not inlined)
-- **Domain-specific sections load on trigger match** — keyword in user message activates them
-- **Without a trigger list, the section is always loaded**
-- **Trigger matching is case-insensitive, word-boundary-aware** — "kubernetes" matches "deploy to kubernetes" but not "kubernetes-health-check" (single word match)
-- **Project-specific sections** (tech stack defaults, deployment patterns) belong in a project's own AGENTS.md, not the universal template — move them there
-
-**This repository implements this via `skills/`:** each section's full text is a skill file. The core (this file) stays lean; skills load on demand.
+Load skills by task trigger, not all at once — see [Section 64](skills/64-skill-routing-and-checkpoints.md) for the routing protocol and [Section 51](skills/51-instruction-architecture-context-economy-self-improvement.md) (51.1) for the rationale.
 
 #### 51.3 Context Budget Awareness
 
@@ -392,7 +372,7 @@ Every instruction loaded into context costs tokens. Large AGENTS.md files can co
 - **Context headroom minimum: 70%** — at least 70% of context window must be available for the task itself
 - **Periodic context snapshot** — if context exceeds 50%, summarize key decisions to external storage before continuing
 
-**Exception — this template (Anchor):** This repository is a universal template library, not a project-specific instruction file. It intentionally exceeds these limits in aggregate, but this entry-point file is kept lean (~450 lines) so constrained-context models can follow the core rules. Individual projects should copy only relevant sections and keep the adapted AGENTS.md within the size budget.
+**Exception — this template (Anchor):** This repository is a universal template library, not a project-specific instruction file. It intentionally exceeds these limits in aggregate, but the entry point is kept as small as the bright lines allow (~410 lines, ~6,000 tokens, measured — not estimated). Sections 1, 2, and 36 stay inline on purpose: a hard stop that only applies when a skill happens to be loaded is not a hard stop. Everything else lives in `skills/`. Individual projects should copy only relevant sections and keep the adapted AGENTS.md within the size budget.
 
 **Size monitoring pattern:**
 ```bash
@@ -403,88 +383,9 @@ print(f'~{int(len(words) / 0.75):,} tokens ({len(words):,} words)')
 "
 ```
 
-#### 51.5 Instruction Provenance — Where Did This Rule Come From
+#### 51.5 Instruction Provenance
 
-Every non-obvious rule should be traceable to its source. This prevents cargo-culting and enables future readers to decide if a rule still applies.
-
-**Rules for provenance:**
-- **Cite the standard** (OWASP, SemVer, Google testing blog, PEP)
-- **Link to source material** when available (arXiv paper, blog post, research article)
-- **Include the date** when a rule was added (in Change Log)
-- **Mark rules derived from project-specific experience** — these may not apply universally
-- **Periodically audit** — if a rule's source has been superseded or disproven, update or remove it
-
----
-
-## Skills Directory
-
-All 63 sections have their full rule text in `skills/`. Load the file whose "Load when" matches your task.
-
-| Skill | Section | Load when |
-|-------|---------|-----------|
-| [01-core-principles.md](skills/01-core-principles.md) | 1 Core Principles | Always — every task |
-| [02-commit-protocol.md](skills/02-commit-protocol.md) | 2 Commit Protocol | Always — every commit/push |
-| [03-shell-execution-rules.md](skills/03-shell-execution-rules.md) | 3 Shell Execution Rules | Running shell commands |
-| [04-code-style.md](skills/04-code-style.md) | 4 Code Style | Writing or editing code |
-| [05-project-structure-conventions.md](skills/05-project-structure-conventions.md) | 5 Project Structure | Scaffolding a project |
-| [06-todo-md-task-tracking-standard.md](skills/06-todo-md-task-tracking-standard.md) | 6 TODO.md Standard | Starting/finishing tasks |
-| [07-docker-deployment.md](skills/07-docker-deployment.md) | 7 Docker / Deployment | Container work |
-| [08-testing-requirements.md](skills/08-testing-requirements.md) | 8 Testing Requirements | Writing/running tests |
-| [09-linting-type-checking.md](skills/09-linting-type-checking.md) | 9 Linting & Type Checking | Before commit |
-| [10-error-handling-patterns.md](skills/10-error-handling-patterns.md) | 10 Error Handling | Writing error paths |
-| [11-configuration-management.md](skills/11-configuration-management.md) | 11 Configuration | Config/env work |
-| [12-api-design.md](skills/12-api-design.md) | 12 API Design | Designing endpoints |
-| [13-security-best-practices.md](skills/13-security-best-practices.md) | 13 Security | Any security-sensitive code |
-| [14-logging-standards.md](skills/14-logging-standards.md) | 14 Logging | Adding logging |
-| [15-git-workflow.md](skills/15-git-workflow.md) | 15 Git Workflow | Any git operation |
-| [16-documentation-requirements.md](skills/16-documentation-requirements.md) | 16 Documentation | Writing docs |
-| [17-dependency-management.md](skills/17-dependency-management.md) | 17 Dependencies | Adding a dependency |
-| [18-performance-considerations.md](skills/18-performance-considerations.md) | 18 Performance | Performance work |
-| [19-build-deployment.md](skills/19-build-deployment.md) | 19 Build & Deployment | Building/deploying |
-| [20-external-integrations.md](skills/20-external-integrations.md) | 20 External Integrations | Third-party APIs |
-| [21-ai-agent-instruction-guidance.md](skills/21-ai-agent-instruction-guidance.md) | 21 Agent Instruction Guidance | Writing agent prompts |
-| [22-multi-agent-cooperation-patterns.md](skills/22-multi-agent-cooperation-patterns.md) | 22 Multi-Agent Patterns | Multi-agent systems |
-| [23-verification-gates.md](skills/23-verification-gates.md) | 23 Verification Gates | Verifying completion |
-| [24-common-failure-modes.md](skills/24-common-failure-modes.md) | 24 Failure Modes | Diagnosing agent failures |
-| [25-common-gotchas.md](skills/25-common-gotchas.md) | 25 Common Gotchas | Debugging common issues |
-| [26-getting-help.md](skills/26-getting-help.md) | 26 Getting Help | Asking for help |
-| [27-code-quality-standards.md](skills/27-code-quality-standards.md) | 27 Code Quality | Writing quality code |
-| [28-default-tech-stack-playbook.md](skills/28-default-tech-stack-playbook.md) | 28 Tech Stack | Choosing stack |
-| [29-operational-patterns.md](skills/29-operational-patterns.md) | 29 Operational Patterns | Resilience patterns |
-| [30-health-endpoint-specification.md](skills/30-health-endpoint-specification.md) | 30 Health Endpoint | Health checks |
-| [31-production-security-patterns.md](skills/31-production-security-patterns.md) | 31 Production Security | Prod security |
-| [32-docker-support.md](skills/32-docker-support.md) | 32 Docker Support | Docker/K8s deep dive |
-| [33-pr-change-size-standards.md](skills/33-pr-change-size-standards.md) | 33 PR Size Standards | Creating PRs |
-| [34-ai-code-quality-anti-pattern-detection.md](skills/34-ai-code-quality-anti-pattern-detection.md) | 34 Anti-Pattern Detection | Reviewing AI code |
-| [35-pr-description-format-template.md](skills/35-pr-description-format-template.md) | 35 PR Description | Writing PR descriptions |
-| [36-explicit-prohibitions-the-never-list.md](skills/36-explicit-prohibitions-the-never-list.md) | 36 NEVER List | Always — bright lines (reproduced above) |
-| [37-pre-commit-hook-standards.md](skills/37-pre-commit-hook-standards.md) | 37 Pre-Commit Hooks | Setting up hooks |
-| [38-ci-cd-pipeline-standards.md](skills/38-ci-cd-pipeline-standards.md) | 38 CI/CD | CI/CD pipelines |
-| [39-semantic-versioning-changelog.md](skills/39-semantic-versioning-changelog.md) | 39 SemVer & Changelog | Versioning/releases |
-| [40-code-coverage-enforcement.md](skills/40-code-coverage-enforcement.md) | 40 Coverage | Coverage enforcement |
-| [41-observability-standards.md](skills/41-observability-standards.md) | 41 Observability | Logs/tracing/metrics |
-| [42-infrastructure-as-code.md](skills/42-infrastructure-as-code.md) | 42 IaC | Terraform/OpenTofu |
-| [43-database-backup-recovery.md](skills/43-database-backup-recovery.md) | 43 Backup & Recovery | DB backups |
-| [44-secrets-management.md](skills/44-secrets-management.md) | 44 Secrets | Secrets handling |
-| [45-flaky-test-management.md](skills/45-flaky-test-management.md) | 45 Flaky Tests | Flaky test handling |
-| [46-mutation-testing.md](skills/46-mutation-testing.md) | 46 Mutation Testing | Mutation testing |
-| [47-performance-benchmark-testing.md](skills/47-performance-benchmark-testing.md) | 47 Benchmark Testing | Performance benchmarks |
-| [48-contract-testing-pact.md](skills/48-contract-testing-pact.md) | 48 Contract Testing | Cross-service contracts |
-| [49-chaos-engineering.md](skills/49-chaos-engineering.md) | 49 Chaos Engineering | Resilience testing |
-| [50-intentional-minimalism-the-simplicity-first-architecture.md](skills/50-intentional-minimalism-the-simplicity-first-architecture.md) | 50 Intentional Minimalism | Always — simplicity (key parts above) |
-| [51-instruction-architecture-context-economy-self-improvement.md](skills/51-instruction-architecture-context-economy-self-improvement.md) | 51 Instruction Architecture | Maintaining instructions |
-| [52-rule-enforcement-architecture-from-advisory-to-deterministic.md](skills/52-rule-enforcement-architecture-from-advisory-to-deterministic.md) | 52 Rule Enforcement | Enforcing rules |
-| [53-project-type-patterns.md](skills/53-project-type-patterns.md) | 53 Project Types | Non-web projects |
-| [54-mcp-usage-and-guardrails.md](skills/54-mcp-usage-and-guardrails.md) | 54 MCP Guardrails | Adding/using MCP servers |
-| [55-prompt-injection-defenses-for-agents.md](skills/55-prompt-injection-defenses-for-agents.md) | 55 Prompt-Injection Defenses | Any agent handling untrusted input |
-| [56-agent-memory-and-state-management.md](skills/56-agent-memory-and-state-management.md) | 56 Agent Memory | Long-running sessions, compaction |
-| [57-tool-call-permission-and-safety-rules.md](skills/57-tool-call-permission-and-safety-rules.md) | 57 Tool-Call Permissions | Configuring agent permissions |
-| [58-supply-chain-security-and-sbom.md](skills/58-supply-chain-security-and-sbom.md) | 58 Supply-Chain & SBOM | Dependencies, releases, CI actions |
-| [59-incident-response-and-runbooks.md](skills/59-incident-response-and-runbooks.md) | 59 Incident Response | Outages, on-call, postmortems |
-| [60-property-based-testing.md](skills/60-property-based-testing.md) | 60 Property-Based Testing | Property tests (Hypothesis) |
-| [61-snapshot-golden-file-testing.md](skills/61-snapshot-golden-file-testing.md) | 61 Snapshot Testing | Golden-file/snapshot tests |
-| [62-retries-backoff-and-idempotency.md](skills/62-retries-backoff-and-idempotency.md) | 62 Retries & Idempotency | Outbound calls, retries |
-| [63-ui-quality-and-anti-slop-guardrails.md](skills/63-ui-quality-and-anti-slop-guardrails.md) | 63 UI Quality & Anti-Slop | UI/frontend work |
+Every rule should say where it came from (which failure it prevents). Full detail, including the dated-rule convention, is in [Section 51](skills/51-instruction-architecture-context-economy-self-improvement.md) (51.5).
 
 ---
 
@@ -504,10 +405,3 @@ The AGENTS.md file itself is subject to its own rules. This is not a meta observ
 - Does this section reduce ambiguity or add it? (every rule should eliminate a real failure mode)
 
 ---
-
-## Change Log
-
-- **2026-08-20** — Restructured AGENTS.md into a high-level entry point. Full rule text for the original 53 sections moved to `skills/NN-name.md` (byte-for-byte preservation), then expanded to 62 sections with 9 new agent-focused skills (54 MCP, 55 prompt-injection, 56 agent memory, 57 tool-call permissions, 58 supply-chain/SBOM, 59 incident response, 60 property-based testing, 61 snapshot testing, 62 retries/idempotency). Core rules inline in full: Sections 1, 2, and 36; selected subsections of 50 (50.1, 50.3, 50.6) and 51 (51.1, 51.3, 51.5). The remaining subsections of 50/51 (50.2, 50.4, 50.5, 50.7, 50.8, 51.2, 51.4) live only in the skill files. Entry-point file reduced from ~6,700 lines to ~450 lines to fit constrained context windows. Section Index and Quick-Navigation Cheatsheet now link to skill files.
-- **2026-07-01** — Added Section 53 (Project Type Patterns) and Section 52 (Rule Enforcement Architecture).
-- **2026-08-20** — Added Sections 54-62 (agent-focused skills; see the 2026-08-20 entry above).
-- **2026-08-20** — Added Section 63 (UI Quality & Anti-Slop Guardrails) — no fabricated content/placeholders, no dead controls, required empty/loading/error states, WCAG AA accessibility minimums, and the ENERGY/RHYTHM/MOTION dials mechanism for enforceable visual liveliness. Adapted from the universal engineering subset of the anti-slop rule library (https://github.com/miqdadbadjuber/anti-slop); mirrors Section 34 for the visual layer. This brings the library to 63 sections.

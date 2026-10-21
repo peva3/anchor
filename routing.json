@@ -1,0 +1,362 @@
+{
+  "$comment": "Declarative skill routing map. Data only: no scoring, no weights, no code. Same request maps to the same skills every time. Task types are the allowed values; skills are section numbers whose file lives in skills/NN-slug.md. See Section 64.",
+  "version": 1,
+  "core": {
+    "$comment": "Always loaded. Inlined in AGENTS.md so they apply even in a constrained context window.",
+    "always": [
+      1,
+      2,
+      36
+    ]
+  },
+  "routing": {
+    "$comment": "Loaded to perform routing itself; part of the core set in practice.",
+    "skill": 64
+  },
+  "budget": {
+    "maxActiveSkills": 7
+  },
+  "phases": {
+    "plan": [
+      50
+    ],
+    "build": [],
+    "verify": [
+      8,
+      23,
+      40
+    ],
+    "commit": [
+      15,
+      33,
+      35
+    ]
+  },
+  "taskTypes": [
+    {
+      "type": "fix",
+      "triggers": [
+        "bug",
+        "broken",
+        "failing test",
+        "error",
+        "regression",
+        "crash",
+        "does not work"
+      ],
+      "always": [
+        34
+      ],
+      "skills": [
+        10,
+        24,
+        25,
+        27,
+        40,
+        45
+      ]
+    },
+    {
+      "type": "feature",
+      "triggers": [
+        "add",
+        "build",
+        "implement",
+        "new endpoint",
+        "feature",
+        "support for"
+      ],
+      "always": [
+        35
+      ],
+      "skills": [
+        5,
+        8,
+        12,
+        16,
+        27,
+        40
+      ]
+    },
+    {
+      "type": "refactor",
+      "triggers": [
+        "refactor",
+        "rename",
+        "extract",
+        "split",
+        "clean up",
+        "simplify",
+        "technical debt"
+      ],
+      "always": [
+        50
+      ],
+      "skills": [
+        1,
+        23,
+        27,
+        33,
+        40
+      ]
+    },
+    {
+      "type": "test",
+      "triggers": [
+        "test",
+        "tests",
+        "coverage",
+        "flaky",
+        "property-based",
+        "snapshot",
+        "mutation",
+        "benchmark"
+      ],
+      "always": [],
+      "skills": [
+        27,
+        45,
+        46,
+        47,
+        48,
+        60,
+        61
+      ]
+    },
+    {
+      "type": "review",
+      "triggers": [
+        "review",
+        "pull request",
+        "pr",
+        "audit",
+        "code quality check"
+      ],
+      "always": [
+        33,
+        34,
+        36
+      ],
+      "skills": [
+        27,
+        31,
+        35,
+        50
+      ]
+    },
+    {
+      "type": "docs",
+      "triggers": [
+        "docs",
+        "readme",
+        "changelog",
+        "adr",
+        "documentation",
+        "comments",
+        "deeplink"
+      ],
+      "always": [
+        16
+      ],
+      "skills": [
+        4,
+        6,
+        39
+      ]
+    },
+    {
+      "type": "release",
+      "triggers": [
+        "release",
+        "version",
+        "tag",
+        "publish",
+        "bump",
+        "cut a release"
+      ],
+      "always": [
+        39
+      ],
+      "skills": [
+        16,
+        19,
+        38,
+        58
+      ]
+    },
+    {
+      "type": "incident",
+      "triggers": [
+        "incident",
+        "outage",
+        "down",
+        "sev",
+        "rollback",
+        "production is broken",
+        "on-call"
+      ],
+      "always": [
+        59
+      ],
+      "skills": [
+        24,
+        29,
+        30,
+        41,
+        43
+      ]
+    },
+    {
+      "type": "ui",
+      "triggers": [
+        "ui",
+        "frontend",
+        "page",
+        "component",
+        "css",
+        "layout",
+        "accessibility",
+        "design",
+        "landing"
+      ],
+      "always": [
+        63
+      ],
+      "skills": [
+        4,
+        33,
+        34,
+        35
+      ]
+    },
+    {
+      "type": "data",
+      "triggers": [
+        "etl",
+        "pipeline",
+        "schema",
+        "migration",
+        "backfill",
+        "warehouse",
+        "dataset"
+      ],
+      "always": [
+        53
+      ],
+      "skills": [
+        29,
+        40,
+        42,
+        43
+      ]
+    },
+    {
+      "type": "infra",
+      "triggers": [
+        "docker",
+        "kubernetes",
+        "terraform",
+        "deploy",
+        "container",
+        "helm",
+        "infrastructure"
+      ],
+      "always": [
+        32
+      ],
+      "skills": [
+        7,
+        19,
+        30,
+        38,
+        41,
+        42
+      ]
+    },
+    {
+      "type": "security",
+      "triggers": [
+        "security",
+        "vulnerability",
+        "secret",
+        "auth",
+        "prompt injection",
+        "supply chain",
+        "cve",
+        "permissions"
+      ],
+      "always": [
+        36
+      ],
+      "skills": [
+        13,
+        31,
+        44,
+        54,
+        55,
+        58
+      ]
+    },
+    {
+      "type": "ai",
+      "triggers": [
+        "agent",
+        "llm",
+        "rag",
+        "mcp",
+        "prompt",
+        "eval",
+        "assistant",
+        "embedding"
+      ],
+      "always": [
+        53
+      ],
+      "skills": [
+        31,
+        54,
+        55,
+        56,
+        57,
+        58
+      ]
+    },
+    {
+      "type": "deck",
+      "triggers": [
+        "deck",
+        "slides",
+        "presentation",
+        "talk",
+        "keynote",
+        "pitch"
+      ],
+      "always": [
+        66
+      ],
+      "skills": [
+        50,
+        63
+      ]
+    },
+    {
+      "type": "hackathon",
+      "triggers": [
+        "hackathon",
+        "demo",
+        "spike",
+        "time-boxed",
+        "prototype",
+        "proof of concept"
+      ],
+      "always": [
+        65
+      ],
+      "skills": [
+        6,
+        36,
+        63
+      ]
+    }
+  ]
+}
