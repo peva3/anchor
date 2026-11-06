@@ -1,3 +1,7 @@
+---
+name: skill-40-code-coverage-enforcement
+description: "Section 40 — Code Coverage Enforcement. Load when: Coverage enforcement."
+---
 # Skill 40: Code Coverage Enforcement
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

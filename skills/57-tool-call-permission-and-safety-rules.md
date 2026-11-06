@@ -1,3 +1,7 @@
+---
+name: skill-57-tool-call-permission-and-safety-rules
+description: "Section 57 — Tool-Call Permission & Safety Rules. Load when: Configuring agent permissions."
+---
 # Skill 57: Tool-Call Permission & Safety Rules
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

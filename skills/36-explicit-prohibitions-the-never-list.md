@@ -1,3 +1,7 @@
+---
+name: skill-36-explicit-prohibitions-the-never-list
+description: "Section 36 — Explicit Prohibitions — The \"NEVER\" List. Load when: Always — bright lines (reproduced above)."
+---
 # Skill 36: Explicit Prohibitions — The "NEVER" List
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

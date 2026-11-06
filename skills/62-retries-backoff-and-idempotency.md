@@ -1,3 +1,7 @@
+---
+name: skill-62-retries-backoff-and-idempotency
+description: "Section 62 — Retries, Backoff & Idempotency. Load when: Outbound calls, retries."
+---
 # Skill 62: Retries, Backoff & Idempotency
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

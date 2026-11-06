@@ -91,6 +91,13 @@ Glossary and routing table in one. Load a file when its trigger matches your tas
 - **64 Skill Routing & Checkpoints** — Starting any task, or when the task changes direction — [open](skills/64-skill-routing-and-checkpoints.md)
 - **65 Time-Boxed Delivery Mode** — Hackathon, demo, spike, or time-boxed prototype — [open](skills/65-time-boxed-delivery-mode.md)
 - **66 Presentation Decks** — Building slide decks or presentations — [open](skills/66-presentation-decks.md)
+- **67 Requirements Elicitation (Grilling)** — Ambiguous asks, expensive-to-reverse decisions, alignment before building — [open](skills/67-requirements-elicitation-grilling.md)
+- **68 Spec & Ticket Decomposition** — Turning an agreed outcome into a spec and vertical, demoable slices — [open](skills/68-spec-and-ticket-decomposition.md)
+- **69 Bug Diagnosis Loop** — Hard bugs, intermittent failures, regressions without a known cause — [open](skills/69-bug-diagnosis-loop.md)
+- **70 Two-Axis Code Review** — Reviewing a diff for standards and for spec correctness — [open](skills/70-two-axis-code-review.md)
+- **71 Codebase Design** — Module boundaries, deep interfaces, seams — [open](skills/71-codebase-design-deep-modules.md)
+- **72 Domain Modeling & Glossary** — Ubiquitous language, invariants, ADRs — [open](skills/72-domain-modeling-and-glossary.md)
+- **73 Retrospective** — After a sprint, incident, or repeated correction — [open](skills/73-retrospective.md)
 
 ## Core Rules (kept in full — always apply)
 

@@ -1,3 +1,7 @@
+---
+name: skill-35-pr-description-format-template
+description: "Section 35 — PR Description Format & Template. Load when: Writing PR descriptions."
+---
 # Skill 35: PR Description Format & Template
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
@@ -100,6 +104,37 @@ The `HUMAN:` section at the top of the template serves as a gate:
 - CI can be configured to check for content between `HUMAN:` and the human-tested checkbox
 - The human MUST add their verification before merging
 - The agent MUST NOT fill in the human verification section
+
+### 35.5 Merge Danger — Reversibility and Blast Radius
+
+Before merging, answer two questions in the PR description: **how hard is this to undo?**
+and **how far does a mistake travel?**
+
+| Question | Two-way door (merge freely) | One-way door (requires explicit approval) |
+|----------|-----------------------------|-------------------------------------------|
+| **Reversibility** | Revert the commit; no data or contract change | Data migration, published API, deleted column, sent webhook, rotated key |
+| **Blast radius** | One module, one user, one request | Every tenant, every request, a shared dependency |
+| **Observability** | Failure is visible in logs/metrics immediately | Silent data corruption discovered days later |
+| **Recovery time** | Minutes, with a known revert | Hours, with a restore or forward fix |
+| **Evidence** | Tests cover the change | Tests cannot reproduce the production shape |
+
+**Required for a one-way door:**
+
+- **An explicit approval** — the PR body names the decision and who approved it.
+- **A rollback plan** — revert, feature flag off, or restore procedure, with the exact command.
+- **Before/after evidence** — the measurement, query result, or trace that proves the change
+  is safe. "Should be fine" is not evidence ([Section 50.6](skills/50-intentional-minimalism-the-simplicity-first-architecture.md)).
+- **A staged rollout** — flag, canary, or dark launch when the blast radius is shared
+  ([Section 29](skills/29-operational-patterns.md)).
+- **A verification step after deploy** — the signal that says it worked, and the one that
+  says to roll back.
+
+**Do not bundle a one-way door with unrelated cleanup.** A migration hidden inside a
+refactor cannot be reverted without reverting the refactor, and reviewers cannot see the
+risk. Split it ([Section 33](skills/33-pr-change-size-standards.md)).
+
+A two-way door still needs tests, but it does not need a committee. Spend review attention
+where the door only swings one way.
 
 ---
 

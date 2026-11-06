@@ -1,3 +1,7 @@
+---
+name: skill-59-incident-response-and-runbooks
+description: "Section 59 — Incident Response & Runbooks. Load when: Outages, on-call, postmortems."
+---
 # Skill 59: Incident Response & Runbooks
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

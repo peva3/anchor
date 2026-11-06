@@ -1,3 +1,7 @@
+---
+name: skill-12-api-design
+description: "Section 12 — API Design. Load when: Designing endpoints."
+---
 # Skill 12: API Design
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

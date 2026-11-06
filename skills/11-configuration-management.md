@@ -1,3 +1,7 @@
+---
+name: skill-11-configuration-management
+description: "Section 11 — Configuration Management. Load when: Config/env work."
+---
 # Skill 11: Configuration Management
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

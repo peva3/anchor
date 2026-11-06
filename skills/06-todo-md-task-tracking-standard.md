@@ -1,3 +1,7 @@
+---
+name: skill-06-todo-md-task-tracking-standard
+description: "Section 6 — TODO.md — Task Tracking Standard. Load when: Starting/finishing tasks."
+---
 # Skill 06: TODO.md — Task Tracking Standard
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

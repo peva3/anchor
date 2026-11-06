@@ -1,3 +1,7 @@
+---
+name: skill-34-ai-code-quality-anti-pattern-detection
+description: "Section 34 — AI Code Quality — Anti-Pattern Detection. Load when: Reviewing AI code."
+---
 # Skill 34: AI Code Quality — Anti-Pattern Detection
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

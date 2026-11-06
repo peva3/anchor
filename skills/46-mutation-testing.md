@@ -1,3 +1,7 @@
+---
+name: skill-46-mutation-testing
+description: "Section 46 — Mutation Testing. Load when: Mutation testing."
+---
 # Skill 46: Mutation Testing
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

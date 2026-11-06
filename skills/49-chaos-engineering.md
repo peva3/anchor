@@ -1,3 +1,7 @@
+---
+name: skill-49-chaos-engineering
+description: "Section 49 — Chaos Engineering. Load when: Resilience testing."
+---
 # Skill 49: Chaos Engineering
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

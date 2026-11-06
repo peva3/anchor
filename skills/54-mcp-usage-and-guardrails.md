@@ -1,3 +1,7 @@
+---
+name: skill-54-mcp-usage-and-guardrails
+description: "Section 54 — MCP Usage & Guardrails. Load when: Adding/using MCP servers."
+---
 # Skill 54: MCP Usage & Guardrails
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

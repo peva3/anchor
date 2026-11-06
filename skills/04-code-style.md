@@ -1,3 +1,7 @@
+---
+name: skill-04-code-style
+description: "Section 4 — Code Style. Load when: Writing or editing code."
+---
 # Skill 04: Code Style
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

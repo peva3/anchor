@@ -1,3 +1,7 @@
+---
+name: skill-45-flaky-test-management
+description: "Section 45 — Flaky Test Management. Load when: Flaky test handling."
+---
 # Skill 45: Flaky Test Management
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

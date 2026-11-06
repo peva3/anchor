@@ -1,3 +1,7 @@
+---
+name: skill-52-rule-enforcement-architecture-from-advisory-to-deterministic
+description: "Section 52 — Rule Enforcement Architecture. Load when: Enforcing rules."
+---
 # Skill 52: Rule Enforcement Architecture — From Advisory to Deterministic
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

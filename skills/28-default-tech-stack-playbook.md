@@ -1,3 +1,7 @@
+---
+name: skill-28-default-tech-stack-playbook
+description: "Section 28 — Default Tech Stack Playbook. Load when: Choosing stack."
+---
 # Skill 28: Default Tech Stack Playbook
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

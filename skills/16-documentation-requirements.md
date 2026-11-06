@@ -1,3 +1,7 @@
+---
+name: skill-16-documentation-requirements
+description: "Section 16 — Documentation Requirements. Load when: Writing docs."
+---
 # Skill 16: Documentation Requirements
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

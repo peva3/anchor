@@ -1,3 +1,7 @@
+---
+name: skill-61-snapshot-golden-file-testing
+description: "Section 61 — Snapshot / Golden-File Testing. Load when: Golden-file/snapshot tests."
+---
 # Skill 61: Snapshot / Golden-File Testing
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

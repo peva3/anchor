@@ -1,3 +1,7 @@
+---
+name: skill-33-pr-change-size-standards
+description: "Section 33 — PR & Change Size Standards. Load when: Creating PRs."
+---
 # Skill 33: PR & Change Size Standards
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

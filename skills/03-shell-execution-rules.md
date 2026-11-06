@@ -1,3 +1,7 @@
+---
+name: skill-03-shell-execution-rules
+description: "Section 3 — Shell Execution Rules. Load when: Running shell commands."
+---
 # Skill 03: Shell Execution Rules
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

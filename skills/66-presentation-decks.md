@@ -1,3 +1,7 @@
+---
+name: skill-66-presentation-decks
+description: "Section 66 — Presentation Decks. Load when: Building slide decks or presentations."
+---
 # Skill 66: Presentation Decks
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

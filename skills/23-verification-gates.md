@@ -1,3 +1,7 @@
+---
+name: skill-23-verification-gates
+description: "Section 23 — Verification Gates. Load when: Verifying completion."
+---
 # Skill 23: Verification Gates
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

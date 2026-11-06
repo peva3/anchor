@@ -1,3 +1,7 @@
+---
+name: skill-21-ai-agent-instruction-guidance
+description: "Section 21 — AI Agent Instruction Guidance. Load when: Writing agent prompts."
+---
 # Skill 21: AI Agent Instruction Guidance
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
@@ -151,6 +155,12 @@ Critic Agent: Reviews and provides feedback
 - Assign explicit roles to each agent
 - Define interaction protocol (sequential, hierarchical, parallel)
 - Include termination criteria for handoffs
+
+**See also:** [Section 51.6](skills/51-instruction-architecture-context-economy-self-improvement.md) —
+writing for agents: context pointers decide triggering, context load is not cognitive load,
+information hierarchy, co-location, completion criteria, leading words, positive phrasing,
+and the no-op test. [Section 56.6](skills/56-agent-memory-and-state-management.md) gives the
+handoff artifact template that makes a multi-agent handoff survive compaction.
 
 ---
 

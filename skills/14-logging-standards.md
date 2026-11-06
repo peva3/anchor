@@ -1,3 +1,7 @@
+---
+name: skill-14-logging-standards
+description: "Section 14 — Logging Standards. Load when: Adding logging."
+---
 # Skill 14: Logging Standards
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

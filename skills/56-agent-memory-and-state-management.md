@@ -1,3 +1,7 @@
+---
+name: skill-56-agent-memory-and-state-management
+description: "Section 56 — Agent Memory & State Management. Load when: Long-running sessions, compaction."
+---
 # Skill 56: Agent Memory & State Management
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
@@ -43,6 +47,47 @@ Agent state lives in several places with different lifetimes. Knowing what survi
 - Each subagent has isolated memory; the parent owns durable state.
 - Handoffs pass a written context, not a reference to "what we discussed" ([Section 22](skills/22-multi-agent-cooperation-patterns.md)).
 - Never let one agent's untrusted reading ([Section 55](skills/55-prompt-injection-defenses-for-agents.md)) leak into another agent's instructions.
+
+### 56.6 The Handoff Artifact
+
+A handoff is a written packet, not a conversation summary. Write it to a file (or the task
+body) so it survives compaction, a new session, and a different agent.
+
+```markdown
+# Handoff — <task / slice>
+
+## Goal
+One sentence: the outcome, not the activity.
+
+## State
+- Done: <what is verified, with the command/output>
+- In progress: <the exact file and line, or the failing test>
+- Not started: <the next slice>
+
+## Decisions
+| Decision | Choice | Why | Reversible? |
+|----------|--------|-----|-------------|
+
+## Facts the next agent must not rediscover
+- Where the relevant code lives
+- The command that reproduces the failure
+- The constraint that ruled out the obvious approach
+
+## Constraints
+Deadline, approvals needed, files that must not be touched.
+
+## Next action
+The single next step, with its verification.
+```
+
+Rules:
+
+- **Self-contained.** A fresh context must be able to act without reading this conversation.
+- **State the verification, not just the claim.** "Tests pass" is weaker than the command
+  and its output ([Section 23](skills/23-verification-gates.md)).
+- **Record rejected paths** so the next agent does not retry them.
+- **Name the owner** if a decision needs a human ([Section 67](skills/67-requirements-elicitation-grilling.md)).
+- **Keep it short.** A handoff longer than the work is sediment; link to the code instead.
 
 ---
 

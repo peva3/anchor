@@ -1,3 +1,7 @@
+---
+name: skill-42-infrastructure-as-code
+description: "Section 42 — Infrastructure as Code. Load when: Terraform/OpenTofu."
+---
 # Skill 42: Infrastructure as Code
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

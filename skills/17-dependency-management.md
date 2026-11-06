@@ -1,3 +1,7 @@
+---
+name: skill-17-dependency-management
+description: "Section 17 — Dependency Management. Load when: Adding a dependency."
+---
 # Skill 17: Dependency Management
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

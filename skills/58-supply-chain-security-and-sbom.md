@@ -1,3 +1,7 @@
+---
+name: skill-58-supply-chain-security-and-sbom
+description: "Section 58 — Supply-Chain Security & SBOM. Load when: Dependencies, releases, CI actions."
+---
 # Skill 58: Supply-Chain Security & SBOM
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

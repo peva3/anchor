@@ -1,3 +1,7 @@
+---
+name: skill-37-pre-commit-hook-standards
+description: "Section 37 — Pre-Commit Hook Standards. Load when: Setting up hooks."
+---
 # Skill 37: Pre-Commit Hook Standards
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

@@ -1,3 +1,7 @@
+---
+name: skill-19-build-deployment
+description: "Section 19 — Build & Deployment. Load when: Building/deploying."
+---
 # Skill 19: Build & Deployment
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

@@ -1,3 +1,7 @@
+---
+name: skill-20-external-integrations
+description: "Section 20 — External Integrations. Load when: Third-party APIs."
+---
 # Skill 20: External Integrations
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

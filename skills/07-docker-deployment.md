@@ -1,3 +1,7 @@
+---
+name: skill-07-docker-deployment
+description: "Section 7 — Docker / Deployment. Load when: Container work."
+---
 # Skill 07: Docker / Deployment
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

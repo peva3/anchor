@@ -1,3 +1,7 @@
+---
+name: skill-26-getting-help
+description: "Section 26 — Getting Help. Load when: Asking for help."
+---
 # Skill 26: Getting Help
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

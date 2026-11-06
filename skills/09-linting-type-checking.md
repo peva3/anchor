@@ -1,3 +1,7 @@
+---
+name: skill-09-linting-type-checking
+description: "Section 9 — Linting & Type Checking. Load when: Before commit."
+---
 # Skill 09: Linting & Type Checking
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

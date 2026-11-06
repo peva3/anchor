@@ -1,3 +1,7 @@
+---
+name: skill-63-ui-quality-and-anti-slop-guardrails
+description: "Section 63 — UI Quality & Anti-Slop Guardrails. Load when: UI/frontend work."
+---
 # Skill 63: UI Quality & Anti-Slop Guardrails
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

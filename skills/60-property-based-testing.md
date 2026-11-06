@@ -1,3 +1,7 @@
+---
+name: skill-60-property-based-testing
+description: "Section 60 — Property-Based Testing. Load when: Property tests (Hypothesis)."
+---
 # Skill 60: Property-Based Testing
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

@@ -1,3 +1,7 @@
+---
+name: skill-51-instruction-architecture-context-economy-self-improvement
+description: "Section 51 — Instruction Architecture. Load when: Maintaining instructions."
+---
 # Skill 51: Instruction Architecture — Context Economy & Self-Improvement
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
@@ -168,6 +172,35 @@ Every non-obvious rule should be traceable to its source. This prevents cargo-cu
 - **Include the date** when a rule was added (recorded in `CHANGELOG.md`, not in the rule file)
 - **Mark rules derived from project-specific experience** — these may not apply universally
 - **Periodically audit** — if a rule's source has been superseded or disproven, update or remove it
+
+### 51.6 Writing for Agents
+
+Instructions are read by a model under context pressure, not by a human with time to spare.
+Write for that reader.
+
+| Technique | What it means | Failure it prevents |
+|-----------|---------------|---------------------|
+| **Context pointer** | The skill's name, description, and triggers are the retrieval surface; wording decides whether it loads | A perfect rule that never enters context |
+| **Two loads** | Optimize **context load** (tokens) and **cognitive load** (attention); a short rule in the wrong place still costs | Lean files that are still hard to follow |
+| **Information hierarchy** | In-file step > in-file reference > disclosed reference; put the action where it is needed | The agent reads three files to find the command |
+| **Co-location** | The rule lives beside the action it governs | A test rule buried in a deployment section |
+| **Completion criteria** | State when the task is done, in observable terms ([Section 21.4](skills/21-ai-agent-instruction-guidance.md)) | The agent stops early or never stops |
+| **Leading words** | Use the term the model already knows; define a new term once, then use it consistently | Synonym drift and misrouting |
+| **Positive phrasing** | Say what to do, not only what not to do | The model freezes or invents a path |
+| **No-op test** | If deleting the sentence would not change behavior, delete it | Sediment that dilutes the rules that matter |
+| **Single source of truth** | One rule, one place; cross-reference instead of copying | Two copies drift and contradict |
+
+**Negation is a failure mode.** "Never use `os.path`" leaves the replacement implicit. Write
+"Use `pathlib.Path` for all filesystem paths" — the positive form is actionable and the
+negative is implied.
+
+**Prune on every edit.** Adding a rule is cheap; the cost is the reader's attention. Before
+adding, check whether an existing rule already covers it, and whether a deterministic check
+([Section 52](skills/52-rule-enforcement-architecture-from-advisory-to-deterministic.md))
+would enforce it better than prose.
+
+**Sprawl is a correctness problem.** A rule stated twice will eventually be stated
+differently, and the agent will follow whichever copy it loaded. Prefer a link over a copy.
 
 ---
 

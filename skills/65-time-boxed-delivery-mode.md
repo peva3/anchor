@@ -1,3 +1,7 @@
+---
+name: skill-65-time-boxed-delivery-mode
+description: "Section 65 — Time-Boxed Delivery Mode. Load when: Hackathon, demo, spike, or time-boxed prototype."
+---
 # Skill 65: Time-Boxed Delivery Mode
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

@@ -1,3 +1,7 @@
+---
+name: skill-38-ci-cd-pipeline-standards
+description: "Section 38 — CI/CD Pipeline Standards. Load when: CI/CD pipelines."
+---
 # Skill 38: CI/CD Pipeline Standards
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

@@ -1,3 +1,7 @@
+---
+name: skill-48-contract-testing-pact
+description: "Section 48 — Contract Testing (Pact). Load when: Cross-service contracts."
+---
 # Skill 48: Contract Testing (Pact)
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

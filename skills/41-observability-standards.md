@@ -1,3 +1,7 @@
+---
+name: skill-41-observability-standards
+description: "Section 41 — Observability Standards. Load when: Logs/tracing/metrics."
+---
 # Skill 41: Observability Standards
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

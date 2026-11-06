@@ -1,3 +1,7 @@
+---
+name: skill-25-common-gotchas
+description: "Section 25 — Common Gotchas. Load when: Debugging common issues."
+---
 # Skill 25: Common Gotchas
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

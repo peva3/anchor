@@ -1,3 +1,7 @@
+---
+name: skill-22-multi-agent-cooperation-patterns
+description: "Section 22 — Multi-Agent Cooperation Patterns. Load when: Multi-agent systems."
+---
 # Skill 22: Multi-Agent Cooperation Patterns
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

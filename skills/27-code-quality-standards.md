@@ -1,3 +1,7 @@
+---
+name: skill-27-code-quality-standards
+description: "Section 27 — Code Quality Standards. Load when: Writing quality code."
+---
 # Skill 27: Code Quality Standards
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

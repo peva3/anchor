@@ -1,3 +1,7 @@
+---
+name: skill-50-intentional-minimalism-the-simplicity-first-architecture
+description: "Section 50 — Intentional Minimalism. Load when: Always — simplicity (key parts above)."
+---
 # Skill 50: Intentional Minimalism — The Simplicity-First Architecture
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

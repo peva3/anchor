@@ -1,3 +1,7 @@
+---
+name: skill-10-error-handling-patterns
+description: "Section 10 — Error Handling Patterns. Load when: Writing error paths."
+---
 # Skill 10: Error Handling Patterns
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

@@ -1,3 +1,7 @@
+---
+name: skill-05-project-structure-conventions
+description: "Section 5 — Project Structure Conventions. Load when: Scaffolding a project."
+---
 # Skill 05: Project Structure Conventions
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

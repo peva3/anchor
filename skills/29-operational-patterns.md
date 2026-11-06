@@ -1,3 +1,7 @@
+---
+name: skill-29-operational-patterns
+description: "Section 29 — Operational Patterns. Load when: Resilience patterns."
+---
 # Skill 29: Operational Patterns
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

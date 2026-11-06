@@ -1,3 +1,7 @@
+---
+name: skill-02-commit-protocol
+description: "Section 2 — Commit Protocol. Load when: Always — every commit/push."
+---
 # Skill 02: Commit Protocol
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

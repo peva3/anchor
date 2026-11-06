@@ -1,3 +1,7 @@
+---
+name: skill-47-performance-benchmark-testing
+description: "Section 47 — Performance Benchmark Testing. Load when: Performance benchmarks."
+---
 # Skill 47: Performance Benchmark Testing
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

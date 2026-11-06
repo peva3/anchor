@@ -1,3 +1,7 @@
+---
+name: skill-01-core-principles
+description: "Section 1 — Core Principles. Load when: Always — every task."
+---
 # Skill 01: Core Principles
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

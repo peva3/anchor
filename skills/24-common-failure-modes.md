@@ -1,3 +1,7 @@
+---
+name: skill-24-common-failure-modes
+description: "Section 24 — Common Failure Modes. Load when: Diagnosing agent failures."
+---
 # Skill 24: Common Failure Modes
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
@@ -127,6 +131,8 @@ Based on AgentBench (arXiv:2308.03688) findings on LLM agent failures.
 
 ### 24.11 Diagnose Before Patching
 
+- **Build a loop that goes red on this bug before theorising.** A fix you cannot demonstrate failing before and passing after is unverified ([Section 23](skills/23-verification-gates.md)). No red-capable command → stop and report what you need; do not guess.
 - **Find the root cause before changing code.** A patch that makes a symptom disappear without naming the cause is a guess, and guesses regress. State the cause, then the fix.
 - **For a regression after a deploy, revert first and diagnose second.** Restoring service beats understanding the bug — a revert is a known-good state, while a forward fix under pressure is an experiment on production. Revert, confirm recovery, then investigate with the pressure off ([Section 59](skills/59-incident-response-and-runbooks.md)).
-- **Reproduce it, or say you could not.** A fix you cannot demonstrate failing before and passing after is unverified ([Section 23](skills/23-verification-gates.md)).
+
+**Full loop:** [Section 69](skills/69-bug-diagnosis-loop.md) — loop types, minimisation, falsifiable hypotheses, one variable at a time, and the regression test at the right seam.

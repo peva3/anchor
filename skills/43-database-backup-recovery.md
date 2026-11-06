@@ -1,3 +1,7 @@
+---
+name: skill-43-database-backup-recovery
+description: "Section 43 — Database Backup & Recovery. Load when: DB backups."
+---
 # Skill 43: Database Backup & Recovery
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

@@ -1,3 +1,7 @@
+---
+name: skill-31-production-security-patterns
+description: "Section 31 — Production Security Patterns. Load when: Prod security."
+---
 # Skill 31: Production Security Patterns
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

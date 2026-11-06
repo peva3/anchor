@@ -1,3 +1,7 @@
+---
+name: skill-53-project-type-patterns
+description: "Section 53 — Project Type Patterns. Load when: Non-web projects."
+---
 # Skill 53: Project Type Patterns
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

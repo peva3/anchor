@@ -1,3 +1,7 @@
+---
+name: skill-32-docker-support
+description: "Section 32 — Docker Support. Load when: Docker/K8s deep dive."
+---
 # Skill 32: Docker Support
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

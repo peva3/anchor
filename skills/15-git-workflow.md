@@ -1,3 +1,7 @@
+---
+name: skill-15-git-workflow
+description: "Section 15 — Git Workflow. Load when: Any git operation."
+---
 # Skill 15: Git Workflow
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

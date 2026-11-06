@@ -1,3 +1,7 @@
+---
+name: skill-18-performance-considerations
+description: "Section 18 — Performance Considerations. Load when: Performance work."
+---
 # Skill 18: Performance Considerations
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

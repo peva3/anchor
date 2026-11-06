@@ -14,14 +14,13 @@
     "skill": 64
   },
   "budget": {
-    "$comment": "Cap on task-scoped skills beyond the always-loaded core. Measured: each skill costs ~955 tokens, so 8 slots stay inside a 32K window once the commit phase drops build-only skills.",
+    "$comment": "Cap on task-scoped skills beyond the always-loaded core. Measured: each skill costs ~1,800 tokens, so 8 slots plus the ~6,000-token entry point is ~20,000 tokens — about 63% of a 32K window. Split the task rather than exceed the cap.",
     "maxActiveSkills": 8
   },
   "phases": {
     "plan": {
       "add": [
-        50,
-        28
+        50
       ],
       "drop": []
     },
@@ -52,6 +51,49 @@
     }
   },
   "taskTypes": [
+    {
+      "type": "plan",
+      "triggers": [
+        "spec",
+        "specification",
+        "write a spec",
+        "write the spec",
+        "gather requirements",
+        "functional requirements",
+        "non-functional requirements",
+        "write requirements",
+        "write a plan",
+        "plan the work",
+        "plan this",
+        "planning session",
+        "break down the work",
+        "break it down",
+        "break this down",
+        "break into tickets",
+        "create tickets",
+        "write tickets",
+        "tracer bullet",
+        "grill me",
+        "interview me",
+        "align on",
+        "scope the work",
+        "what should we build",
+        "how should we",
+        "technical design",
+        "design doc",
+        "rfc"
+      ],
+      "always": [
+        67
+      ],
+      "skills": [
+        68,
+        28,
+        50,
+        6,
+        64
+      ]
+    },
     {
       "type": "fix",
       "triggers": [
@@ -87,7 +129,8 @@
         25,
         27,
         14,
-        3
+        3,
+        69
       ]
     },
     {
@@ -129,7 +172,8 @@
         "notifications"
       ],
       "always": [
-        35
+        35,
+        67
       ],
       "skills": [
         27,
@@ -182,7 +226,8 @@
         33,
         17,
         18,
-        5
+        5,
+        71
       ]
     },
     {
@@ -263,7 +308,8 @@
         27,
         31,
         35,
-        50
+        50,
+        70
       ]
     },
     {
@@ -291,7 +337,11 @@
         "runbooks",
         "accessibility statement",
         "conformance statement",
-        "privacy policy"
+        "privacy policy",
+        "glossary",
+        "domain model",
+        "ubiquitous language",
+        "terminology"
       ],
       "always": [
         16
@@ -299,7 +349,8 @@
       "skills": [
         4,
         6,
-        39
+        39,
+        72
       ]
     },
     {
@@ -947,7 +998,11 @@
         "self-audit",
         "routing",
         "router",
-        "skills"
+        "skills",
+        "retro",
+        "retrospective",
+        "after-action",
+        "agent retro"
       ],
       "always": [
         51
@@ -957,7 +1012,8 @@
         24,
         26,
         50,
-        52
+        52,
+        73
       ]
     }
   ],

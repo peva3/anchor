@@ -1,3 +1,7 @@
+---
+name: skill-30-health-endpoint-specification
+description: "Section 30 — Health Endpoint Specification. Load when: Health checks."
+---
 # Skill 30: Health Endpoint Specification
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

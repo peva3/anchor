@@ -1,3 +1,7 @@
+---
+name: skill-44-secrets-management
+description: "Section 44 — Secrets Management. Load when: Secrets handling."
+---
 # Skill 44: Secrets Management
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

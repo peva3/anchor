@@ -1,3 +1,7 @@
+---
+name: skill-13-security-best-practices
+description: "Section 13 — Security Best Practices. Load when: Any security-sensitive code."
+---
 # Skill 13: Security Best Practices
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

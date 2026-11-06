@@ -1,3 +1,7 @@
+---
+name: skill-55-prompt-injection-defenses-for-agents
+description: "Section 55 — Prompt-Injection Defenses for Agents. Load when: Any agent handling untrusted input."
+---
 # Skill 55: Prompt-Injection Defenses for Agents
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.

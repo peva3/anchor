@@ -1,3 +1,7 @@
+---
+name: skill-39-semantic-versioning-changelog
+description: "Section 39 — Semantic Versioning & Changelog. Load when: Versioning/releases."
+---
 # Skill 39: Semantic Versioning & Changelog
 
 > Part of the Anchor skills library. Full rule text extracted from AGENTS.md.
