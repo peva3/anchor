@@ -10,10 +10,11 @@
 | # | Status | Description |
 |---|--------|-------------|
 | 1 | ✅ | Audit current project state against AGENTS.md |
-| 2 | 🔄 | Ship the routing map, checkpoints, branch policy, hard stops, and sections 64-66 |
-| 3 | ⬜ | Decide whether to ship a local routing/benchmark checker (Phase 4 proposal — approval required) |
-| 4 | ⬜ | Populate or remove empty `research/papers/full/` directory |
-| 5 | ⬜ | Keep `routing.json` and the Section Index in sync when skills change |
+| 2 | ✅ | Ship the routing map, checkpoints, branch policy, hard stops, and sections 64-66 |
+| 3 | ✅ | Ship the local routing/benchmark checker (`scripts/check_structure.py` + `tests/bench_projects.py`) |
+| 4 | ✅ | `research/papers/full/` holds the full papers, linked from `research/index.md` |
+| 5 | ✅ | Keep `routing.json` and the Section Index in sync — now enforced by `scripts/check_structure.py` |
+| 6 | 🔄 | Ship sections 67-73 (the delivery loop), the `plan` route, skill frontmatter, and benchmark batch 31 |
 
 ## Completed Sprints
 
@@ -30,6 +31,7 @@
 | 9 | ✅ | Rebrand to "Anchor" with SEO-optimized README |
 | 10 | ✅ | Add Section 36 financial/identity NEVER rules |
 | 11 | ✅ | Repo self-audit identified 33 issues; fixes in flight |
+| 12 | ✅ | Sections 67-73 — elicitation, decomposition, diagnosis, two-axis review, design, domain modeling, retro; `plan` task type |
 
 ## Notes
 

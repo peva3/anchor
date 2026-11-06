@@ -9,8 +9,8 @@ Anchor is a documentation-only template. It ships rules, not code.
 
 ```
 anchor/
-├── AGENTS.md                # ⭐ The deliverable — high-level entry point, 66 sections of agent rules
-├── skills/                  # Full rule text — 66 skill files (NN-name.md), lazy-loaded by task
+├── AGENTS.md                # ⭐ The deliverable — high-level entry point, 73 sections of agent rules
+├── skills/                  # Full rule text — 73 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md               # AI bootstrap guide — phases for greenfield projects
 ├── README.md                # Public-facing description, stats, quick start
 ├── CONTRIBUTING.md          # How to add/change sections safely
@@ -39,7 +39,7 @@ There is no runtime data flow. The data flow is **rule distribution**:
 
 1. **Author** writes a section in `AGENTS.md` addressing a specific observed failure mode
 2. **Extract** the section's full text into `skills/NN-name.md` (one skill per section)
-3. **Validate** — verify the Section Index has 66 rows and every link resolves to a file in skills/ (no duplicate headings, no cross-references to sections that don't exist); a deeper scratch audit (`tests/test_agents_md_quality.py`, run during development, not shipped) covers numbering, skill-file completeness, code-block validity, and workflow coverage
+3. **Validate** — `scripts/check_structure.py` verifies the Section Index has 73 rows, every link resolves to a file in `skills/`, headings are unique, every task type references existing skills, every section is reachable by some route, and `tests/routing-benchmark.json` matches `routing.json`; `scripts/check_links.py` catches broken links. Both are local development tooling (gitignored, like `tests/`)
 4. **Consumer** copies `AGENTS.md` + `skills/` (and platform-specific config) into their own project
 5. **AI agent** in the consumer project reads the entry point, loads the skills its task needs, and follows the rules
 
@@ -47,21 +47,27 @@ The template is therefore optimized for two audiences simultaneously: humans who
 
 ## Key Decisions
 
-### Why 66 sections, not fewer
+### Why 73 sections, not fewer
 
 Section 51.3 mandates ≤2,000 lines and ≤5,000 tokens for *project-specific* AGENTS.md files, with an explicit exception for this template repository. The template's value is breadth — a single import gives a project access to production-readiness patterns (CI/CD, observability, secrets, mutation testing, chaos engineering) that would otherwise take a team months to assemble.
 
 The template reconciles breadth with constrained context windows by **splitting into an entry point + lazy-loaded skills**:
 
-1. `AGENTS.md` stays lean (~407 lines, ~6,000 tokens, measured) — a single Section Index (routing + glossary in one) plus the core rules (Sections 1, 2, 36, 50.1/50.6, 51.3) reproduced in full, because a hard stop that only applies when a skill happens to be loaded is not a hard stop.
+1. `AGENTS.md` stays lean (~415 lines, ~6,500 tokens, measured) — a single Section Index (routing + glossary in one) plus the core rules (Sections 1, 2, 36, 50.1/50.6, 51.3) reproduced in full, because a hard stop that only applies when a skill happens to be loaded is not a hard stop.
 2. `skills/NN-name.md` holds each section's full rule text, byte-for-byte identical to the former monolith. Agents load only the skills their current task needs (Section 51.1 trigger-based loading).
-3. A 32K-context model can follow all guardrails by loading the entry point plus 7-12 relevant skills (~16-19K tokens total), verified during development by the scratch constrained-context test suite (`tests/`, not shipped).
+3. A 32K-context model can follow all guardrails by loading the entry point plus the routed skills (~20K tokens at the 8-skill budget, about 63% of the window). The budget is enforced by `tests/bench_projects.py`; `routing.json` records the per-skill cost estimate.
 
 Consumers trim on import: copy `AGENTS.md` + `skills/`, delete inapplicable skills, inline what remains.
 
-### Why validation is manual here (and automated in scratch)
+### Why the delivery loop was added (Sections 67-73)
 
-Nothing structural ships as a script — `scripts/` is gitignored (see "Gotchas"). The **structural invariant** is checked manually: every entry-point index link resolves to a skill file, no duplicate headings exist, every "Section NN" cross-reference lands on a real section, and every skill number referenced by `routing.json` exists. During development a deeper Python audit (`tests/test_agents_md_quality.py`, scratch, gitignored) automates those checks plus code-block validity and workflow coverage. It is pure standard library (re, pathlib, collections), runs in under a second over the entry point plus 66 skill files, but it is **not shipped** — per Section 1, `tests/` is gitignored (see "Gotchas" below).
+The first 66 sections are standards-shaped: they say what good code, tests, releases, and operations look like. They did not describe the work that produces those artifacts. An agent could follow every rule and still start building on a guess, slice work horizontally, theorise at a bug instead of reproducing it, review a diff without its spec, or repeat the same correction next sprint.
+
+Sections 67-73 close that loop: elicit the requirement (67), decompose it into vertical slices (68), diagnose failures by building a red-capable loop first (69), review against Standards and Spec independently (70), choose module boundaries with a shared vocabulary (71), name the domain and record decisions (72), and run a retrospective that ends in exactly one change (73). `routing.json` gained a `plan` task type so elicitation and decomposition load before implementation skills, and `feature` now loads Section 67 as a base skill because most feature work starts with an ambiguous ask.
+
+### Why validation tooling is local, not shipped
+
+Nothing structural ships as a script — `scripts/` and `tests/` are gitignored (see "Gotchas"). The **structural invariant** is still enforced, by local tooling: `scripts/check_structure.py` checks index ↔ skill parity, unique headings, routing integrity and reachability, core drift, and benchmark alignment; `scripts/check_links.py` checks links; `tests/bench_projects.py` routes 129 project scenarios through the map and asserts budget, reachability, decoys, and phase adds/drops. A fresh clone has none of them, so a contributor without the local tooling verifies manually: the Section Index has 73 rows, every link resolves, and every skill referenced by `routing.json` exists. The pre-commit hook skips these checks when the scripts are absent rather than failing on a missing file.
 
 ### Why the deployed platform configs are lightweight
 
@@ -73,11 +79,11 @@ The template cannot avoid governing itself — every section is a rule the maint
 
 ## Gotchas and Landmines
 
-1. **`tests/` is entirely gitignored** — by design (Section 1: tests are scratch). The scratch audit and test suites live locally during development but are **not shipped** in the template. A fresh clone has no `tests/` directory — any config or doc that invokes `python3 tests/...` will fail and must be kept out of the repo. The guardrails ship as the entry-point + skills structure itself; contributors verify structural integrity manually (Section Index has 66 rows, every link resolves).
+1. **`tests/` and `scripts/` are gitignored** — by design (Section 1: tests are scratch; the structural scripts are local development tooling). The benchmark suites, routing benchmark, audit scripts, and link checker live locally during development but are **not shipped**. A fresh clone has neither directory — any config or doc that invokes `python3 tests/...` or `python3 scripts/...` must tolerate their absence; the pre-commit hook does. Contributors without the tooling verify the structural invariant manually (Section Index has 73 rows, every link resolves).
 
 2. **Duplicate section 3.9 in STARTUP.md** — historically had two `### 3.9 Create SECURITY.md` headings, with the first one containing the CONTRIBUTING template by mistake. Any agent following STARTUP literally would have overwritten SECURITY.md. Fixed.
 
-3. **`research/papers/full/`** is an empty directory artifact. Either populate or remove. Kept empty for now pending full paper imports; see TODO.md.
+3. **`research/papers/full/` is not empty** — it holds the full text of the cited papers (AgentBench, CAMEL, and others), with `agentbench.md` as a shorter excerpt. Earlier notes calling it an empty artifact were wrong; the catalog is `research/index.md`.
 
 4. **Historical note (no longer applicable):** an earlier agent host wrapped every command in a `snip` shim that broke `cd`/`export`/`source`. That host is gone; current harnesses run shell commands directly and support a `workdir` parameter. The gotcha is recorded only so future maintainers recognize old references to it.
 

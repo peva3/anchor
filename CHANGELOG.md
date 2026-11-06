@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-11-06
+
+### Added
+- **Sections 67–73: the delivery loop the ruleset was missing.** Anchor covered standards well and workflow barely at all — nothing said how to elicit an ambiguous ask, slice an agreed outcome, diagnose a bug that will not reproduce, review a diff against its spec, choose a module boundary, name the domain, or learn from a sprint.
+  - **67 Requirements Elicitation (Grilling)** — walk a design tree, ask only frontier questions whose prerequisites are settled, give each question a recommended answer, treat facts as the agent's job and decisions as the user's, and stop only when the frontier is empty and the user confirms alignment
+  - **68 Spec & Ticket Decomposition** — a spec shape, vertical tracer-bullet slices sized to one fresh context window and demoable alone, blocking edges, S/M/L/XL sizing, and the expand → migrate → contract exception for wide refactors
+  - **69 Bug Diagnosis Loop** — build a loop that goes red on this exact bug before theorising; ten loop types; tighten for speed and determinism; 3–5 falsifiable hypotheses; one variable at a time; regression test at the lowest seam (and if there is no seam, that is the finding)
+  - **70 Two-Axis Code Review** — Standards and Spec reviewed independently, each with its own evidence, and no cross-axis reranking. Includes the twelve Fowler smell names as a judgement baseline
+  - **71 Codebase Design** — module, interface, implementation, depth, seam, adapter, leverage, locality; the deletion test; one adapter is a hypothetical seam, two make it real
+  - **72 Domain Modeling & Glossary** — GLOSSARY.md as the ubiquitous language, invariants and state transitions modeled explicitly, and numbered immutable ADRs that record rejected options
+  - **73 Retrospective** — evidence-first retro categories, a severity ladder that prefers a deterministic check over prose, and one change per retro
+- **`plan` task type** — elicitation and decomposition now have a route. Twenty task types total. Planning loads 67 as its base, plus 68, 28, 50, 6, 64.
+- **Skill frontmatter on every skill file** — `name` and `description` in YAML, so the library is loadable by Claude Code-style skill loaders without a separate manifest. The AGENTS.md index remains the source of truth for descriptions.
+- **Benchmark batch 31** — seven scenarios covering spec writing, decomposition, intermittent-bug diagnosis, two-axis review, seam-driven refactoring, domain documentation, and retrospectives. The project benchmark now has 129 scenarios.
+
+### Changed
+- **Section 8 now teaches TDD** — the red → green → refactor loop, one vertical slice at a time, seams agreed with the user before writing, and the anti-patterns (implementation-coupled, tautological, horizontal slicing). Refactoring belongs to review.
+- **Section 24.11 is now a pointer** — the short diagnosis advice delegates to the full Section 69 loop instead of duplicating it.
+- **Section 35.5 Merge Danger** — reversibility (one-way vs two-way door), blast radius, approval, rollback, evidence, canary, and a post-deploy check. Do not bundle a risky change with cleanup.
+- **Section 56.6 The Handoff Artifact** — a fixed Goal / State / Decisions / Facts / Constraints / Next-action template for long sessions.
+- **Section 51.6 Writing for Agents** — context pointer, context load vs cognitive load, information hierarchy, co-location, completion criteria as clarity plus demand, leading words, positive phrasing, and the no-op test. Negation is a failure mode.
+- **Section 64.1** — the task-type list is current, and the cap is 8 task-scoped skills, matching what `routing.json` enforces.
+- **Routing budget recalibrated** — each skill costs roughly 1,800 tokens, so 8 slots plus the ~6,000-token entry point lands near 20,000 tokens (~63% of a 32K window). The plan phase now adds only Section 50; Section 28 is dropped at build instead of lingering.
+
+### Fixed
+- **Section 64 claimed a 7-skill cap while the router enforced 8** — one number now, in both places.
+- **README statistics** — section count, skill-file count, entry-point size, Python-block count, and the validation section all match what the scripts actually check.
+
 ## [2.3.0] - 2026-10-21
 
 ### Added
