@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-11-07
+
+### Added
+- **Section 74: Design Systems & Visual Craft.** Section 63 said what a UI must not fake; nothing said what to build it from or how to judge the rendered result. Section 74 adds surface modes (Persuade / Operate / Read / Experience), tokens as the contract, the inner-radius rule, material inventory (real / pictures / absent), job-led structure with the mirror test, a Hard Floor / Reflex / Finish severity split, a refused-defaults table, copy rules, the rendered-surface ship checklist, `PRODUCT.md` and `DESIGN.md`, and deterministic detection before prose review. Routed with `ui`.
+- **Section 75: Security Audit Loop.** Section 13 lists controls; Section 75 is the method that proves which are present. It adds the coverage ledger (entry point × attack class), source-to-sink traces with `file:line` evidence, adversarial validation by a fresh verifier, tri-state verdicts (confirmed / needs validation / rejected), severity as likelihood × impact with hardening notes kept separate, the sandbox gate, and additive re-audits. Routed with `security`.
+- **Section 63.7 Design Critique** — critique and audit are separate passes; P0–P3 findings versus ranked observations; the reviewer must have a fresh context and the builder acts on the verdict.
+- **Benchmark batch 32** — design-system page, security audit, and design-critique scenarios. The project benchmark now has 132 scenarios.
+
+### Changed
+- **Section 50.2 debt sweep** — `# ponytail:` comments are harvested into `TODO.md` at sprint close or retro, with their triggers, so the ledger is reviewed rather than merely greppable.
+- **Section 50.6 evidence classes** — claims are tagged `EXTRACTED`, `INFERRED`, or `AMBIGUOUS`, and every report ends with what was not checked.
+- **Section 70 review depth** — read the callers of changed public surfaces, sequence Spec before Standards, cite a consequence for every finding, and verify received review points before complying.
+- **Section 67 elicitation** — offer 2–4 concrete options per question, state the inferences behind a blanket "go ahead", and play the brief back in short chunks.
+- **Section 16 living specs** — `SPEC.md` beside the module, changed in the same commit as the contract, plus a documentation drift check.
+- **Section 72 maintenance** — contract changes update `SPEC.md` and the governing ADR in the same commit; a rename is not done until code, tests, glossary, and ADR agree.
+- **Section 15.1 parallel agents** — one worktree, one branch, one task per agent; no overlapping files; a recorded green baseline; explicit merge / keep / discard.
+- **Section 22.2** — handoff rules now require worktree isolation for parallel agents.
+- **Section 51.6** — index-first navigation for large corpora: index → linked page, never re-parse the whole store.
+- **Routing** — `ui` gains 74 (and a `screen` trigger); `security` gains 75 (and `security audit` / `attack surface` triggers). `feature` stays at the 8-skill cap, so UI work routes through `ui`.
+
 ## [2.4.0] - 2026-11-06
 
 ### Added

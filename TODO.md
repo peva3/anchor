@@ -14,7 +14,8 @@
 | 3 | ✅ | Ship the local routing/benchmark checker (`scripts/check_structure.py` + `tests/bench_projects.py`) |
 | 4 | ✅ | `research/papers/full/` holds the full papers, linked from `research/index.md` |
 | 5 | ✅ | Keep `routing.json` and the Section Index in sync — now enforced by `scripts/check_structure.py` |
-| 6 | 🔄 | Ship sections 67-73 (the delivery loop), the `plan` route, skill frontmatter, and benchmark batch 31 |
+| 6 | ✅ | Ship sections 67-73 (the delivery loop), the `plan` route, skill frontmatter, and benchmark batch 31 |
+| 7 | 🔄 | Ship sections 74-75 (design systems, security audit), design critique, cross-cutting tweaks, and benchmark batch 32 |
 
 ## Completed Sprints
 
@@ -32,6 +33,7 @@
 | 10 | ✅ | Add Section 36 financial/identity NEVER rules |
 | 11 | ✅ | Repo self-audit identified 33 issues; fixes in flight |
 | 12 | ✅ | Sections 67-73 — elicitation, decomposition, diagnosis, two-axis review, design, domain modeling, retro; `plan` task type |
+| 13 | ✅ | Sections 74-75 — design systems and visual craft, security audit loop; 63.7 critique; cross-cutting tweaks; benchmark batch 32 |
 
 ## Notes
 
