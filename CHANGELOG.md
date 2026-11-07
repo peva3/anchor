@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-11-07
+
+### Changed
+- **STARTUP.md refreshed to the 75-section layout.** The bootstrap guide had drifted two releases behind: it still advertised 66 sections in twelve places and its "Key AGENTS.md Sections" table stopped at Section 51. All counts now match `AGENTS.md`, and the table covers 52–75 (rule enforcement, MCP guardrails, supply chain, property tests, UI quality, the delivery loop, design systems, and the security audit loop).
+- **Starter bundle includes STARTUP.md again.** It was excluded from 2.5.0 because the stale section map would have misled new projects.
+
+### Fixed
+- **STARTUP.md no longer tells new projects to gitignore `tests/`.** Sections 8 and 40 require committed tests; the bootstrap advice now says to ignore local scratch, build artifacts, and secrets, and the summary table matches.
+
 ## [2.5.0] - 2026-11-07
 
 ### Added
