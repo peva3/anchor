@@ -32,6 +32,10 @@ Use the merge-base (`...`) so unrelated changes on the base branch do not appear
 the base commit in the report; "reviewed the PR" without a fixed point is unrepeatable.
 For a self-review before commit, the base is `HEAD`.
 
+**Then read the blast radius.** The diff is the change; the callers are the consequence.
+For every changed public function, type, schema, or config key, read at least one caller and
+the nearest test. A review that reads only the diff cannot see the broken contract.
+
 ### 70.2 Axis A — Standards
 
 Check the repo's documented rules **first**; they override any generic taste. Then use the
@@ -87,6 +91,11 @@ confirm correctness against a moving target. Point back to
   spec" and "it meets the spec but is unmaintainable" are both failures.
 - Report in two sections, with severities local to each axis. Do not produce one combined
   ranked list.
+- **Sequence: Spec first, Standards second.** Confirm the change does the right thing before
+  polishing how it does it. A beautiful implementation of the wrong requirement is rework.
+- For a multi-task plan, review each slice against its own acceptance item as it lands, not
+  only the combined diff at the end
+  ([Section 68](skills/68-spec-and-ticket-decomposition.md)).
 
 ### 70.5 Report Format
 
@@ -105,8 +114,9 @@ confirm correctness against a moving target. Point back to
 Standards: changes requested. Spec: not met (1 blocker).
 ```
 
-Every finding needs **location, evidence, why it matters, and the fix**. A finding without
-a location is unactionable. A finding without a rule or spec reference is taste.
+Every finding needs **location, evidence, why it matters, what happens if you skip it, and
+the fix**. A finding without a location is unactionable. A finding without a rule or spec
+reference is taste. A finding without a consequence is a preference.
 
 ### 70.6 Verify Before You Report
 
@@ -115,6 +125,9 @@ a location is unactionable. A finding without a rule or spec reference is taste.
 - Do not invent line numbers or files — quote what is there.
 - Separate **blockers** (correctness, security, spec) from **suggestions** (naming, style).
 - If you found nothing on an axis, say so explicitly; silence is not a clean bill of health.
+- **When you receive a review, verify before you comply.** Reproduce each point against the
+  code; if it is valid, fix it, and if it is not, say why with evidence. Applying a
+  plausible-sounding suggestion unchecked is how a review introduces a bug.
 
 ### 70.7 When to Use
 
@@ -143,6 +156,8 @@ a location is unactionable. A finding without a rule or spec reference is taste.
 - Did both axes run, with separate reports?
 - Does every blocker name a location and a rule or acceptance item?
 - Did you re-check each finding against the actual diff?
+- Did you read the callers of every changed public surface?
+- Does every blocker name a consequence, not just a preference?
 - Is the verdict explicit — approved, changes requested, or not reviewable?
 
 ---

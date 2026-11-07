@@ -101,6 +101,8 @@ def set_cache(key: str, value: Any) -> None:
 - Ties the upgrade to a measurable condition (not a vague "if this gets slow")
 - Makes debt scannable — `grep -r "ponytail:" src/` produces an instant ledger of all intentional shortcuts
 - Distinguishes intentional simplifications from bugs-in-waiting
+- Becomes a **debt ledger**: harvest `# ponytail:` comments into `TODO.md` at a sprint
+  boundary or retro ([Section 73](skills/73-retrospective.md)), with the trigger and owner
 
 **Examples of good tradeoff comments:**
 ```python
@@ -122,6 +124,12 @@ def set_cache(key: str, value: Any) -> None:
 - NOT a permission slip for sloppy code
 - NOT a TODO — it has a named ceiling and a specific trigger
 - NOT an excuse to skip error handling where data loss is possible
+
+**Harvest the ledger on a cadence.** A comment nobody reads is still a hidden landmine.
+At sprint close or retro ([Section 73](skills/73-retrospective.md)), run
+`grep -rn "ponytail:" src/`, copy each entry into `TODO.md` with its trigger, and delete the
+entries whose upgrade shipped or whose ceiling no longer applies. Debt that outlives its
+trigger is a bug, not a tradeoff.
 
 ### 50.3 Safety Carve-Outs — What to NEVER Be Lazy About
 
@@ -225,6 +233,21 @@ Prevent agents from making invalid or misleading claims. These are NOT optional.
 **ALWAYS name what produced a result** — when a model, provider, tool, or benchmark generated something you are reporting, name it (model name and version). An unattributed result cannot be reproduced or audited.
 
 **ALWAYS say "unknown" when the evidence is missing** — an honest gap beats a confident guess. This applies to answers about the codebase, the user's intent, and any expert-adjacent question.
+
+**Tag every load-bearing claim with its evidence class:**
+
+| Tag | Means | Required alongside it |
+|-----|-------|-----------------------|
+| `EXTRACTED` | Quoted or directly observed | Path, line, command, or URL |
+| `INFERRED` | Derived from evidence by reasoning | The reasoning and the evidence it rests on |
+| `AMBIGUOUS` | Sources conflict or are silent | Both readings, and what would settle it |
+
+An untagged claim in a report is read as `INFERRED`. Do not dress an inference as an
+extraction.
+
+**End with what you did not check.** A report that lists only what was examined implies
+completeness it does not have. State the unexamined surface: "Not checked: export worker,
+admin CLI, Safari rendering." Absence of evidence is not evidence of absence.
 
 ### 50.7 Tests Are Not Bloat
 

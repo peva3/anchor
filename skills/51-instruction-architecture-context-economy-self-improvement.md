@@ -189,6 +189,11 @@ Write for that reader.
 | **Positive phrasing** | Say what to do, not only what not to do | The model freezes or invents a path |
 | **No-op test** | If deleting the sentence would not change behavior, delete it | Sediment that dilutes the rules that matter |
 | **Single source of truth** | One rule, one place; cross-reference instead of copying | Two copies drift and contradict |
+| **Index-first navigation** | For a large store — docs, wiki, skills — read the index, then the one linked page | Re-parsing the whole corpus every turn |
+
+**Navigation is part of the instruction budget.** A large corpus with no index forces the
+reader to load all of it. Keep one `index.md` that lists every page with a one-line summary,
+and navigate index → page → link, never index → everything.
 
 **Negation is a failure mode.** "Never use `os.path`" leaves the replacement implicit. Write
 "Use `pathlib.Path` for all filesystem paths" — the positive form is actionable and the

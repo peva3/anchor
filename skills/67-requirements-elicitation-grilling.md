@@ -56,6 +56,12 @@ frontier visible and work it in rounds.
   derived.
 - **Name the cost of each option.** "Guest checkout adds duplicate-account handling;
   accounts add a signup step" is a decision aid. "Which do you prefer?" is not.
+- **Give 2–4 concrete options, not an open field.** "Postgres, SQLite, or a hosted
+  service?" is answerable; "what database do you want?" moves the design work back to the
+  user. Include the recommended option and what would change the recommendation.
+- **Treat "go ahead" as choosing the recommendation — and say what you inferred.** After a
+  blanket approval, list the assumptions you filled in: "Proceeding with: 15-minute holds,
+  guest checkout, no admin UI in v1." That gives the user one last cheap place to correct you.
 
 ```markdown
 1. Should checkout require an account?
@@ -75,6 +81,10 @@ The grill is done when **all** of these hold:
 - [ ] You can name the acceptance test that proves it.
 - [ ] Non-goals are written down, not implied.
 - [ ] The user confirms the summary in their own words.
+
+**Play it back in chunks.** Summarize in 3–5 short blocks — goal, decisions, non-goals,
+acceptance — and ask for corrections after each. A single 40-line recap gets skimmed and
+rubber-stamped; a short block gets read.
 
 If the user says "just build it", record the assumptions you are making, pick the safer
 route ([Section 64](skills/64-skill-routing-and-checkpoints.md)), and proceed. Do not

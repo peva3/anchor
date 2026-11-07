@@ -84,6 +84,34 @@ Before a UI change is marked complete, run this checklist (mirrors [Section 34.8
 - [ ] `prefers-reduced-motion` respected for any animation
 - [ ] ENERGY / RHYTHM / MOTION dials set deliberately and met
 - [ ] Renders correctly at the project's supported viewport sizes
+- [ ] Visual values come from tokens, not literals ([Section 74](skills/74-design-systems-and-visual-craft.md))
+
+### 63.7 Design Critique — Judge the Rendered Result
+
+Passing the checklist is not the same as being good. Run a critique when a surface is new,
+substantially restyled, or about to ship.
+
+**Critique and audit are different jobs.** Do both, in this order:
+
+| Pass | Question | Output |
+|------|----------|--------|
+| **Audit** | Is it technically correct? | Findings with severity: contrast, labels, focus, overflow, performance |
+| **Critique** | Does it do its job well? | Ranked, scored observations: hierarchy, clarity, pacing, genericness |
+
+- **Audit findings are P0–P3** and are fixed or waived with a reason.
+- **Critique observations are ranked by "fix first"**, not by severity theatre. One clear
+  priority beats ten equal-weight opinions.
+- Judge the **rendered surface**, not the source. Screenshot it at the supported widths and
+  read it as a user would.
+- Score only what the surface is trying to do: a dashboard is judged on scan speed and
+  stability, a landing page on a single clear action ([Section 74.1](skills/74-design-systems-and-visual-craft.md)).
+
+**The reviewer must not be the builder.** A fresh context — a subagent or a new session —
+is given the screenshots, the brief, and the checklist, but not the builder's reasoning. Its
+verdict is the one the builder acts on; the builder does not get to re-rank it away.
+
+**A critique without a decision is entertainment.** End with one of: ship, fix these three,
+or return to the brief because the surface is solving the wrong problem.
 
 ---
 

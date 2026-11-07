@@ -41,6 +41,8 @@ Product Manager → Architect → Engineer → QA → Deploy
 2. Verification gate at each handoff before proceeding
 3. Document any deviations at handoff boundaries
 4. Supervisor agent tracks overall progress
+5. Parallel agents get one worktree, one task, and no overlapping files
+   ([Section 15.1](skills/15-git-workflow.md))
 
 **Example:**
 ```

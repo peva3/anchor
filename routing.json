@@ -489,7 +489,13 @@
         "tracker",
         "admin dashboard",
         "internal dashboard",
-        "onboarding flow"
+        "onboarding flow",
+        "design system",
+        "design tokens",
+        "visual design",
+        "style guide",
+        "design critique",
+        "screen"
       ],
       "always": [
         63
@@ -500,7 +506,8 @@
         34,
         35,
         13,
-        53
+        53,
+        74
       ]
     },
     {
@@ -814,7 +821,9 @@
         "multi-tenant",
         "multitenant",
         "jwt validation",
-        "token validation"
+        "token validation",
+        "security audit",
+        "attack surface"
       ],
       "always": [
         36
@@ -825,7 +834,8 @@
         44,
         55,
         58,
-        27
+        27,
+        75
       ]
     },
     {

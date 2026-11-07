@@ -115,6 +115,10 @@ PR note ([Section 50](skills/50-intentional-minimalism-the-simplicity-first-arch
 - Delete a term that no longer exists in code; a stale glossary teaches the wrong language.
 - Cross-link the ADR from the code it governs (one line, not a paragraph).
 - Run a link check in CI or pre-commit ([Section 37](skills/37-pre-commit-hook-standards.md)).
+- When a boundary or contract changes, update the module `SPEC.md`
+  ([Section 16.1](skills/16-documentation-requirements.md)) and the governing ADR in the
+  same commit.
+- A rename is not done until code, tests, glossary, and ADR all use the new term.
 
 ### 72.7 Anti-Patterns
 

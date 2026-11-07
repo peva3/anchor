@@ -98,6 +98,8 @@ Glossary and routing table in one. Load a file when its trigger matches your tas
 - **71 Codebase Design** — Module boundaries, deep interfaces, seams — [open](skills/71-codebase-design-deep-modules.md)
 - **72 Domain Modeling & Glossary** — Ubiquitous language, invariants, ADRs — [open](skills/72-domain-modeling-and-glossary.md)
 - **73 Retrospective** — After a sprint, incident, or repeated correction — [open](skills/73-retrospective.md)
+- **74 Design Systems & Visual Craft** — Building or restyling a UI surface, tokens, visual judgment — [open](skills/74-design-systems-and-visual-craft.md)
+- **75 Security Audit Loop** — Auditing a codebase or API, validating a security finding — [open](skills/75-security-audit-loop.md)
 
 ## Core Rules (kept in full — always apply)
 

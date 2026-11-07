@@ -76,5 +76,25 @@ Migration 010 adds constraint with deduplication pass.
 - **Branch naming:** `feature/name`, `fix/name`, `sprint-n`
 - **Solo vs shared (Section 36.2):** in a shared/team repo, always branch and use the review process — no exceptions, including emergencies. In a solo repo where only `main` matters, direct commits and pushes to `main` are fine and usually preferred as a versioned backup. An experiments-only branch does not make a repo shared, and a private repo is not necessarily a solo one. Branch protections still apply, and pushing still happens only when the user asks.
 
+### 15.1 Parallel Agents — One Worktree per Task
+
+Parallel work fails on shared state, not on talent. Isolate it:
+
+- **One worktree and one branch per agent**, one task per agent
+  ([Section 22](skills/22-multi-agent-cooperation-patterns.md)).
+- **No overlapping files.** Assign file ownership before dispatch; if two tasks must touch
+  the same file, run them in sequence.
+- **Record a clean baseline first.** Note the commit and confirm the suite is green before
+  dispatch, so a failure is attributable ([Section 23](skills/23-verification-gates.md)).
+- **Each agent commits its own work** and reports the branch, the verification it ran, and
+  what it did not check.
+- **Integrate explicitly.** A human or integrator decides merge / keep / discard per branch.
+  No auto-merge, no force push, no shared-branch rewriting.
+- **Remove the worktree when the branch lands or is discarded**; stale worktrees hide
+  uncommitted work.
+
+A single agent editing two concerns at once is the same problem at a smaller scale: commit
+one logical change before starting the next.
+
 ---
 
