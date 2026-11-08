@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.5] - 2026-11-08
+
+### Added
+- **Section 76: Security Reconnaissance & Attack Classes.** Section 75 assumed the unit list already existed. Section 76 produces it: a one-page `architecture.md` (principals, protected resources, entry surfaces, trust boundaries, starting paths, known limits), attack-class packs selected by target type rather than language, the high-yield classes scanners miss (state machines, races, numeric manipulation, export/import abuse, search oracles, preview leakage, callback SSRF), one unclassified wildcard unit, and a literal obvious-things pass.
+- **Section 77: Security Finding Validation & Reporting.** Candidate validation and record verification are separate. Section 77 adds the fresh-reviewer check of every `file:line`, precondition, and impact; a prior-run state table (same source, changed source, unresolved, rejected, deferred, missing ledger); findings as validated data with three verdict branches and stable fingerprints; reproduction in the target's native interface; and a report structure where zero confirmed findings is a valid, stated result.
+- **`audit` task type** — a 21st route for security audit work, owning `security audit`, `attack surface`, `penetration test`, `pentest`, `vulnerability audit`, and `security review`. It loads Sections 75–77 plus the controls, secrets, supply-chain, production, and prompt-injection skills (8 scoped).
+
+### Changed
+- **Section 75 now states a quick/deep scope profile, points to Section 76 before building the ledger and to Section 77 before writing the report, and replaces the sandbox sentence with five explicit controls** (no external network, sanitized environment, read-only target, scratch-only writes, resource limits).
+- **Security audit triggers moved from `security` to `audit`**, so implementing a control and auditing a codebase resolve to different skill sets.
+- **Benchmark coverage** — routing cases now cover 21 task types; the project benchmark has 133 scenarios, including a firmware pen-test that exercises the native attack classes.
+- **STARTUP.md section map extended through 77**, so the bootstrap guide matches the index again.
+
 ## [2.6.0] - 2026-11-07
 
 ### Changed
