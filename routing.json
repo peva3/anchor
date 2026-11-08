@@ -813,7 +813,6 @@
         "privacy",
         "compliance",
         "threat model",
-        "pentest",
         "audit trail",
         "audit log",
         "audit logs",
@@ -821,9 +820,7 @@
         "multi-tenant",
         "multitenant",
         "jwt validation",
-        "token validation",
-        "security audit",
-        "attack surface"
+        "token validation"
       ],
       "always": [
         36
@@ -836,6 +833,33 @@
         58,
         27,
         75
+      ]
+    },
+    {
+      "type": "audit",
+      "triggers": [
+        "security audit",
+        "attack surface",
+        "penetration test",
+        "pentest",
+        "vulnerability audit",
+        "security review",
+        "audit the codebase",
+        "find vulnerabilities",
+        "red team",
+        "exploit chain"
+      ],
+      "always": [
+        75
+      ],
+      "skills": [
+        76,
+        77,
+        13,
+        44,
+        58,
+        31,
+        55
       ]
     },
     {

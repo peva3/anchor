@@ -100,6 +100,8 @@ Glossary and routing table in one. Load a file when its trigger matches your tas
 - **73 Retrospective** — After a sprint, incident, or repeated correction — [open](skills/73-retrospective.md)
 - **74 Design Systems & Visual Craft** — Building or restyling a UI surface, tokens, visual judgment — [open](skills/74-design-systems-and-visual-craft.md)
 - **75 Security Audit Loop** — Auditing a codebase or API, validating a security finding — [open](skills/75-security-audit-loop.md)
+- **76 Security Reconnaissance & Attack Classes** — Scoping an audit, mapping trust boundaries, choosing attack classes — [open](skills/76-security-reconnaissance-and-attack-classes.md)
+- **77 Security Finding Validation & Reporting** — Verifying a finding record, carrying prior results, writing the report — [open](skills/77-security-finding-validation-and-reporting.md)
 
 ## Core Rules (kept in full — always apply)
 

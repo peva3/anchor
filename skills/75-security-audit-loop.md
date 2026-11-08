@@ -27,8 +27,18 @@ Three properties make the difference:
 - **Tri-state verdicts.** A finding is confirmed, explicitly unresolved, or disproved — never
   "probably fine".
 
+State the **scope profile** before hunting, and report it with the result:
+
+- **Quick** — one pass over the in-scope surfaces; prior gaps are listed but not reopened.
+- **Deep** — adds lifecycle modes (create/update/delete/restore) and revalidation of prior
+  gaps and changed source.
+
+"Audited the codebase" without a profile and a coverage count is not a claim anyone can check.
+
 ### 75.2 Build the Coverage Ledger
 
+Start from reconnaissance ([Section 76.1](skills/76-security-reconnaissance-and-attack-classes.md))
+and select classes by target type ([Section 76.2](skills/76-security-reconnaissance-and-attack-classes.md)).
 Enumerate the units before testing anything:
 
 | Axis | Examples |
@@ -71,6 +81,8 @@ verdict: confirmed injection (bounded observed result: query returns other tenan
 - If the verifier cannot reproduce the path, downgrade or reject the finding. Record why.
 - This is the security instance of the independent-axes rule in
   [Section 70.4](skills/70-two-axis-code-review.md).
+- Candidate validation is not record verification. After the report is written, a second
+  fresh reviewer checks the record itself ([Section 77.1](skills/77-security-finding-validation-and-reporting.md)).
 
 ### 75.5 Use Tri-State Verdicts
 
@@ -97,10 +109,16 @@ verdict: confirmed injection (bounded observed result: query returns other tenan
 ### 75.7 Respect the Sandbox Gate
 
 Never execute target code or a live exploit unless the environment provides an OS-enforced
-sandbox (container, VM, seccomp, network isolation).
+sandbox with all of these controls:
 
-- No sandbox → static analysis only. Findings that would need execution stay
-  `needs_validation`.
+- **No external network** — loopback or a dedicated network namespace only.
+- **Sanitized environment** — an explicit allowlist, no inherited secrets or credentials.
+- **Read-only target and toolchain** — code and tools cannot be modified by the run.
+- **Scratch-only writes** — no writes to the repository, home, or shared paths.
+- **Explicit limits** — CPU, memory, process count, file size, disk, and wall clock.
+
+Missing any control means the target does not execute. Findings that would need execution stay
+`needs_validation`.
 - Do not send payloads to production, shared staging, or a third-party service.
 - Do not exfiltrate real data to prove a read. Use a bounded, synthetic marker where possible.
 - Record the gate in the report: "dynamic validation unavailable; N findings need validation".
@@ -108,6 +126,9 @@ sandbox (container, VM, seccomp, network isolation).
 ### 75.8 Audits Are Additive
 
 - Reuse the previous ledger. Do not start from a blank page and call it a fresh audit.
+- Classify every prior unit before reusing it — unchanged confirmed, changed source,
+  unresolved, rejected, deferred, or missing ledger each have a different action
+  ([Section 77.2](skills/77-security-finding-validation-and-reporting.md)).
 - Revalidate units whose source changed; mark stale entries.
 - **Never count a stale or unresolved unit as covered.** Coverage is a claim about this
   revision of the code.
@@ -115,6 +136,11 @@ sandbox (container, VM, seccomp, network isolation).
   that is what you did, and schedule another rather than implying completeness.
 
 ### 75.9 Report Format
+
+Record structure, findings-as-data, native-interface reproduction, and honesty rules are in
+[Section 77.3](skills/77-security-finding-validation-and-reporting.md) through
+[Section 77.5](skills/77-security-finding-validation-and-reporting.md). The skeleton below is
+the minimum.
 
 ```markdown
 ## Coverage
