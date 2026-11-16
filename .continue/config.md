@@ -23,7 +23,7 @@ Pre-commit hooks (Section 37) are mandatory: `pre-commit install`.
 
 ## Project Structure Requirements
 
-- `tests/` — All tests and random scripts (always gitignored)
+- `tests/` — All tests (committed); only `tests/scripts/` and caches are gitignored
 - `docs/` — Required for every project
 - `research/` — Required for every project
 - `DEEPDIVE.md` — Living system narrative, update on architecture changes

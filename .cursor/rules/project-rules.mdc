@@ -21,7 +21,7 @@ mypy .
 
 ### Required Folders
 Every project MUST have:
-- `tests/` — All tests + random scripts (in `.gitignore`)
+- `tests/` — All tests (committed); only `tests/scripts/` and caches are gitignored
 - `docs/` — Architecture documentation
 - `research/` — Whitepapers, references
 

@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-11-16
+
+### Added
+- **Section 5.1: Vendored Anchor files are gitignored.** Projects that copy the Anchor bundle now add `AGENTS.md`, `STARTUP.md`, `routing.json`, `skills/`, and the platform configs to `.gitignore`, so rule updates stay out of project history. `tests/`, `docs/`, `src/`, and the repo's own `.github/` templates remain project source, and `LICENSE` stays tracked.
+- **Section 51.7: Repository overrides (`OVERRIDE.md`).** A repo-root `OVERRIDE.md` records narrow, human-approved exceptions to a named section. Overrides cannot waive Sections 13, 36, 44, 50.3, or 55, and agents may not create or edit one to bypass a rule.
+- **`OVERRIDE.md`** at the repository root, exempting this template repository from Section 5.1 — ignoring its own deliverable would drop new sections from commits and releases.
+
+### Changed
+- **How to Use This File:** step 8 now separates vendoring (ignore the bundle) from adopting and trimming the rules (keep them tracked); step 9 makes `OVERRIDE.md` part of startup.
+
+### Fixed
+- **`.gitignore` guidance in STARTUP.md and the platform pointer configs** no longer tells new projects to ignore the whole `tests/` folder. Only `tests/scripts/` and generated artifacts are ignored, matching Sections 5 and 8. The bootstrap step now also lists the vendored Anchor block.
+
 ## [2.6.5] - 2026-11-08
 
 ### Added

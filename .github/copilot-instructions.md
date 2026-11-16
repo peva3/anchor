@@ -17,7 +17,7 @@
    ```bash
    ruff check . && ruff format . && vulture . && mypy .
    ```
-4. **tests/ folder** — All tests and random scripts go here; always in `.gitignore` (Section 5)
+4. **tests/ folder** — All tests go here and are committed; only `tests/scripts/` and caches are gitignored (Section 5)
 5. **docs/ and research/** — Create for every new project (Section 5)
 6. **Human-sounding commits** — Explain WHY changes were made, not just WHAT changed (Section 15)
 7. **DEEPDIVE.md** — Update after any architectural change (Section 5)
@@ -39,7 +39,7 @@
 ```
 project/
 ├── src/              # Source code
-├── tests/            # All tests (gitignored)
+├── tests/            # All tests (committed; tests/scripts/ ignored)
 ├── docs/             # Architecture docs
 ├── research/         # Research files
 ├── DEEPDIVE.md       # System narrative

@@ -62,7 +62,7 @@ ruff check . && ruff format . && vulture . && mypy .
 ```
 
 ### Required Folders
-- `tests/` — All tests + random scripts (always gitignored)
+- `tests/` — All tests (committed); only `tests/scripts/` and caches are gitignored
 - `docs/` — Architecture documentation
 - `research/` — Whitepapers, references
 
@@ -116,7 +116,7 @@ See DEEPDIVE.md for detailed system narrative including:
 1. **No dead code** — Remove unused functions, imports, variables immediately (Section 1)
 2. **Test-first** — Write tests before code, verify all pass before committing (Section 8)
 3. **Full cleanup sweep** before every commit: `ruff check . && ruff format . && vulture . && mypy .` (Section 9)
-4. **tests/ folder** — All tests and random scripts go here; always in `.gitignore` (Section 5)
+4. **tests/ folder** — All tests go here and are committed; only `tests/scripts/` and caches are gitignored (Section 5)
 5. **docs/ and research/** — Create for every new project (Section 5)
 6. **Human-sounding commits** — Explain WHY changes were made (Section 15)
 7. **DEEPDIVE.md** — Update after any architectural change (Section 5)
@@ -137,7 +137,7 @@ See DEEPDIVE.md for detailed system narrative including:
 ```
 project/
 ├── src/              # Source code
-├── tests/            # All tests (gitignored)
+├── tests/            # All tests (committed; tests/scripts/ ignored)
 ├── docs/             # Architecture docs
 ├── research/         # Research files
 ├── DEEPDIVE.md       # System narrative
@@ -181,7 +181,7 @@ ruff check . && ruff format . && vulture . && mypy .
 
 ### Required Folders
 Every project MUST have:
-- `tests/` — All tests + random scripts (in `.gitignore`)
+- `tests/` — All tests (committed); only `tests/scripts/` and caches are gitignored
 - `docs/` — Architecture documentation
 - `research/` — Whitepapers, references
 
@@ -248,7 +248,7 @@ Clean = commit. Dirty = fix first.
 ```
 project/
 ├── src/           # Source code
-├── tests/         # Tests + random scripts (gitignored)
+├── tests/         # Tests (committed; tests/scripts/ ignored)
 ├── docs/          # Documentation
 ├── research/      # Research files
 ├── DEEPDIVE.md    # System narrative (update on architecture changes)
@@ -312,7 +312,7 @@ All must pass before committing.
 
 ## Project Structure Requirements
 
-- `tests/` — All tests and random scripts (always gitignored)
+- `tests/` — All tests (committed); only `tests/scripts/` and caches are gitignored
 - `docs/` — Required for every project
 - `research/` — Required for every project
 - `DEEPDIVE.md` — Living system narrative, update on architecture changes
@@ -384,7 +384,7 @@ All checks must pass. No exceptions.
 ## Required Project Elements
 
 Every project must have:
-- **`tests/`** — All tests + random scripts (in `.gitignore`)
+- **`tests/`** — All tests (committed); only `tests/scripts/` and caches are gitignored
 - **`docs/`** — Architecture documentation
 - **`research/`** — Whitepapers and references
 - **`DEEPDIVE.md`** — Living system narrative (update after architecture changes)
@@ -496,10 +496,30 @@ Before writing any code, check each rung:
 
 The template includes:
 ```
-.env, *.pem, __pycache__/, *.pyc, venv/, .vscode/, tests/ (always gitignored),
-logs/, .coverage, docker-compose.override.yml, .mypy_cache/, .terraform/, pacts/
+.env, *.pem, __pycache__/, *.pyc, venv/, .vscode/,
+tests/scripts/, logs/, .coverage, docker-compose.override.yml,
+.mypy_cache/, .terraform/, pacts/
 ```
-See `.gitignore` in the Anchor repo for the complete template.
+Never ignore the whole `tests/` folder — only generated artifacts under it.
+
+Then add the vendored Anchor files ([Section 5.1](skills/05-project-structure-conventions.md)) so rule updates stay out of project history:
+
+```
+AGENTS.md
+STARTUP.md
+routing.json
+skills/
+CLAUDE.md
+CLAUDE.desktop.md
+docs/AGENT_INSTRUCTIONS.md
+.claude/config.json
+.cursor/rules/project-rules.mdc
+.windsurf/config.md
+.continue/config.md
+.github/copilot-instructions.md
+```
+
+The Anchor template repository itself is the one exception — it is the source of these files and records the exception in `OVERRIDE.md`.
 
 ### 3.2 Create .env.example
 
@@ -615,7 +635,7 @@ After completing all phases, your project will have:
 | `README.md` | Project documentation |
 | `TODO.md` | Task tracking |
 | `src/` | Source code directory |
-| `tests/` | Test directory (gitignored) |
+| `tests/` | Test directory (committed; `tests/scripts/` ignored) |
 | `docs/` | Documentation directory |
 | `research/` | Research files directory |
 

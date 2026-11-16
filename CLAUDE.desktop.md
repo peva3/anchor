@@ -16,7 +16,7 @@ ruff check . && ruff format . && vulture . && mypy .
 ```
 
 ### Required Folders
-- `tests/` — All tests + random scripts (always gitignored)
+- `tests/` — All tests (committed); only `tests/scripts/` and caches are gitignored
 - `docs/` — Architecture documentation
 - `research/` — Whitepapers, references
 

@@ -77,5 +77,42 @@ Date: 2026-05-15
 Decision: Split API into dual ports (migration 009)
 ```
 
+### 5.1 Vendored Anchor Files Are Gitignored
+
+When a project is scaffolded from the Anchor bundle, the Anchor files are **vendored
+tooling**, not project source. Add this block to `.gitignore` as part of setup:
+
+```gitignore
+# Anchor instruction system — vendored; update by re-copying the bundle
+AGENTS.md
+STARTUP.md
+routing.json
+skills/
+CLAUDE.md
+CLAUDE.desktop.md
+docs/AGENT_INSTRUCTIONS.md
+.claude/config.json
+.cursor/rules/project-rules.mdc
+.windsurf/config.md
+.continue/config.md
+.github/copilot-instructions.md
+```
+
+- **Why:** the project's history should describe the product, not the instructions that
+  produced it. Vendoring keeps upstream rule updates out of the project's diff, and one
+  ignore block replaces per-file conflict resolution on every update.
+- **Apply once, idempotently.** Add the block only when it is missing; do not duplicate
+  entries or rewrite unrelated lines.
+- **Keep `LICENSE` tracked** when the project redistributes Anchor. It is not in the
+  managed list.
+- **Never ignore project files to satisfy this rule.** `tests/`, `docs/`, `src/`, and the
+  repo's own `.github/` templates are project source ([Section 8](skills/08-testing-requirements.md)).
+  Ignore `.github/copilot-instructions.md` specifically, not `.github/`.
+- **This rule does not apply to the Anchor template repository itself** — it is the source
+  of these files, not a consumer, and ships an `OVERRIDE.md` ([Section 51.7](skills/51-instruction-architecture-context-economy-self-improvement.md)).
+- **If contributors or CI need the rules from a clean clone**, keep the files tracked
+  instead and record the deviation in `PROJECT.md`. An ignored `AGENTS.md` is invisible to
+  anyone who only clones the repo.
+
 ---
 

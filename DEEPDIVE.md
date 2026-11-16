@@ -10,6 +10,7 @@ Anchor is a documentation-only template. It ships rules, not code.
 ```
 anchor/
 ├── AGENTS.md                # ⭐ The deliverable — high-level entry point, 77 sections of agent rules
+├── OVERRIDE.md              # Repo-local exception: the vendoring rule must not apply here
 ├── skills/                  # Full rule text — 77 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md               # AI bootstrap guide — phases for greenfield projects
 ├── README.md                # Public-facing description, stats, quick start
@@ -53,7 +54,7 @@ Section 51.3 mandates ≤2,000 lines and ≤5,000 tokens for *project-specific* 
 
 The template reconciles breadth with constrained context windows by **splitting into an entry point + lazy-loaded skills**:
 
-1. `AGENTS.md` stays lean (~419 lines, ~6,600 tokens, measured) — a single Section Index (routing + glossary in one) plus the core rules (Sections 1, 2, 36, 50.1/50.6, 51.3) reproduced in full, because a hard stop that only applies when a skill happens to be loaded is not a hard stop.
+1. `AGENTS.md` stays lean (~420 lines, ~6,700 tokens, measured) — a single Section Index (routing + glossary in one) plus the core rules (Sections 1, 2, 36, 50.1/50.6, 51.3) reproduced in full, because a hard stop that only applies when a skill happens to be loaded is not a hard stop.
 2. `skills/NN-name.md` holds each section's full rule text, byte-for-byte identical to the former monolith. Agents load only the skills their current task needs (Section 51.1 trigger-based loading).
 3. A 32K-context model can follow all guardrails by loading the entry point plus the routed skills (~20K tokens at the 8-skill budget, about 63% of the window). The budget is enforced by `tests/bench_projects.py`; `routing.json` records the per-skill cost estimate.
 
@@ -94,6 +95,12 @@ Each platform (Cursor, Windsurf, Continue, Copilot, Claude) gets a thin pointer 
 ### Why AGENTS.md is self-referential (Section 50.8)
 
 The template cannot avoid governing itself — every section is a rule the maintainers must follow, and the structure (entry-point ↔ skill files) enforces it. If the template were exempt, future maintainers would slowly drift away from its own standards. Section 50.8 makes the constraint explicit: editing AGENTS.md requires following every rule in AGENTS.md.
+
+### Why vendored Anchor files are gitignored (and why this repo opts out)
+
+Downstream projects install Anchor by copying the bundle, so the instruction system is tooling, not product source. Section 5.1 tells them to ignore the managed set: upstream rule updates then stay out of project diffs, and one ignore block replaces per-file conflict resolution. The trade-off is explicit in the rule — a clean clone has no rules, so a team that needs them in CI keeps the files tracked and records that deviation in `PROJECT.md`.
+
+This repository is the exception. Its deliverable *is* those files, so ignoring them would hide new sections from `git status`, silently drop them from `git add`, and exclude them from release bundles. The exception lives in `OVERRIDE.md` under the mechanism in Section 51.7: repo-local, narrow, citing the section and reason. It is deliberately excluded from the starter bundle and must not be copied into derived projects.
 
 ## Gotchas and Landmines
 

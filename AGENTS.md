@@ -17,7 +17,8 @@
 5. **Follow cross-references:** When a loaded skill references another section, that section is NOT included — load `skills/NN-name.md` for it too before proceeding. Every reference is a real link.
 6. **Verification:** When in doubt about a rule's full wording, read the skill file — never guess.
 7. **Write in English:** all code, comments, docs, commit messages, and PR text in English regardless of the language you were addressed in — a request in another language is still answered in English ([Section 4](skills/04-code-style.md)). If the user writes in another language, say so once and continue in English.
-8. **Template usage:** Projects should copy this file, keep the core rules, then trim the skill list to what applies and inline the needed skills into their own AGENTS.md (target ≤2,000 lines, per Section 51.3). Project-specific facts belong in a `PROJECT.md` you create per project — not in this file.
+8. **Template usage:** Projects should copy this file, keep the core rules, then trim the skill list to what applies and inline the needed skills into their own AGENTS.md (target ≤2,000 lines, per Section 51.3). Project-specific facts belong in a `PROJECT.md` you create per project — not in this file. If the project vendors the Anchor bundle as-is, also add the managed file list to `.gitignore` ([Section 5.1](skills/05-project-structure-conventions.md)); if you adopt and trim the rules into project-owned instructions, keep them tracked.
+9. **Check for overrides:** If the repo root contains `OVERRIDE.md`, read it before routing. It records narrow, human-approved exceptions and wins only for the scope it names. It cannot waive Sections 13, 36, 44, 50.3, or 55, and agents never create or edit it to bypass a rule — only the user may ([Section 51.7](skills/51-instruction-architecture-context-economy-self-improvement.md)).
 
 ---
 

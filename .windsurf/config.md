@@ -23,7 +23,7 @@ Pre-commit hooks (Section 37) are mandatory. Install once: `pre-commit install`.
 ```
 project/
 ├── src/           # Source code
-├── tests/         # Tests + random scripts (gitignored)
+├── tests/         # Tests (committed; tests/scripts/ ignored)
 ├── docs/          # Documentation
 ├── research/      # Research files
 ├── DEEPDIVE.md    # System narrative (update on architecture changes)

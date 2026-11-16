@@ -22,7 +22,7 @@ Pre-commit hooks (Section 37) are mandatory. Install once: `pre-commit install`.
 ## Required Project Elements
 
 Every project must have:
-- **`tests/`** — All tests + random scripts (in `.gitignore`)
+- **`tests/`** — All tests (committed); only `tests/scripts/` and caches are gitignored
 - **`docs/`** — Architecture documentation
 - **`research/`** — Whitepapers and references
 - **`DEEPDIVE.md`** — Living system narrative (update after architecture changes)

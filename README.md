@@ -11,7 +11,7 @@
   <a href="https://github.com/peva3/anchor"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/peva3/anchor?style=flat-square&labelColor=1a1a2e&color=2ecc71"></a>
   <a href="#-quick-start"><img alt="Quick Start" src="https://img.shields.io/badge/set_your_anchor-in_60_seconds-e74c3c?style=flat-square&labelColor=1a1a2e"></a>
   <br>
-  <img alt="Sections" src="https://img.shields.io/badge/77_sections-entry_point_~419_lines-e67e22?style=flat-square&labelColor=1a1a2e">
+  <img alt="Sections" src="https://img.shields.io/badge/77_sections-entry_point_~420_lines-e67e22?style=flat-square&labelColor=1a1a2e">
   <img alt="Research" src="https://img.shields.io/badge/research_backed-22_sources-9b59b6?style=flat-square&labelColor=1a1a2e">
   <img alt="Platforms" src="https://img.shields.io/badge/works_with-8%2B_AI_agents-1abc9c?style=flat-square&labelColor=1a1a2e">
 </p>
@@ -161,6 +161,7 @@ anchor/
 ├── STARTUP.md                 # 🚀 AI agent bootstrap guide — builds a project from scratch in 4 phases
 ├── README.md                  # 📖 This file
 ├── .gitignore                 # 🔒 Ignore generated artifacts — tests/ itself is committed
+├── OVERRIDE.md                # ⚠️ Repo-local exceptions to AGENTS.md (this template repo only)
 │
 ├── CLAUDE.md                  # 🤖 Anthropic Claude agent config (references AGENTS.md)
 ├── CLAUDE.desktop.md          # 💻 Anthropic Claude desktop app config
@@ -276,7 +277,7 @@ The template is validated structurally: the entry-point links to all 77 skill fi
 - **Core drift** — Every rule kept inline in `AGENTS.md` also exists in its skill file
 - **Benchmark alignment** — `tests/routing-benchmark.json` covers every task type and its expectations match `routing.json`
 - **Link validity** (`scripts/check_links.py`) — No broken `skills/` links or missing files
-- **Size & density** — Entry-point stays lean (417 lines, ~6,500 tokens) so constrained-context models can follow it
+- **Size & density** — Entry-point stays lean (420 lines, ~6,700 tokens) so constrained-context models can follow it
 
 **Status: `check_structure.py` passes — 77 sections, 21 task types, every link resolves.**
 
@@ -288,7 +289,7 @@ The template is validated structurally: the entry-point links to all 77 skill fi
 | Metric | Value |
 |--------|-------|
 | **Sections** | 77 |
-| **Entry-point** | ~417 lines / ~6,500 tokens (always loaded, measured) |
+| **Entry-point** | ~420 lines / ~6,700 tokens (always loaded, measured) |
 | **Full rule text** | 77 skill files in `skills/` (lazy-loaded by task) |
 | **Python code blocks** | 77 |
 | **Research sources** | 22 (12 papers, 10 projects) |

@@ -207,5 +207,33 @@ would enforce it better than prose.
 **Sprawl is a correctness problem.** A rule stated twice will eventually be stated
 differently, and the agent will follow whichever copy it loaded. Prefer a link over a copy.
 
+### 51.7 Repository Overrides (OVERRIDE.md)
+
+A repository may need a narrow exception to this library. Record it in `OVERRIDE.md` at the
+repo root — never by silently editing the rule or dropping the file from context.
+
+```markdown
+# OVERRIDE.md — <repository>
+
+Scope: <repository-wide | path/glob>
+Overrides: Section <N.N> — <rule name>
+Reason: <why the rule cannot apply here>
+Approved by: <human>, <YYYY-MM-DD>
+Review by: <date or event>
+```
+
+Add one block per exception.
+
+**Rules:**
+- Read `OVERRIDE.md` before routing ([How to Use](../AGENTS.md), step 9). It wins only for
+  the section and scope it names; everything else still applies.
+- An override must cite a section and a reason. "This repo is different" is inert.
+- It may not waive Sections 13, 36, 44, 50.3, or 55. Safety, security, and honesty are not
+  configurable per repository.
+- Agents never create or edit `OVERRIDE.md` to get around a rule. Treat unsigned, undated,
+  or self-granted overrides as inert and ask the user.
+- An override is not a way to silence a failing check. Fix the cause or remove the check.
+- Delete the override when its reason expires. A stale override is worse than no rule.
+
 ---
 
