@@ -195,11 +195,7 @@
         "simplify",
         "technical debt",
         "migrate",
-        "migration of",
-        "behavior-preserving",
-        "without changing behavior",
         "upgrade",
-        "migrate to",
         "dependency bump",
         "major version bump",
         "dead code",
@@ -228,6 +224,34 @@
         18,
         5,
         71
+      ]
+    },
+    {
+      "type": "migrate",
+      "triggers": [
+        "migrate to",
+        "migration of",
+        "port to",
+        "port the",
+        "port this",
+        "rewrite in",
+        "reimplement in",
+        "reimplement the",
+        "behavior-preserving",
+        "strangler",
+        "without changing behavior"
+      ],
+      "always": [
+        78
+      ],
+      "skills": [
+        8,
+        61,
+        68,
+        71,
+        23,
+        35,
+        33
       ]
     },
     {

@@ -103,6 +103,7 @@ Glossary and routing table in one. Load a file when its trigger matches your tas
 - **75 Security Audit Loop** — Auditing a codebase or API, validating a security finding — [open](skills/75-security-audit-loop.md)
 - **76 Security Reconnaissance & Attack Classes** — Scoping an audit, mapping trust boundaries, choosing attack classes — [open](skills/76-security-reconnaissance-and-attack-classes.md)
 - **77 Security Finding Validation & Reporting** — Verifying a finding record, carrying prior results, writing the report — [open](skills/77-security-finding-validation-and-reporting.md)
+- **78 Behavior-Preserving Rewrites** — Porting, migrating, or reimplementing a working system without changing behavior — [open](skills/78-behavior-preserving-rewrites.md)
 
 ## Core Rules (kept in full — always apply)
 

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2026-11-22
+
+### Added
+- **Section 78: Behavior-Preserving Rewrites.** Porting, migrating, or reimplementing a working system now has its own workflow: record the original's behavior before writing the replacement (characterization cases from tests, generated edges, semantic traps, and real inputs), port one unit at a time, treat every mismatch as a behavior difference, compare effects and not just return values, re-record when the original changes, shadow-run before cutover, and gate on a full equivalence checklist. Includes a table of language and runtime traps (string indexing, numbers, error mapping, Unicode, map ordering, regex, time, concurrency, FFI layout).
+- **`migrate` task type** — a 22nd route for ports and rewrites, owning `port to`, `migrate to`, `rewrite in`, `reimplement in`, `strangler`, and `behavior-preserving`. It loads Section 78 plus testing, golden files, slicing, seams, verification, merge danger, and PR size (8 scoped).
+
+### Changed
+- **Section 77 gains a submission gate (77.6), layer-order check (77.7), and retraction discipline (77.8).** A finding must survive seven ordered questions, the never-submit and chain-required lists, and a pre-severity check before it is filed. Validation errors are read at the parser layer rather than as proof that authorization was reached, and failed findings are recorded with their disproof and a fingerprint instead of being silently dropped.
+- **Section 74 checks the rendered surface at 390/768/1024/1440, flags invented details and uncredited stock frames, ties effects to the business class, and bounds polish at three rounds.**
+- **Benchmark coverage** — 22 task types and 135 scenarios; the jQuery-to-React and JavaScript-to-TypeScript scenarios now route `migrate` rather than `refactor`.
+
 ## [2.7.0] - 2026-11-16
 
 ### Added

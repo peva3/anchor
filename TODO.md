@@ -18,6 +18,7 @@
 | 7 | ✅ | Ship sections 74-75 (design systems, security audit), design critique, cross-cutting tweaks, and benchmark batch 32 |
 | 8 | ✅ | Split security into 76-77 (recon/classes, validation/reporting) and add the `audit` route |
 | 9 | ✅ | Ship Section 5.1 (vendored Anchor files gitignored), Section 51.7 (`OVERRIDE.md`), and the repo-local override |
+| 10 | ✅ | Ship Section 78 (behavior-preserving rewrites), the `migrate` route, and the 77/74 triage and rendered-surface checks |
 
 ## Completed Sprints
 
@@ -38,6 +39,7 @@
 | 13 | ✅ | Sections 74-75 — design systems and visual craft, security audit loop; 63.7 critique; cross-cutting tweaks; benchmark batch 32 |
 | 14 | ✅ | Sections 76-77 — security reconnaissance/attack classes and finding validation/reporting; `audit` task type |
 | 15 | ✅ | Sections 5.1 and 51.7 — vendored Anchor files gitignored downstream, plus the `OVERRIDE.md` exception for this repo |
+| 16 | ✅ | Section 78 behavior-preserving rewrites, `migrate` task type, security submission gate, rendered-surface checks; benchmark batch 33 |
 
 ## Notes
 

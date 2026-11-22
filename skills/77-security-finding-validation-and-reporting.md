@@ -115,7 +115,83 @@ A complete report has these sections, in this order:
 - A quick, scoped, or budget-limited run is a **partial pass**; say so plainly.
 - Do not describe an unvalidated candidate as a finding.
 
-### 77.6 Anti-Patterns
+### 77.6 The Submission Gate
+
+Validation answers "is this true?" Submission answers "would a competent reviewer accept
+it?" A true observation that cannot survive triage is noise, and filing it costs the
+reviewer's trust.
+
+Ask these in order. **One failed question kills the finding** — do not downgrade it and
+submit anyway.
+
+| # | Question | Kill condition |
+|---|----------|----------------|
+| 1 | Can an attacker do it now, step by step? | You cannot write the setup, the exact request, the result, the impact, and the cost |
+| 2 | Is the impact on the target's accepted list? | It is a hardening note dressed as a vulnerability |
+| 3 | Is the root cause in an in-scope asset? | It lives in staging, a third party, or an excluded component |
+| 4 | Does it need access an attacker cannot get? | The precondition is "an admin can…" or "a user with the secret can…" |
+| 5 | Is it already known or accepted? | Disclosed report, open issue, changelog entry, or documented behavior |
+| 6 | Is there proof beyond "technically possible"? | XSS shows `alert(1)`; SSRF returns DNS only; IDOR returns your own record |
+| 7 | Is it a never-submit class, or valid only as a chain? | See the two lists below |
+
+**Never submit alone:** missing CSP/HSTS/SPF/DMARC, banner disclosure, GraphQL
+introspection, clickjacking on a non-sensitive page, tabnabbing, CSV injection without
+execution, CORS wildcard without credential exfiltration, logout CSRF, self-XSS, open
+redirect, host-header reflection, SSRF DNS-only, session not invalidated on logout,
+concurrent sessions, internal IP in an error, mixed content, weak cipher suites, missing
+cookie flags.
+
+**Valid only with a demonstrated chain:** open redirect + OAuth callback → account
+takeover; clickjacking + a sensitive action; permissive CORS + credentialed PII; CSRF +
+a state-changing action; rate-limit bypass + OTP brute force; SSRF + internal data;
+host-header injection + password-reset poisoning; prompt injection + cross-user data;
+self-XSS + CSRF; subdomain takeover + OAuth redirect.
+
+**Before calling anything Critical or High**, confirm all five:
+
+- The full chain is validated, not one primitive that might connect.
+- One sentence names what the attacker leaves with.
+- It reproduces end to end, twice.
+- No inheritance, signature, or audience gate still blocks it.
+- The target has not rejected this severity class before.
+
+### 77.7 Read the Layer Order
+
+A validation error does not prove authentication was reached. Body parsers, sanitizers,
+and schema validators commonly run **before** auth, so an error about input shape is
+evidence about the parser, not the business logic.
+
+- Test with the simplest **well-formed** body (`{}`), not malformed input.
+- Distinguish "expected a string" (parser) from "not permitted" (authorization).
+- A block at the WAF or CDN edge is an edge response, not an origin response; say which
+  layer produced the evidence.
+- Record the layer assumption in the finding; an unstated assumption is how a parser
+  error becomes a fake auth bypass.
+
+### 77.8 Retraction and Evidence Hygiene
+
+Never silently drop a finding that failed. A silent drop means the next run repeats the
+work and the reviewer cannot see what was ruled out.
+
+Record the retraction in an appendix:
+
+```markdown
+- Original signal: <what looked wrong, with file:line>
+- Disproving evidence: <the test or source trace that killed it>
+- Why it looked real: <the layer or assumption that misled>
+- Date and fingerprint: <YYYY-MM-DD, hash>
+```
+
+Common false positives worth naming: marker collisions (the string `javascript` in a help
+link), status-code-only confidence with a byte-identical body, server policy mistaken for
+a state oracle, and a timing difference measured once.
+
+Evidence hygiene: strip cookies, bearer tokens, and PII from screenshots and request
+captures; keep raw evidence in a restricted location and cite it, rather than pasting it
+into the report. A rejected finding is not an absent one — keep its fingerprint so the
+next pass can skip it.
+
+### 77.9 Anti-Patterns
 
 | Anti-pattern | Why it fails | Do instead |
 |--------------|--------------|------------|
@@ -126,8 +202,11 @@ A complete report has these sections, in this order:
 | **HTTP assumed** | Invents an interface the target lacks | Native reproduction ([77.4](#774-report-in-the-targets-native-interface)) |
 | **Filling a clean report** | Manufactures findings to look useful | Report zero honestly ([77.5](#775-report-structure-and-honesty)) |
 | **Burying rejected work** | The next run repeats it | Keep the disproof and fingerprint |
+| **Submitting "technically true"** | A hardening note fails triage and costs trust | Run the gate in [77.6](#776-the-submission-gate) |
+| **Malformed input as auth proof** | Parser errors are read as authorization gaps | Test a well-formed body ([77.7](#777-read-the-layer-order)) |
+| **Silent retraction** | The same false lead returns next run | Record the disproof ([77.8](#778-retraction-and-evidence-hygiene)) |
 
-### 77.7 Verification
+### 77.10 Verification
 
 - Did a reviewer who did not hunt verify every retained record?
 - Were material replacements verified by a second independent reviewer?
@@ -135,6 +214,10 @@ A complete report has these sections, in this order:
 - Do the records validate against the schema, and does the prose match the records exactly?
 - Is each reproduction written in the target's native interface?
 - Does the report state its status, scope, limits, and coverage counts?
+- Did every retained finding pass the submission gate, including the never-submit and
+  chain-required checks?
+- Is the layer that produced each piece of evidence named, and was the request well formed?
+- Does every retraction have a disproof and a fingerprint, with evidence redacted?
 
 ---
 

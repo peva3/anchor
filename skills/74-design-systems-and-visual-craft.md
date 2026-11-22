@@ -30,6 +30,9 @@ it are different modes even when they share a brand.
 - A screen may borrow a second mode, but one is dominant. Mixed modes are a decision, not a default.
 - **Operate and Read fail loudly, Persuade fails quietly.** A slow dashboard or an unreadable
   doc is a defect; a landing page that merely underwhelms is a critique item.
+- **Effects follow the class.** Software, tech, and gaming can carry WebGL, scroll scenes, or
+  motion; hospitality, retail, and professional services are photo- and type-led. When in
+  doubt, remove the effect rather than adding a fallback for it.
 
 ### 74.2 Tokens Are the Contract
 
@@ -143,7 +146,9 @@ Run this against the rendered surface, not the source:
 
 - [ ] Stated mode and material inventory match what is on screen
 - [ ] No colour, font, or spacing literal outside the token block
-- [ ] Renders at 320, 768, and 1440 without overlap or clipped text
+- [ ] Renders at 390, 768, 1024, and 1440 without overlap or clipped text
+- [ ] No placeholder text and no invented details (names, quotes, street numbers, logos, metrics)
+- [ ] Real photographs carry one credit line; library frames are labeled stand-ins
 - [ ] Keyboard-only pass: visible focus, logical order, no traps
 - [ ] Zoom to 200%: no content lost
 - [ ] Reduced-motion preference respected
@@ -152,6 +157,10 @@ Run this against the rendered surface, not the source:
 - [ ] Contrast and labels pass WCAG AA ([Section 63.4](skills/63-ui-quality-and-anti-slop-guardrails.md))
 - [ ] No refused default survived without a written reason
 - [ ] `DESIGN.md` reflects every token and component used
+
+**Finish gate.** Hand off only when no fixable FAIL remains. Limit polish to **three
+rounds**; after that, name what is left and why, rather than continuing to iterate.
+Polishing without a stopping rule is how a surface ships late and no better.
 
 ### 74.9 PRODUCT.md and DESIGN.md
 
@@ -190,9 +199,9 @@ Prose review misses what a tool catches every time. Before handing off a UI chan
 |-------|---------|--------------|
 | Token/style lint | Literal colours, unknown tokens, duplicate values | stylelint, custom grep |
 | Accessibility scan | Contrast, labels, landmarks, focus order | axe, pa11y, Lighthouse |
-| Rendered screenshots | Overflow, overlap, layout shift | Playwright screenshots |
+| Rendered screenshots | Overflow, overlap, layout shift, empty visuals | Playwright at 390/768/1024/1440 |
 | Link check | Dead navigation and CTAs | [Section 37](skills/37-pre-commit-hook-standards.md) hooks |
-| Content check | Lorem ipsum, placeholder text, empty alts | grep / lint rule |
+| Content check | Lorem ipsum, placeholder text, empty alts, invented numbers or names | grep / lint rule |
 
 - Fix every FAIL. A waiver records the reason and the owner.
 - If a rule can be checked mechanically, add the check instead of another paragraph
