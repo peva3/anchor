@@ -19,6 +19,7 @@
 | 8 | ✅ | Split security into 76-77 (recon/classes, validation/reporting) and add the `audit` route |
 | 9 | ✅ | Ship Section 5.1 (vendored Anchor files gitignored), Section 51.7 (`OVERRIDE.md`), and the repo-local override |
 | 10 | ✅ | Ship Section 78 (behavior-preserving rewrites), the `migrate` route, and the 77/74 triage and rendered-surface checks |
+| 11 | ✅ | Ship Section 79 (design verification and motion), load it on the `ui` route, and refresh the §74 checks |
 
 ## Completed Sprints
 
@@ -40,6 +41,7 @@
 | 14 | ✅ | Sections 76-77 — security reconnaissance/attack classes and finding validation/reporting; `audit` task type |
 | 15 | ✅ | Sections 5.1 and 51.7 — vendored Anchor files gitignored downstream, plus the `OVERRIDE.md` exception for this repo |
 | 16 | ✅ | Section 78 behavior-preserving rewrites, `migrate` task type, security submission gate, rendered-surface checks; benchmark batch 33 |
+| 17 | ✅ | Section 79 design verification and motion, `ui` route load, §74 motion/token/browser checks; benchmark batch 34 |
 
 ## Notes
 

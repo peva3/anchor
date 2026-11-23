@@ -11,14 +11,14 @@
   <a href="https://github.com/peva3/anchor"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/peva3/anchor?style=flat-square&labelColor=1a1a2e&color=2ecc71"></a>
   <a href="#-quick-start"><img alt="Quick Start" src="https://img.shields.io/badge/set_your_anchor-in_60_seconds-e74c3c?style=flat-square&labelColor=1a1a2e"></a>
   <br>
-  <img alt="Sections" src="https://img.shields.io/badge/78_sections-entry_point_~421_lines-e67e22?style=flat-square&labelColor=1a1a2e">
+  <img alt="Sections" src="https://img.shields.io/badge/79_sections-entry_point_~422_lines-e67e22?style=flat-square&labelColor=1a1a2e">
   <img alt="Research" src="https://img.shields.io/badge/research_backed-22_sources-9b59b6?style=flat-square&labelColor=1a1a2e">
   <img alt="Platforms" src="https://img.shields.io/badge/works_with-8%2B_AI_agents-1abc9c?style=flat-square&labelColor=1a1a2e">
 </p>
 
 <p align="center">
   <b>Anchor — the production-grade AGENTS.md template for AI coding agents.</b><br>
-  <sub>Keep your agents grounded. 78 sections of battle-tested rules distilled from 100+ real-world projects, academic research, and production failures.</sub>
+  <sub>Keep your agents grounded. 79 sections of battle-tested rules distilled from 100+ real-world projects, academic research, and production failures.</sub>
 </p>
 
 <p align="center">
@@ -124,6 +124,7 @@ cp anchor/STARTUP.md ./your-new-project/STARTUP.md
 | 74-75 | Design systems and visual craft (surface modes, tokens, refused defaults, PRODUCT/DESIGN docs), security audit loop (coverage ledger, adversarial validation, tri-state verdicts) |
 | 76-77 | Security reconnaissance and attack classes (architecture map, target-type packs, high-yield classes), finding validation and reporting (fresh reviewer, prior-state handling, findings as data) |
 | 78 | Behavior-preserving rewrites (record the original, equivalence gate, effect comparison, shadow cutover) |
+| 79 | Design verification and motion (contrast matrix, scored render loop, tells scan, motion audit) |
 
 ---
 
@@ -141,7 +142,7 @@ cp anchor/STARTUP.md ./your-new-project/STARTUP.md
 
 | | Typical AGENTS.md | This Template |
 |---|---|---|
-| **Sections** | 5-15 | 78 (entry-point + skills) |
+| **Sections** | 5-15 | 79 (entry-point + skills) |
 | **Testing depth** | "Write tests" | Flaky management, mutation testing, contract testing, chaos engineering, coverage enforcement |
 | **Security** | "No secrets in code" | Prompt injection detection, audit logging, key encryption, IP whitelisting, 6-category NEVER list |
 | **Production** | Basic Docker | Circuit breaker, DLQ, middleware stack, health endpoints, structured logging, OpenTelemetry, SLOs |
@@ -156,9 +157,9 @@ cp anchor/STARTUP.md ./your-new-project/STARTUP.md
 
 ```
 anchor/
-├── AGENTS.md                  # ⭐ The main template — high-level entry point, 78 sections (full text in skills/), copy this into your project
+├── AGENTS.md                  # ⭐ The main template — high-level entry point, 79 sections (full text in skills/), copy this into your project
 ├── routing.json               # 🧭 Task type → skills to load (deterministic map, Section 64)
-├── skills/                    # 📂 Full rule text — 78 skill files (NN-name.md), lazy-loaded by task
+├── skills/                    # 📂 Full rule text — 79 skill files (NN-name.md), lazy-loaded by task
 ├── STARTUP.md                 # 🚀 AI agent bootstrap guide — builds a project from scratch in 4 phases
 ├── README.md                  # 📖 This file
 ├── .gitignore                 # 🔒 Ignore generated artifacts — tests/ itself is committed
@@ -270,9 +271,9 @@ The template ships with config files for 8+ AI coding agent platforms. All refer
 
 ## 🧪 Quality Validation
 
-The template is validated structurally: the entry-point links to all 78 skill files, and the skills hold the full rule text. Two local scripts enforce this:
+The template is validated structurally: the entry-point links to all 79 skill files, and the skills hold the full rule text. Two local scripts enforce this:
 
-- **Section structure** (`scripts/check_structure.py`) — All 78 sections present, sequentially numbered; each has a skill file, and every index entry resolves
+- **Section structure** (`scripts/check_structure.py`) — All 79 sections present, sequentially numbered; each has a skill file, and every index entry resolves
 - **Heading integrity** — No duplicate `### N.M` subsection numbers across files
 - **Routing integrity** — Every task type references existing skills, stays within the active-skill budget, owns unique triggers, and reaches every section (no dead guidance)
 - **Core drift** — Every rule kept inline in `AGENTS.md` also exists in its skill file
@@ -280,7 +281,7 @@ The template is validated structurally: the entry-point links to all 78 skill fi
 - **Link validity** (`scripts/check_links.py`) — No broken `skills/` links or missing files
 - **Size & density** — Entry-point stays lean (420 lines, ~6,700 tokens) so constrained-context models can follow it
 
-**Status: `check_structure.py` passes — 78 sections, 22 task types, every link resolves.**
+**Status: `check_structure.py` passes — 79 sections, 22 task types, every link resolves.**
 
 
 ---
@@ -289,9 +290,9 @@ The template is validated structurally: the entry-point links to all 78 skill fi
 
 | Metric | Value |
 |--------|-------|
-| **Sections** | 78 |
+| **Sections** | 79 |
 | **Entry-point** | ~420 lines / ~6,700 tokens (always loaded, measured) |
-| **Full rule text** | 78 skill files in `skills/` (lazy-loaded by task) |
+| **Full rule text** | 79 skill files in `skills/` (lazy-loaded by task) |
 | **Python code blocks** | 77 |
 | **Research sources** | 22 (12 papers, 10 projects) |
 | **Agent platforms supported** | 8+ |
@@ -309,7 +310,7 @@ This template follows its own rules. Before contributing:
 
 1. **Read Section 50.8** — AGENTS.md governs itself. Agents editing it must follow all rules herein.
 2. **Read Section 51.2** — Propose additions when you encounter a failure mode not yet covered.
-3. **Verify the structure** — All 78 sections must stay linked from the entry-point with their skill file present. Where the local tooling is present, run `python3 scripts/check_structure.py`; it checks the Section Index has 78 rows and each link resolves to a file in skills/. Without it, verify those two facts manually.
+3. **Verify the structure** — All 79 sections must stay linked from the entry-point with their skill file present. Where the local tooling is present, run `python3 scripts/check_structure.py`; it checks the Section Index has 79 rows and each link resolves to a file in skills/. Without it, verify those two facts manually.
 4. **Follow Section 33** — PRs must stay under 800 lines.
 5. **Follow Section 15** — Commit messages must be human-sounding, WHY-focused.
 6. **Follow Section 35** — Use the PR template, including the Review Assistance Notes section (review aids only — never authorship attribution, per Sections 2 and 36.5).
@@ -334,4 +335,4 @@ MIT — use it, modify it, ship it. Attribution appreciated.
 
 ---
 
-<sub>Anchor — keep your agents grounded. 78 sections. 0 filler. Built from 100+ real-world AGENTS.md files, 22 research papers, and production codebases.</sub>
+<sub>Anchor — keep your agents grounded. 79 sections. 0 filler. Built from 100+ real-world AGENTS.md files, 22 research papers, and production codebases.</sub>

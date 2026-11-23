@@ -50,6 +50,8 @@ invent values.
 - **Radius composes.** When a child sits inside a parent with a gap smaller than 32px, set
   `inner radius = outer radius − gap` (never below 2px). Equal radii on nested boxes look
   wrong at every size.
+- **Motion uses named tokens too.** Durations and easings live in the token block; ad-hoc
+  `ms` values or `cubic-bezier()` outside it are a defect, not a flourish.
 - **Adding a token is a design decision.** Add it with a name and a reason in `DESIGN.md`;
   never inline the value and call it a one-off.
 
@@ -190,6 +192,9 @@ Motion: <what moves, why, and the reduced-motion fallback>
 - A component that exists only in one screen is a pattern waiting to drift; name it or inline it.
 - For a small project, one file with two sections is enough. The point is that the values
   are written once.
+- **Seed from a real reference, then verify.** `DESIGN.md` may be initialized by extracting
+  tokens from a live URL or screenshot with a script. Record the source and date, and verify
+  the computed values rather than trusting a description of the image.
 
 ### 74.10 Prefer Deterministic Detection
 
@@ -199,7 +204,8 @@ Prose review misses what a tool catches every time. Before handing off a UI chan
 |-------|---------|--------------|
 | Token/style lint | Literal colours, unknown tokens, duplicate values | stylelint, custom grep |
 | Accessibility scan | Contrast, labels, landmarks, focus order | axe, pa11y, Lighthouse |
-| Rendered screenshots | Overflow, overlap, layout shift, empty visuals | Playwright at 390/768/1024/1440 |
+| Rendered screenshots | Overflow, overlap, layout shift, empty visuals, console errors, blank canvases | Playwright in Chromium **and WebKit** at 390/768/1024/1440 |
+| Motion behavior | `transition: all`, long timings, layout animation, missing reduced-motion | [Section 79](skills/79-design-verification-and-motion.md) audit |
 | Link check | Dead navigation and CTAs | [Section 37](skills/37-pre-commit-hook-standards.md) hooks |
 | Content check | Lorem ipsum, placeholder text, empty alts, invented numbers or names | grep / lint rule |
 
@@ -207,6 +213,8 @@ Prose review misses what a tool catches every time. Before handing off a UI chan
 - If a rule can be checked mechanically, add the check instead of another paragraph
   ([Section 52](skills/52-rule-enforcement-architecture-from-advisory-to-deterministic.md)).
 - Say what the checks cannot see: taste, hierarchy, and whether the page has a job.
+- Close the loop with [Section 79](skills/79-design-verification-and-motion.md): a contrast
+  matrix, a scored render-and-revise pass, a tells scan with locations, and a motion audit.
 
 ### 74.11 Anti-Patterns
 

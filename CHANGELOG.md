@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.0] - 2026-11-23
+
+### Added
+- **Section 79: Design Verification & Motion.** A rendered surface now has a proof step separate from building it: a contrast matrix over every role pair (text / border / decorative, solved to WCAG floors), an honest split between measured and judged claims, a render → score → revise loop bounded at three rounds, a tells scan that reports model defaults with `file:line`, a motion audit (`transition: all`, `ease-in`, `scale(0)`, layout animation, hover gating, missing reduced motion), a third-party component adaptation checklist, and identity gates that present 2–3 directions for a human to choose.
+- **The `ui` route now loads Section 79** for every interface task. It stays at 8 scoped skills by moving Section 35 to the commit phase, which already adds it.
+
+### Changed
+- **Section 74** gains motion tokens, a `DESIGN.md` seeding rule (extract tokens from a real reference, record source and date, verify computed values), and a browser check that runs Chromium **and WebKit** and reports blank canvases, console errors, overflow, and reduced-motion behavior.
+- **Benchmark coverage** — 137 scenarios, including a design review and a motion audit that exercise the new section.
+
 ## [2.8.0] - 2026-11-22
 
 ### Added
